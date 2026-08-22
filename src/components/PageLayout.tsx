@@ -329,7 +329,12 @@ export function PageLayout({
           className,
         )}
       >
-        <div className="relative mx-auto flex w-full max-w-[1240px] flex-col gap-4 pb-6 px-1 sm:px-2 md:px-0">
+        <div
+          className={cn(
+            "relative mx-auto flex w-full flex-col gap-4 pb-6 px-1 sm:px-2 md:px-0",
+            pageId === "home" ? "max-w-full h-full min-h-full flex-1" : "max-w-[1240px]"
+          )}
+        >
           {/* 2.1 TOP HEADER BAR: Tiêu đề, Popup Video, Filter, View Mode, Giao Diện Icon, Ngôn Ngữ */}
           {!shouldHideHeader && (
             <div

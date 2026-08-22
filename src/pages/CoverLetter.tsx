@@ -54,7 +54,7 @@ function PrincipleSection() {
   const { t } = useLanguageContent();
 
   return (
-    <div className="rounded-2xl border border-black/5 bg-slate-50/50 p-4 sm:p-5 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.02] flex flex-col justify-between space-y-3" id="principles-section">
+    <div className="rounded-2xl border border-black/5 bg-slate-50/50 p-4 sm:p-5 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.02] flex flex-col justify-between space-y-3 h-full" id="principles-section">
       <p className="flex items-center gap-1.5 text-left text-xs leading-relaxed font-bold text-slate-800 sm:text-[13px] dark:text-slate-200">
         <Target size={14} className="text-[#0b2853] dark:text-amber-400" />
         <span>{t.common.pillarsTitle}</span>
@@ -73,24 +73,24 @@ function PrincipleSection() {
             <div
               key={pillar.id}
               className={cn(
-                "group relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl border border-white/20 bg-gradient-to-br p-4 text-center shadow-lg backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-xl",
+                "group relative flex min-h-[175px] h-full w-full flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/25 bg-gradient-to-br p-3.5 text-center shadow-md backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
                 pillar.bgClass,
               )}
             >
-              <Icon className="absolute -right-4 -bottom-4 h-28 w-28 text-white/10 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6" />
+              <Icon className="absolute -right-4 -bottom-4 h-24 w-24 text-white/10 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6" />
               <div className="relative z-10 flex w-full flex-col items-center justify-center gap-1.5 text-white">
                 <div
                   className={cn(
-                    "mb-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+                    "mb-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-inner",
                     pillar.iconBgClass,
                   )}
                 >
                   <Icon size={18} />
                 </div>
-                <h4 className="m-0 flex items-center gap-2 text-sm font-black tracking-wide text-white uppercase">
+                <h4 className="m-0 flex items-center gap-2 text-xs sm:text-sm font-black tracking-wider text-white uppercase drop-shadow-xs">
                   {localPillar.title}
                 </h4>
-                <p className="mt-0.5 max-w-[90%] text-center text-[11px] leading-snug font-bold text-white/80">
+                <p className="mt-0.5 max-w-[95%] text-center text-[11px] leading-snug font-bold text-white/90">
                   {localPillar.desc}
                 </p>
               </div>
@@ -163,7 +163,7 @@ export function CoverLetter() {
   return (
     <PageLayout
       id="cover-letter-main-card"
-      rootClassName="main-info-card w-full max-w-full !p-[5px] rounded-[15px] sm:rounded-[20px] border border-[var(--border)] relative flex flex-1 flex-col !bg-white/50 dark:!bg-slate-900/50 transition-all duration-300"
+      rootClassName="main-info-card w-full max-w-full !p-[5px] rounded-[15px] sm:rounded-[20px] border border-[var(--border)] relative flex flex-1 flex-col !bg-transparent transition-all duration-300"
       headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !rounded-full transition-all duration-300"
       headerContainerClassName="!px-0"
       className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent"
@@ -271,9 +271,7 @@ export function CoverLetter() {
               <PrincipleSection />
 
               {/* Right Column: Bên cạnh công nghệ, tôi luôn chú trọng đào tạo đội ngũ */}
-              <div className="rounded-2xl border border-black/5 bg-slate-50/50 p-4 sm:p-5 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.02]">
-                <CoreValuesSection />
-              </div>
+              <CoreValuesSection />
             </div>
 
             {/* 4. ROW 2: ĐỊNH HƯỚNG CÔNG NGHỆ (CRM, AI) CÙNG HÀNG VỚI MONG MUỐN ĐỒNG HÀNH & CHỮ KÝ */}

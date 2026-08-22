@@ -1223,16 +1223,16 @@ export function BookEducationCard({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleCloseBook}
-              className="absolute inset-0 bg-slate-950/70 backdrop-blur-md"
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl transition-all"
             />
 
-            {/* Popup Dialog with 3D Book Opening Effect matching app-main-window-container / main.main-info-card */}
+            {/* Popup Dialog with Glassmorphic Mirror Effect */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 15 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 15 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-10 flex h-full max-h-[750px] w-full max-w-[1280px] flex-col overflow-hidden rounded-[15px] sm:rounded-[20px] border border-white/40 bg-white/95 shadow-2xl backdrop-blur-2xl dark:bg-slate-900/95 dark:border-white/15"
+              className="relative z-10 flex h-full max-h-[820px] w-full max-w-[1320px] flex-col overflow-hidden rounded-[20px] sm:rounded-[24px] border border-white/60 bg-white/95 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)] backdrop-blur-3xl dark:bg-slate-900/95 dark:border-white/20"
               style={{ perspective: "2500px" }}
             >
               <div

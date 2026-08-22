@@ -304,7 +304,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
         data-name="Nội dung giới thiệu Nguyễn Hùng Thái"
         style={{ width: "350px", height: "200px" }}
         className={cn(
-          "group magic-card relative z-30 flex w-[350px] h-[200px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-indigo-500/40 bg-[var(--card)]/95 p-3.5 text-[var(--text-primary)] shadow-[0_12px_36px_rgba(0,0,0,0.35)] backdrop-blur-2xl transition-shadow duration-300 hover:shadow-indigo-500/20",
+          "group magic-card glass-card relative z-30 flex w-[350px] h-[200px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] !p-[15px] !m-0 text-[var(--text-primary)] shadow-xl backdrop-blur-2xl transition-all duration-300 hover:border-indigo-500/40 hover:shadow-2xl",
           isMobilePos ? "max-w-[calc(100vw-32px)]" : ""
         )}
       >
@@ -323,7 +323,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
               <span className="text-[10px] font-black tracking-widest text-[var(--muted)] uppercase">
                 {language === "vi" ? "Xin chào! Tôi là" : "Hello! I am"}
               </span>
-              <span className="truncate bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-sm font-black text-transparent dark:from-indigo-400 dark:to-purple-400">
+              <span className="truncate bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-[25px] font-black leading-tight text-transparent dark:from-indigo-400 dark:to-purple-400">
                 Nguyễn Hùng Thái
               </span>
             </div>
@@ -532,10 +532,10 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
   return (
     <PageLayout
       id="home-main-card"
-      rootClassName="w-full max-w-full !p-[5px] rounded-[15px] sm:rounded-[20px] border border-[var(--border)] relative flex flex-1 flex-col !bg-white/80 dark:!bg-slate-950/80 shadow-lg backdrop-blur-2xl transition-all duration-300"
+      rootClassName="w-full max-w-full h-full min-h-full !p-[5px] rounded-[15px] sm:rounded-[20px] border border-[var(--border)] relative flex flex-1 flex-col !bg-white/80 dark:!bg-slate-950/80 shadow-lg backdrop-blur-2xl transition-all duration-300"
       headerClassName="glass-header !py-2 sm:!py-3 md:!py-4 !mb-0 !rounded-full transition-all duration-300"
       headerContainerClassName="!px-0"
-      className="no-scrollbar custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent text-slate-900 dark:text-slate-100"
+      className="no-scrollbar custom-scrollbar !h-full !min-h-full w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent text-slate-900 dark:text-slate-100 flex flex-col"
       pageId="home"
       pageName="Home Main Card"
       title={
@@ -732,7 +732,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
           <AnimatePresence mode="wait">
             {!hideMainUI && !isTransitioning && !isIntro && renderSpeechBubble(isMobile)}
 
-            {/* Right Side: "Hủy" Button (when Video is playing) */}
+            {/* Right Side: Stop/Cancel Intro Button matching Interview Video style */}
             {isIntro && (
               <motion.div
                 key="cancel"
@@ -740,56 +740,75 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
-                className="pointer-events-auto mb-1 flex shrink-0 items-center self-end"
+                className="pointer-events-auto flex shrink-0 items-center self-end"
               >
-                <div className="group flex items-center rounded-[10px] border border-rose-500/50 bg-rose-950/90 p-1.5 text-white shadow-[0_8px_30px_rgba(225,29,72,0.3)] backdrop-blur-2xl transition-all hover:scale-105 hover:border-rose-400 active:scale-98">
-                  {/* Audio Toggle */}
-                  <button
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.95 }}
+                  id="cancel-intro-video-btn"
+                  data-name="Nút hủy video đang phát (Cancel Intro Video Button)"
+                  type="button"
+                  onClick={handleCancelIntro}
+                  className="flex w-[281px] h-[51px] cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-indigo-400/80 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_0_25px_rgba(99,102,241,0.6)] backdrop-blur-md transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
+                  style={{ width: "281px", height: "51px" }}
+                  title={language === "vi" ? "Dừng video giới thiệu" : "Stop Intro Video"}
+                >
+                  <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-md">
+                    <Pause size={14} className="fill-indigo-600" />
+                  </div>
+                  <span>
+                    {language === "vi" ? "Dừng video giới thiệu" : "Stop Intro Video"}
+                  </span>
+
+                  {/* Integrated Divider and Audio Button */}
+                  <div className="mx-1 h-4 w-px shrink-0 bg-white/20" />
+
+                  <div
+                    role="button"
+                    tabIndex={0}
                     id="toggle-video-sound-btn"
                     data-name="Nút bật/tắt âm thanh video (Video Sound Toggle Button)"
-                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       playUiSound("click");
-                      setIsVideoAudioOn(!isVideoAudioOn);
+                      const nextAudio = !isVideoAudioOn;
+                      setIsVideoAudioOn(nextAudio);
+                      if (videoRef.current) {
+                        videoRef.current.muted = !nextAudio;
+                      }
                     }}
-                    className={cn(
-                      "mr-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl transition-colors",
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.stopPropagation();
+                        playUiSound("click");
+                        const nextAudio = !isVideoAudioOn;
+                        setIsVideoAudioOn(nextAudio);
+                        if (videoRef.current) {
+                          videoRef.current.muted = !nextAudio;
+                        }
+                      }
+                    }}
+                    title={
                       isVideoAudioOn
-                        ? "border border-rose-400/40 bg-rose-500/30 text-rose-200"
-                        : "bg-slate-900/80 text-slate-400 hover:text-white",
+                        ? language === "vi"
+                          ? "Tắt âm thanh"
+                          : "Mute Audio"
+                        : language === "vi"
+                          ? "Bật âm thanh"
+                          : "Unmute Audio"
+                    }
+                    className={cn(
+                      "flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition-all text-white hover:bg-white/10 active:scale-90",
+                      isVideoAudioOn ? "bg-white/15" : "bg-rose-500/80"
                     )}
-                    title={isVideoAudioOn ? "Tắt âm thanh" : "Bật âm thanh"}
                   >
                     {isVideoAudioOn ? (
-                      <Volume2
-                        size={18}
-                        className="animate-pulse text-rose-200"
-                      />
+                      <Volume2 size={13} className="animate-pulse" />
                     ) : (
-                      <VolumeX size={18} />
+                      <VolumeX size={13} />
                     )}
-                  </button>
-
-                  <div className="mr-2 h-6 w-[1px] bg-white/20" />
-
-                  {/* Cancel Button */}
-                  <button
-                    id="cancel-intro-video-btn"
-                    data-name="Nút hủy video đang phát (Cancel Intro Video Button)"
-                    type="button"
-                    onClick={handleCancelIntro}
-                    className="flex cursor-pointer items-center gap-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-500 px-4 py-2.5 text-sm font-black text-white shadow-md transition-all hover:from-rose-500 hover:to-red-400 sm:text-base"
-                  >
-                    <div className="rounded-lg bg-white/20 p-1 text-white">
-                      <X
-                        size={18}
-                        className="transition-transform group-hover:rotate-90"
-                      />
-                    </div>
-                    <span>{language === "vi" ? "Hủy" : "Cancel"}</span>
-                  </button>
-                </div>
+                  </div>
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>

@@ -1361,7 +1361,7 @@ export function Education() {
           </div>
         </div>
       }
-      filterOptions={filterOptions}
+      filterOptions={[]}
       activeFilter={selectedCategory}
       onFilterChange={setSelectedCategory}
     >

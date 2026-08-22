@@ -1835,6 +1835,8 @@ div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section:nth
   padding-right: 16px;
   padding-bottom: 16px;
   padding-top: 16px;
+  background: transparent !important;
+  background-color: transparent !important;
 }
 div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section#app-main-window-container:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div#cover-letter-main-card:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1),
 div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div#cover-letter-main-card:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) {
@@ -2936,6 +2938,26 @@ body, h1, h2, h3, h4, h5, h6, p, span, div {
   overflow: hidden !important;
 }
 
+#home-main-card > main,
+#home-main-card > main > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  flex: 1 1 auto !important;
+}
+
+/* Intro speech bubble styles from focus mode */
+div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section#app-main-window-container:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div#home-main-card:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div#intro-speech-bubble:nth-of-type(1),
+#intro-speech-bubble {
+  margin: 0px !important;
+  padding: 15px !important;
+}
+
+div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section#app-main-window-container:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div#home-main-card:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div#intro-speech-bubble:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2) {
+  font-size: 25px !important;
+}
+
 
 /* Opacity Configuration Classes */
 .bg-app-container {
@@ -3561,5 +3583,22 @@ div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section#app
 }
 .dark .glass-l1 {
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Focus Mode CSS Customizations for Education Card Elements */
+div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section#app-main-window-container:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div#education-main-card:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div#education-main-card:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1) {
+  padding-top: 0px !important;
+  padding-left: 0px !important;
+}
+
+div#root:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(2) > section#app-main-window-container:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div#education-main-card:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div#education-main-card:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) {
+  padding-top: 4px !important;
+  margin-left: 0px !important;
+  margin-right: 10px !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 4px !important;
+  padding-right: 10px !important;
+  padding-left: 10px !important;
 }
 

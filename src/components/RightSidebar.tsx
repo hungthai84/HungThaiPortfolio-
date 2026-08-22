@@ -254,7 +254,7 @@ interface RightSidebarProps {
 export function GlassAnimatedWeatherIcon({
   code = 0,
   isDay = true,
-  size = 50,
+  size = 64,
 }: {
   code?: number;
   isDay?: boolean;
@@ -267,32 +267,26 @@ export function GlassAnimatedWeatherIcon({
   const isFog = code >= 45 && code <= 48;
   const isSnow = (code >= 71 && code <= 77) || code === 85 || code === 86;
 
-  // Let's decide which of the 6 precise scenes from the user's attachment to render:
-  // Scene 1: Night cloudy with crescent moon
-  // Scene 2: Thunderstorm with lightning
-  // Scene 3: Day partly cloudy / sunny
-  // Scene 4: Light Rain with glowing purple raindrops
-  // Scene 5: Heavy single raindrop
-  // Scene 6: Snow / snowflake
-  
   const renderIconContent = () => {
     if (!isDay && (isClear || isCloudy || isFog)) {
       // SCENE 1: Night cloudy / crescent moon
       return (
-        <g>
-          {/* Crescent Moon */}
+        <g filter="url(#dropShadow)">
+          {/* Glowing Crescent Moon */}
           <path
-            d="M52 25 C52 25 32 28 32 48 C32 64 45 74 62 72 C48 76 38 64 38 50 C38 36 46 28 52 25 Z"
+            d="M52 22 C52 22 30 26 30 48 C30 66 45 76 64 73 C48 78 36 64 36 48 C36 33 46 25 52 22 Z"
             fill="url(#moonGrad)"
+            stroke="#FFB300"
+            strokeWidth="1.2"
             filter="url(#glow)"
             className="animate-[pulse_3s_ease-in-out_infinite]"
           />
-          {/* Frosted Glass Cloud */}
+          {/* Frosted Glass Cloud with high visibility */}
           <path
             d="M25 60 C25 51.7 31.7 45 40 45 C41.2 45 42.4 45.1 43.5 45.4 C47.5 39.5 54.3 35.6 62 35.6 C72.5 35.6 81.3 42.6 83.7 52.1 C84.7 51.8 85.8 51.6 87 51.6 C94.2 51.6 100 57.4 100 64.6 C100 71.8 94.2 77.6 87 77.6 L40 77.6 C31.7 77.6 25 70.9 25 62.6 Z"
             fill="url(#glassGrad)"
             stroke="url(#glassBorder)"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             className="backdrop-blur-[4px] animate-[pulse_4s_ease-in-out_infinite]"
           />
         </g>
@@ -302,11 +296,13 @@ export function GlassAnimatedWeatherIcon({
     if (isThunder) {
       // SCENE 2: Thunderstorm with lightning
       return (
-        <g>
+        <g filter="url(#dropShadow)">
           {/* Glowing Lightning Bolt */}
           <path
             d="M48 45 L62 45 L48 68 L62 68 L36 94 L48 70 L36 70 Z"
             fill="url(#lightningGrad)"
+            stroke="#FFE500"
+            strokeWidth="1"
             filter="url(#glow)"
             className="animate-pulse"
           />
@@ -315,7 +311,7 @@ export function GlassAnimatedWeatherIcon({
             d="M20 52 C20 43.7 26.7 37 35 37 C36.2 37 37.4 37.1 38.5 37.4 C42.5 31.5 49.3 27.6 57 27.6 C67.5 27.6 76.3 34.6 78.7 44.1 C79.7 43.8 80.8 43.6 82 43.6 C89.2 43.6 95 49.4 95 56.6 C95 63.8 89.2 69.6 82 69.6 L35 69.6 C26.7 69.6 20 62.9 20 54.6 Z"
             fill="url(#thunderCloudGrad)"
             stroke="url(#glassBorder)"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             className="backdrop-blur-[4px]"
           />
         </g>
@@ -325,31 +321,31 @@ export function GlassAnimatedWeatherIcon({
     if (isDay && (isClear || isCloudy || isFog)) {
       // SCENE 3: Day partly cloudy / sunny
       return (
-        <g>
+        <g filter="url(#dropShadow)">
           {/* Glowing Sun with Sunrays */}
-          <g className="animate-[spin_40s_linear_infinite]" transform="translate(58, 38)">
-            <circle cx="0" cy="0" r="16" fill="url(#sunGrad)" filter="url(#glow)" />
+          <g className="animate-[spin_40s_linear_infinite]" transform="translate(60, 36)">
+            <circle cx="0" cy="0" r="18" fill="url(#sunGrad)" filter="url(#glow)" stroke="#FF8F00" strokeWidth="1.5" />
             {/* Sun Rays */}
             {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
               <line
                 key={angle}
                 x1="0"
-                y1="-20"
+                y1="-22"
                 x2="0"
-                y2="-26"
-                stroke="#FFAB40"
-                strokeWidth="3.5"
+                y2="-29"
+                stroke="#FF8F00"
+                strokeWidth="4"
                 strokeLinecap="round"
                 transform={`rotate(${angle})`}
               />
             ))}
           </g>
-          {/* Frosted Glass Cloud */}
+          {/* Frosted Glass Cloud with High Clarity */}
           <path
             d="M18 58 C18 49.7 24.7 43 33 43 C34.2 43 35.4 43.1 36.5 43.4 C40.5 37.5 47.3 33.6 55 33.6 C65.5 33.6 74.3 40.6 76.7 50.1 C77.7 49.8 78.8 49.6 80 49.6 C87.2 49.6 93 55.4 93 62.6 C93 69.8 87.2 75.6 80 75.6 L33 75.6 C24.7 75.6 18 68.9 18 60.6 Z"
             fill="url(#glassGrad)"
             stroke="url(#glassBorder)"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             className="backdrop-blur-[4px] animate-[pulse_5s_ease-in-out_infinite]"
           />
         </g>
@@ -357,15 +353,15 @@ export function GlassAnimatedWeatherIcon({
     }
 
     if (isRain && code >= 60) {
-      // SCENE 4: Heavy Rain with purple neon raindrops
+      // SCENE 4: Heavy Rain with glowing cyan/purple rain streaks
       return (
-        <g>
-          {/* Glowing neon purple rain streaks */}
+        <g filter="url(#dropShadow)">
+          {/* Glowing rain streaks */}
           {[
-            { x1: 34, y1: 65, x2: 28, y2: 82 },
-            { x1: 48, y1: 68, x2: 42, y2: 85 },
-            { x1: 62, y1: 65, x2: 56, y2: 82 },
-            { x1: 76, y1: 68, x2: 70, y2: 85 }
+            { x1: 34, y1: 65, x2: 28, y2: 84 },
+            { x1: 48, y1: 68, x2: 42, y2: 87 },
+            { x1: 62, y1: 65, x2: 56, y2: 84 },
+            { x1: 76, y1: 68, x2: 70, y2: 87 }
           ].map((line, idx) => (
             <line
               key={idx}
@@ -373,8 +369,8 @@ export function GlassAnimatedWeatherIcon({
               y1={line.y1}
               x2={line.x2}
               y2={line.y2}
-              stroke="#E040FB"
-              strokeWidth="3"
+              stroke="#00E5FF"
+              strokeWidth="3.5"
               strokeLinecap="round"
               filter="url(#glow)"
               className="animate-pulse"
@@ -386,7 +382,7 @@ export function GlassAnimatedWeatherIcon({
             d="M20 54 C20 45.7 26.7 39 35 39 C36.2 39 37.4 39.1 38.5 39.4 C42.5 33.5 49.3 29.6 57 29.6 C67.5 29.6 76.3 36.6 78.7 46.1 C79.7 45.8 80.8 45.6 82 45.6 C89.2 45.6 95 51.4 95 58.6 C95 65.8 89.2 71.6 82 71.6 L35 71.6 C26.7 71.6 20 64.9 20 56.6 Z"
             fill="url(#glassGrad)"
             stroke="url(#glassBorder)"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             className="backdrop-blur-[4px]"
           />
         </g>
@@ -394,13 +390,15 @@ export function GlassAnimatedWeatherIcon({
     }
 
     if (isRain) {
-      // SCENE 5: Standard Rain - Heavy single raindrop
+      // SCENE 5: Standard Rain - Glossy blue raindrop
       return (
-        <g>
+        <g filter="url(#dropShadow)">
           {/* Big Glossy blue raindrop */}
           <path
             d="M50 42 C50 42 64 62 64 74 C64 82 58 88 50 88 C42 88 36 82 36 74 C36 62 50 42 50 42 Z"
             fill="url(#rainGrad)"
+            stroke="#0284C7"
+            strokeWidth="1.5"
             filter="url(#glow)"
             className="animate-bounce"
           />
@@ -409,7 +407,7 @@ export function GlassAnimatedWeatherIcon({
             d="M20 48 C20 39.7 26.7 33 35 33 C36.2 33 37.4 33.1 38.5 33.4 C42.5 27.5 49.3 23.6 57 23.6 C67.5 23.6 76.3 30.6 78.7 40.1 C79.7 39.8 80.8 39.6 82 39.6 C89.2 39.6 95 45.4 95 52.6 C95 59.8 89.2 65.6 82 65.6 L35 65.6 C26.7 65.6 20 58.9 20 50.6 Z"
             fill="url(#glassGrad)"
             stroke="url(#glassBorder)"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             className="backdrop-blur-[4px]"
           />
         </g>
@@ -419,13 +417,13 @@ export function GlassAnimatedWeatherIcon({
     if (isSnow) {
       // SCENE 6: Snow / Snowflake
       return (
-        <g>
+        <g filter="url(#dropShadow)">
           {/* Rotating Glowing Snowflake */}
           <g className="animate-[spin_20s_linear_infinite]" transform="translate(50, 72)">
             {[0, 60, 120, 180, 240, 300].map((angle) => (
               <g key={angle} transform={`rotate(${angle})`}>
-                <line x1="0" y1="0" x2="0" y2="-14" stroke="url(#snowGrad)" strokeWidth="2.5" filter="url(#glow)" />
-                <path d="M-4 -8 L0 -12 L4 -8" fill="none" stroke="url(#snowGrad)" strokeWidth="2" />
+                <line x1="0" y1="0" x2="0" y2="-14" stroke="url(#snowGrad)" strokeWidth="3" filter="url(#glow)" />
+                <path d="M-4 -8 L0 -12 L4 -8" fill="none" stroke="url(#snowGrad)" strokeWidth="2.5" />
               </g>
             ))}
           </g>
@@ -434,7 +432,7 @@ export function GlassAnimatedWeatherIcon({
             d="M20 44 C20 35.7 26.7 29 35 29 C36.2 29 37.4 29.1 38.5 29.4 C42.5 23.5 49.3 19.6 57 19.6 C67.5 19.6 76.3 26.6 78.7 36.1 C79.7 35.8 80.8 35.6 82 35.6 C89.2 35.6 95 41.4 95 48.6 C95 55.8 89.2 61.6 82 61.6 L35 61.6 C26.7 61.6 20 54.9 20 46.6 Z"
             fill="url(#glassGrad)"
             stroke="url(#glassBorder)"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             className="backdrop-blur-[4px]"
           />
         </g>
@@ -443,11 +441,11 @@ export function GlassAnimatedWeatherIcon({
 
     // Default Fallback: Classic Cloudy scene
     return (
-      <g>
+      <g filter="url(#dropShadow)">
         {/* Secondary back cloud */}
         <path
           d="M38 52 C38 45.4 43.4 40 50 40 C51 40 51.9 40.1 52.8 40.4 C56 35.7 61.4 32.5 67.5 32.5 C75.9 32.5 82.9 38.1 84.8 45.7 C85.6 45.5 86.5 45.3 87.4 45.3 C93.2 45.3 97.9 50 97.9 55.8 C97.9 61.6 93.2 66.3 87.4 66.3 L50 66.3 C43.4 66.3 38 60.9 38 54.3 Z"
-          fill="rgba(148, 163, 184, 0.5)"
+          fill="rgba(148, 163, 184, 0.7)"
           className="animate-[pulse_6s_ease-in-out_infinite]"
         />
         {/* Main Frosted Glass Cloud */}
@@ -455,47 +453,21 @@ export function GlassAnimatedWeatherIcon({
           d="M18 58 C18 49.7 24.7 43 33 43 C34.2 43 35.4 43.1 36.5 43.4 C40.5 37.5 47.3 33.6 55 33.6 C65.5 33.6 74.3 40.6 76.7 50.1 C77.7 49.8 78.8 49.6 80 49.6 C87.2 49.6 93 55.4 93 62.6 C93 69.8 87.2 75.6 80 75.6 L33 75.6 C24.7 75.6 18 68.9 18 60.6 Z"
           fill="url(#glassGrad)"
           stroke="url(#glassBorder)"
-          strokeWidth="1.5"
+          strokeWidth="2.5"
           className="backdrop-blur-[4px] animate-[pulse_4s_ease-in-out_infinite]"
         />
       </g>
     );
   };
 
-  const getTheme = () => {
-    if (isThunder) return {
-      glow: "from-amber-500/30 via-purple-600/20 to-indigo-900/40",
-      border: "border-amber-400/50 dark:border-amber-300/30",
-    };
-    if (isSnow) return {
-      glow: "from-cyan-300/30 via-sky-400/20 to-blue-600/30",
-      border: "border-cyan-200/50 dark:border-cyan-400/30",
-    };
-    if (isRain) return {
-      glow: "from-sky-400/30 via-blue-500/20 to-indigo-600/30",
-      border: "border-sky-300/50 dark:border-sky-400/30",
-    };
-    if (!isDay) return {
-      glow: "from-indigo-500/30 via-purple-600/20 to-slate-900/40",
-      border: "border-indigo-300/50 dark:border-indigo-400/30",
-    };
-    if (isClear) return {
-      glow: "from-amber-400/40 via-orange-400/20 to-yellow-300/30",
-      border: "border-amber-300/50 dark:border-amber-400/30",
-    };
-    return {
-      glow: "from-sky-300/30 via-slate-400/20 to-indigo-400/20",
-      border: "border-white/50 dark:border-white/30",
-    };
-  };
-
-  const theme = getTheme();
-
   return (
     <div
-      className="group/weather-icon relative flex items-center justify-center select-none"
+      className="group/weather-icon relative flex items-center justify-center select-none transition-all duration-300 group-hover/weather:scale-110"
       style={{ width: size, height: size }}
     >
+      {/* Background aura badge for high contrast */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-sky-400/20 via-indigo-500/10 to-amber-400/20 opacity-80 blur-[2px] transition-all group-hover/weather:opacity-100" />
+
       {/* SVG Canvas representing high fidelity glassmorphism vectors */}
       <svg
         width="100%"
@@ -503,55 +475,65 @@ export function GlassAnimatedWeatherIcon({
         viewBox="0 0 120 120"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="relative z-10 drop-shadow-md"
+        className="relative z-10 filter drop-shadow-lg"
       >
         <defs>
           {/* Intense glow blur filter */}
-          <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
-            <feGaussianBlur stdDeviation="6" result="blur" />
+          <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
 
-          {/* Color Gradients */}
+          {/* High contrast drop shadow filter */}
+          <filter id="dropShadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#0f172a" floodOpacity="0.4" />
+          </filter>
+
+          {/* High Contrast Color Gradients */}
           <linearGradient id="sunGrad" x1="42" y1="22" x2="74" y2="54" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFA726" />
-            <stop offset="100%" stopColor="#FB8C00" />
+            <stop offset="0%" stopColor="#FFF176" />
+            <stop offset="50%" stopColor="#FFB300" />
+            <stop offset="100%" stopColor="#FF6D00" />
           </linearGradient>
 
-          <linearGradient id="moonGrad" x1="32" y1="25" x2="62" y2="72" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#00E5FF" />
-            <stop offset="50%" stopColor="#2979FF" />
-            <stop offset="100%" stopColor="#AA00FF" />
+          <linearGradient id="moonGrad" x1="30" y1="22" x2="64" y2="73" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#FFF59D" />
+            <stop offset="50%" stopColor="#FFC107" />
+            <stop offset="100%" stopColor="#FF8F00" />
           </linearGradient>
 
           <linearGradient id="lightningGrad" x1="40" y1="45" x2="55" y2="85" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFEE58" />
+            <stop offset="0%" stopColor="#FFF59D" />
+            <stop offset="50%" stopColor="#FFEE58" />
             <stop offset="100%" stopColor="#F57F17" />
           </linearGradient>
 
           <linearGradient id="rainGrad" x1="36" y1="42" x2="64" y2="88" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#4FC3F7" />
-            <stop offset="100%" stopColor="#0288D1" />
+            <stop offset="0%" stopColor="#38BDF8" />
+            <stop offset="100%" stopColor="#0284C7" />
           </linearGradient>
 
           <linearGradient id="snowGrad" x1="40" y1="58" x2="60" y2="86" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stopColor="#E0F7FA" />
-            <stop offset="100%" stopColor="#00E5FF" />
+            <stop offset="100%" stopColor="#38BDF8" />
           </linearGradient>
 
+          {/* Vibrant high-contrast frosted glass cloud gradient */}
           <linearGradient id="glassGrad" x1="20" y1="30" x2="100" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="white" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="white" stopOpacity="0.10" />
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
+            <stop offset="45%" stopColor="#F0F9FF" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#BAE6FD" stopOpacity="0.75" />
           </linearGradient>
 
           <linearGradient id="thunderCloudGrad" x1="20" y1="30" x2="100" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#475569" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#1e293b" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#64748B" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#1E293B" stopOpacity="0.8" />
           </linearGradient>
 
           <linearGradient id="glassBorder" x1="20" y1="30" x2="100" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="white" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="white" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.9" />
+            <stop offset="50%" stopColor="#FFFFFF" stopOpacity="1" />
+            <stop offset="100%" stopColor="#0284C7" stopOpacity="0.8" />
           </linearGradient>
         </defs>
 
@@ -1711,13 +1693,11 @@ export function RightSidebar({
               style={{ fontFamily: "'Play', sans-serif" }}
             >
               {/* Icon thời tiết Glass - Nâng cấp phong cách Glassmorphism động */}
-              <div className="relative flex items-center justify-center p-2 transition-all duration-300 group-hover/weather:scale-110">
-                <GlassAnimatedWeatherIcon
-                  code={weather?.code ?? 0}
-                  isDay={time.getHours() >= 6 && time.getHours() < 18}
-                  size={48}
-                />
-              </div>
+              <GlassAnimatedWeatherIcon
+                code={weather?.code ?? 0}
+                isDay={time.getHours() >= 6 && time.getHours() < 18}
+                size={60}
+              />
 
               {/* 4. Nhiệt độ - Font Google Play */}
               <div

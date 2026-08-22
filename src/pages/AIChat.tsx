@@ -444,9 +444,70 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
     return saved !== null ? saved === "true" : true;
   });
 
+  // Robot Voice States
+  const [robotVoiceEnabled, setRobotVoiceEnabled] = useState(() => {
+    const saved = localStorage.getItem("app_ai_robot_voice_enabled");
+    return saved !== null ? saved === "true" : true;
+  });
+  const [robotPitch, setRobotPitch] = useState(() => {
+    const saved = localStorage.getItem("app_ai_robot_pitch");
+    return saved ? parseFloat(saved) : 0.3;
+  });
+  const [robotRate, setRobotRate] = useState(() => {
+    const saved = localStorage.getItem("app_ai_robot_rate");
+    return saved ? parseFloat(saved) : 0.9;
+  });
+
   useEffect(() => {
     localStorage.setItem("app_ai_chat_autospeak", String(autoSpeak));
   }, [autoSpeak]);
+
+  useEffect(() => {
+    localStorage.setItem("app_ai_robot_voice_enabled", String(robotVoiceEnabled));
+  }, [robotVoiceEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem("app_ai_robot_pitch", String(robotPitch));
+  }, [robotPitch]);
+
+  useEffect(() => {
+    localStorage.setItem("app_ai_robot_rate", String(robotRate));
+  }, [robotRate]);
+
+  const testRobotVoice = () => {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+
+    const testText = language === "en"
+      ? "Robot voice system activated. Speech synthesis operating normally."
+      : "Hệ thống giọng nói Robot đã được kích hoạt. Trí Nhân AI sẵn sàng phục vụ.";
+
+    const utterance = new SpeechSynthesisUtterance(testText);
+    utterance.lang = language === "en" ? "en-US" : "vi-VN";
+
+    if (robotVoiceEnabled) {
+      utterance.pitch = robotPitch;
+      utterance.rate = robotRate;
+    } else {
+      utterance.pitch = 0.95;
+      utterance.rate = 1.0;
+    }
+
+    const voiceVi = localStorage.getItem("app_ai_voice_vi") || "";
+    const voiceEn = localStorage.getItem("app_ai_voice_en") || "";
+    const targetVoiceUri = language === "en" ? voiceEn : voiceVi;
+
+    const voices = window.speechSynthesis.getVoices();
+    let targetVoice = voices.find((v) => v.voiceURI === targetVoiceUri);
+    if (!targetVoice) {
+      targetVoice = language === "en"
+        ? getDefaultEnglishVoice(voices)
+        : getDefaultVietnameseVoice(voices);
+    }
+    if (targetVoice) utterance.voice = targetVoice;
+
+    window.speechSynthesis.speak(utterance);
+  };
 
   const [showSavedPresets, setShowSavedPresets] = useState(false);
   const [showQuestionCategoriesDropdown, setShowQuestionCategoriesDropdown] = useState(false);
@@ -744,8 +805,14 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
 
           const isEnText = language === "en";
           utterance.lang = isEnText ? "en-US" : "vi-VN";
-          utterance.rate = 1.0;
-          utterance.pitch = 0.95;
+
+          if (robotVoiceEnabled) {
+            utterance.pitch = robotPitch;
+            utterance.rate = robotRate;
+          } else {
+            utterance.rate = 1.0;
+            utterance.pitch = 0.95;
+          }
 
           const voiceVi = localStorage.getItem("app_ai_voice_vi") || "";
           const voiceEn = localStorage.getItem("app_ai_voice_en") || "";
@@ -952,7 +1019,7 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
                     <User size={16} />
                   ) : (
                     <img
-                      src="https://i.ibb.co/x8Spz9Qm/Avata-AI-POW.gif"
+                      src="https://i.ibb.co/S4Ddv53M/Avata-Chu-t-Tr-Nh-n.gif"
                       alt="Trí Nhân"
                       className="h-full w-full rounded-[10px] object-cover"
                     />
@@ -1059,7 +1126,7 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
                 <div className="absolute -inset-1 animate-pulse rounded-[10px] bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 opacity-80 blur-xs" />
                 <div className="relative z-10 flex h-8 w-8 items-center justify-center overflow-hidden rounded-[10px] border border-purple-400/50 bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 text-white shadow-md">
                   <img
-                    src="https://i.ibb.co/x8Spz9Qm/Avata-AI-POW.gif"
+                    src="https://i.ibb.co/S4Ddv53M/Avata-Chu-t-Tr-Nh-n.gif"
                     alt="Trí Nhân"
                     className="h-full w-full rounded-[10px] object-cover"
                   />
@@ -1474,7 +1541,7 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
             >
               <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-indigo-300/80 shadow-xs">
                 <img
-                  src="https://i.ibb.co/x8Spz9Qm/Avata-AI-POW.gif"
+                  src="https://i.ibb.co/S4Ddv53M/Avata-Chu-t-Tr-Nh-n.gif"
                   alt="Trí Nhân"
                   className="h-full w-full object-cover"
                 />
@@ -1511,19 +1578,22 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
             exit={{ opacity: 0, scale: 0.92, y: 15 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className={cn(
-              "relative flex w-full flex-col shadow-[0_12px_48px_0_rgba(31,38,135,0.15)] transition-all duration-300 pointer-events-auto rounded-[24px]",
+              "relative flex w-full flex-col backdrop-blur-3xl border border-white/80 dark:border-white/20 shadow-[0_20px_60px_-15px_rgba(31,38,135,0.3)] bg-gradient-to-b from-white/70 via-white/50 to-white/40 dark:from-slate-900/85 dark:via-slate-900/75 dark:to-slate-900/65 rounded-[28px] overflow-hidden transition-all duration-300 pointer-events-auto",
               isMaximized
                 ? "h-[100dvh] w-[100vw] max-w-none rounded-none border-none bg-white dark:bg-[#1A1A24]"
-                : "h-[85vh] max-h-[700px] w-[90vw] max-w-[400px] bg-[#E1E5F1] dark:bg-slate-800",
+                : "h-[85vh] max-h-[720px] w-[90vw] max-w-[420px]",
             )}
           >
-            {/* POPUP HEADER BAR - Widget Style */}
-            <div className="relative flex w-full shrink-0 items-start justify-between px-5 pt-6 pb-6">
+            {/* Mirror Glass Reflection Highlight */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/10 to-transparent pointer-events-none z-0" />
+
+            {/* POPUP HEADER BAR - Glass Mirror Style */}
+            <div className="relative flex w-full shrink-0 items-start justify-between px-5 pt-6 pb-6 bg-white/40 dark:bg-slate-800/40 backdrop-blur-2xl border-b border-white/60 dark:border-white/10 z-10">
               <div className="absolute left-4 bottom-[-14px] z-20 h-[105px] w-[95px]">
                 <img
-                  src="https://i.ibb.co/x8Spz9Qm/Avata-AI-POW.gif"
+                  src="https://i.ibb.co/S4Ddv53M/Avata-Chu-t-Tr-Nh-n.gif"
                   alt="Trí Nhân"
-                  className="h-full w-full object-cover object-top drop-shadow-md rounded-b-[40px] pointer-events-none"
+                  className="h-full w-full object-cover object-top drop-shadow-lg rounded-b-[40px] pointer-events-none"
                 />
               </div>
 
@@ -1542,18 +1612,29 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
                   </p>
                 </div>
                 
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-[10px] bg-white text-slate-800 shadow-sm transition-colors hover:bg-slate-50 active:scale-95 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600"
-                >
-                  <X size={20} strokeWidth={2.5} />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsMinimized(true)}
+                    className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-[10px] bg-white/80 dark:bg-slate-700/80 text-slate-800 dark:text-white shadow-xs backdrop-blur-md transition-colors hover:bg-white active:scale-95"
+                    title={language === "en" ? "Minimize" : "Thu nhỏ"}
+                  >
+                    <Minus size={18} strokeWidth={2.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-[10px] bg-white/80 dark:bg-slate-700/80 text-slate-800 dark:text-white shadow-xs backdrop-blur-md transition-colors hover:bg-white active:scale-95"
+                    title={language === "en" ? "Close" : "Đóng"}
+                  >
+                    <X size={20} strokeWidth={2.5} />
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* MAIN CONTENT AREA */}
-            <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col rounded-t-[24px] bg-[#F4F6F9] dark:bg-slate-900 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col rounded-t-[28px] bg-white/35 dark:bg-slate-900/45 backdrop-blur-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.04)] overflow-hidden">
               {activeWidgetTab === "questions" ? (
                 /* Question List View */
                 <div className="no-scrollbar flex min-h-0 w-full flex-1 flex-col overflow-y-auto p-4 bg-[#F4F6F9] dark:bg-slate-900">
@@ -1662,43 +1743,243 @@ export function AIChat({ isPopup = false, onClose }: AIChatProps = {}) {
                   </div>
                 </div>
               ) : activeWidgetTab === "voice" ? (
-                /* Voice View */
-                <div className="flex flex-1 flex-col items-center justify-center p-6 text-center bg-[#F4F6F9] dark:bg-slate-900">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1A1F4C] text-white shadow-lg mb-3 animate-pulse">
-                    <Volume2 size={26} />
+                /* Voice View - Glass Robot Audio Controls */
+                <div className="no-scrollbar flex min-h-0 w-full flex-1 flex-col overflow-y-auto p-4 sm:p-5 bg-white/30 dark:bg-slate-900/40 backdrop-blur-xl">
+                  <div className="flex flex-col items-center justify-center text-center mb-3.5">
+                    <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg mb-2">
+                      <Cpu size={28} className="animate-pulse" />
+                      <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-purple-500 border-2 border-white dark:border-slate-900"></span>
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-extrabold text-[#1A1F4C] dark:text-white flex items-center gap-1.5">
+                      <span>{language === "vi" ? "Cấu hình Giọng nói Robot AI" : "AI Robot Voice Settings"}</span>
+                    </h4>
+                    <p className="text-[11px] text-[#4A5578] dark:text-slate-300 mt-0.5">
+                      {language === "vi"
+                        ? "Tùy chỉnh cao độ, tần số & tốc độ âm thanh Robot máy móc"
+                        : "Customize pitch, frequency & speed parameters for robotic voice sound"}
+                    </p>
                   </div>
-                  <h4 className="text-sm font-bold text-[#1A1F4C] dark:text-white mb-1">
-                    {language === "vi" ? "Chế độ đọc giọng nói AI" : "AI Voice Mode"}
-                  </h4>
-                  <p className="text-[11px] text-[#4A5578] dark:text-slate-400 mb-5 max-w-[240px]">
-                    {language === "vi"
-                      ? "Trí Nhân sẽ tự động thuyết minh câu trả lời bằng giọng nói tiếng Việt tự nhiên."
-                      : "Trí Nhân auto-reads answers using natural speech synthesis."}
-                  </p>
 
+                  {/* Toggle Controls */}
+                  <div className="space-y-2.5 mb-3.5">
+                    {/* Auto Speak Toggle */}
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-white/70 dark:bg-slate-800/70 border border-white/80 dark:border-white/10 backdrop-blur-md shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                          <Volume2 size={18} />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-xs font-bold text-[#1A1F4C] dark:text-white">
+                            {language === "vi" ? "Tự động đọc tin nhắn" : "Auto Read Answers"}
+                          </div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                            {language === "vi" ? "Đọc tự động khi có câu trả lời" : "Speak when answer arrives"}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setAutoSpeak(!autoSpeak);
+                          playUiSound("click");
+                        }}
+                        className={cn(
+                          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                          autoSpeak ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out",
+                            autoSpeak ? "translate-x-5" : "translate-x-0"
+                          )}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Robot Voice FX Toggle */}
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-purple-500/15 via-indigo-500/15 to-pink-500/15 border border-purple-500/30 backdrop-blur-md shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-600 text-white shadow-xs">
+                          <Cpu size={18} />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-xs font-bold text-[#1A1F4C] dark:text-white flex items-center gap-1.5">
+                            <span>{language === "vi" ? "Chế độ Giọng Robot" : "Robot Voice FX"}</span>
+                            <span className="px-1.5 py-0.2 rounded bg-purple-600 text-[9px] font-black text-white">ROBOT</span>
+                          </div>
+                          <div className="text-[10px] text-purple-700 dark:text-purple-300 font-medium">
+                            {language === "vi" ? "Âm thanh giọng kim loại máy móc" : "Monotone metallic synth voice"}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setRobotVoiceEnabled(!robotVoiceEnabled);
+                          playUiSound("click");
+                        }}
+                        className={cn(
+                          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                          robotVoiceEnabled ? "bg-purple-600" : "bg-slate-300 dark:bg-slate-700"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out",
+                            robotVoiceEnabled ? "translate-x-5" : "translate-x-0"
+                          )}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Robot Voice Parameters Sliders */}
+                  {robotVoiceEnabled && (
+                    <div className="space-y-3 p-3.5 rounded-2xl bg-white/70 dark:bg-slate-800/70 border border-white/80 dark:border-white/10 backdrop-blur-md shadow-sm mb-3.5">
+                      <div className="flex items-center justify-between text-xs font-bold text-[#1A1F4C] dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">
+                        <span>{language === "vi" ? "Thông số hiệu ứng Robot" : "Robot Parameters"}</span>
+                        <span className="text-[10px] font-mono font-bold text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full">
+                          Pitch: {robotPitch.toFixed(2)} | Rate: {robotRate.toFixed(2)}
+                        </span>
+                      </div>
+
+                      {/* Pitch Slider */}
+                      <div className="space-y-1 text-left">
+                        <div className="flex justify-between items-center text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                          <span>{language === "vi" ? "Cao độ Robot (Pitch)" : "Robot Pitch"}</span>
+                          <span className="font-mono text-purple-600 dark:text-purple-400 font-bold">{robotPitch.toFixed(2)}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="2.0"
+                          step="0.05"
+                          value={robotPitch}
+                          onChange={(e) => setRobotPitch(parseFloat(e.target.value))}
+                          className="w-full accent-purple-600 cursor-pointer h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg"
+                        />
+                        <div className="flex justify-between text-[9px] text-slate-400 font-medium">
+                          <span>{language === "vi" ? "0.1 (Robot Trầm)" : "0.1 (Deep Metallic)"}</span>
+                          <span>{language === "vi" ? "2.0 (Robot Cao)" : "2.0 (High Synth)"}</span>
+                        </div>
+                      </div>
+
+                      {/* Rate Slider */}
+                      <div className="space-y-1 text-left">
+                        <div className="flex justify-between items-center text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                          <span>{language === "vi" ? "Tốc độ đọc (Speed Rate)" : "Speech Rate"}</span>
+                          <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">{robotRate.toFixed(2)}x</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="2.0"
+                          step="0.05"
+                          value={robotRate}
+                          onChange={(e) => setRobotRate(parseFloat(e.target.value))}
+                          className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg"
+                        />
+                        <div className="flex justify-between text-[9px] text-slate-400 font-medium">
+                          <span>0.5x ({language === "vi" ? "Chậm" : "Slow"})</span>
+                          <span>2.0x ({language === "vi" ? "Nhanh" : "Fast"})</span>
+                        </div>
+                      </div>
+
+                      {/* Quick Presets */}
+                      <div className="pt-1">
+                        <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 text-left">
+                          {language === "vi" ? "Mẫu cấu hình Robot nhanh:" : "Quick Robot Presets:"}
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <button
+                            onClick={() => {
+                              setRobotPitch(0.2);
+                              setRobotRate(0.85);
+                              playUiSound("click");
+                            }}
+                            className="px-2 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-[10px] font-bold border border-purple-500/20 cursor-pointer transition-colors text-center"
+                          >
+                            🤖 {language === "vi" ? "Trầm kim loại" : "Deep Metal"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRobotPitch(0.35);
+                              setRobotRate(0.95);
+                              playUiSound("click");
+                            }}
+                            className="px-2 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-500/20 cursor-pointer transition-colors text-center"
+                          >
+                            ⚡ {language === "vi" ? "Robot Chuẩn" : "Classic Synth"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRobotPitch(0.6);
+                              setRobotRate(1.1);
+                              playUiSound("click");
+                            }}
+                            className="px-2 py-1.5 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 text-pink-700 dark:text-pink-300 text-[10px] font-bold border border-pink-500/20 cursor-pointer transition-colors text-center"
+                          >
+                            🛸 Cyber Bot
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRobotPitch(1.85);
+                              setRobotRate(1.15);
+                              playUiSound("click");
+                            }}
+                            className="px-2 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 text-[10px] font-bold border border-amber-500/30 cursor-pointer transition-colors text-center shadow-2xs"
+                            title={language === "vi" ? "Giọng Robot Trẻ Em (Cao vút & Nhảnh)" : "Child Robot Voice"}
+                          >
+                            👶 {language === "vi" ? "Robot Trẻ Em" : "Child Bot"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Voice Test Button */}
                   <button
                     onClick={() => {
-                      setAutoSpeak(!autoSpeak);
                       playUiSound("click");
+                      testRobotVoice();
                     }}
-                    className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs shadow-sm transition-all cursor-pointer",
-                      autoSpeak
-                        ? "bg-[#1A1F4C] text-white dark:bg-indigo-600"
-                        : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
-                    )}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md active:scale-98 transition-all cursor-pointer mb-3"
                   >
-                    <Volume2 size={15} />
-                    <span>
-                      {autoSpeak
-                        ? language === "vi" ? "Đã bật thuyết minh" : "Voice Enabled"
-                        : language === "vi" ? "Đã tắt thuyết minh" : "Voice Disabled"}
-                    </span>
+                    <Volume2 size={16} />
+                    <span>{language === "vi" ? "Thử âm thanh giọng Robot ngay" : "Test Robot Voice Now"}</span>
                   </button>
+
+                  {/* Voice Selectors for VI and EN */}
+                  <div className="w-full text-left space-y-2 p-3 rounded-2xl bg-white/70 dark:bg-slate-800/70 border border-white/80 dark:border-white/10 backdrop-blur-md mb-2">
+                    <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                      {language === "vi" ? "Mẫu giọng đọc hệ thống:" : "System Voice Profile:"}
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Tiếng Việt:</label>
+                      <select
+                        value={selectedVoiceVi}
+                        onChange={(e) => {
+                          setSelectedVoiceVi(e.target.value);
+                          localStorage.setItem("app_ai_voice_vi", e.target.value);
+                        }}
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-1 text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none"
+                      >
+                        {availableVoices
+                          .filter((v) => v.lang.toLowerCase().includes("vi") || v.name.toLowerCase().includes("tiếng việt"))
+                          .map((v) => (
+                            <option key={v.voiceURI} value={v.voiceURI}>
+                              {formatVoiceLabel(v, true)}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
 
                   <button
                     onClick={() => setActiveWidgetTab("chat")}
-                    className="mt-5 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                    className="mt-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
                   >
                     ← {language === "vi" ? "Quay lại hội thoại" : "Back to Chat"}
                   </button>
