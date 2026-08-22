@@ -1,0 +1,8 @@
+{
+  "name": "Nguyễn Hùng Thái - CX Expert Portfolio",
+  "description": "Executive CX Portfolio built on the Microsoft Fluent UI 3 Design System with Mica and Acrylic materials, responsive navigation, and interactive dashboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

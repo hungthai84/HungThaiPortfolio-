@@ -1,0 +1,218 @@
+==================================================
+WEBSITE CONTENT MASTER INVENTORY
+================================
+
+1. WEBSITE OVERVIEW
+- Scope: Thẻ Job 2026 (Video2026Card)
+
+2. SITEMAP
+- /experience (Experience Page - 2026 Job Card Section)
+
+3. ROUTES
+- /experience
+
+4. PAGE INVENTORY
+PAGE
+├── Route: /experience
+├── File: src/pages/Experience.tsx
+├── Page Title: Kinh Nghiệm Làm Việc
+├── Description: Thẻ tóm tắt hành trình và định hướng công việc năm 2026+
+├── Main Content: Video2026Card Component
+├── Sections: Video Player, Bottom Action Bar, Expandable Detail Panel
+├── Components: Video2026Card, Play, Pause, FileText
+├── Data: selectedExp (id: exp-8, category: tech)
+├── Images: https://i.ibb.co/ynnj4BXr/H-nh-tr-nh-ki-n-t-o.png (Poster)
+├── Videos: VIDEO_1_URL, VIDEO_2_URL
+├── Links: None
+├── Interactive Elements: toggleInterview (Play/Pause), Action Bar Toggle
+└── Dependencies: React, framer-motion, lucide-react
+
+5. SECTION INVENTORY
+- SECTION-001: Video Player Container (Thumbnail, Video source, gradient overlay)
+- SECTION-002: Bottom Video Controls Action Bar (Play/Pause button, Text label)
+- SECTION-003: Sub-Cards or Video 2026 Container (Parent container in Experience.tsx)
+
+6. TEXT CONTENT INVENTORY
+- TEXT-001 (Label): "Hành trình kiến tạo"
+- TEXT-002 (Data): "Công nghệ / Chuyển đổi số"
+- TEXT-003 (Data): "Sẵn sàng cho thử thách mới (2026+)"
+- TEXT-004 (Data): "Head of CS / CS Director"
+- TEXT-005 (Data): "Từ Năm 2026 đến Hiện tại"
+- TEXT-006 (Data): "Sẵn sàng đảm nhận vị trí Trưởng phòng Dịch vụ Khách hàng (Head of CS) hoặc Giám đốc Trải nghiệm Khách hàng (CS Director)..."
+- TEXT-007 (Data): "Hoạch định & Thực thi chiến lược Trải nghiệm Khách hàng (CX Strategy 2026+)"
+
+7. VIETNAMESE CONTENT
+- "Hành trình kiến tạo"
+- "Sẵn sàng cho thử thách mới (2026+)"
+- "Từ Năm 2026 đến Hiện tại"
+
+8. ENGLISH CONTENT
+- "Head of CS / CS Director"
+- "CX Strategy 2026+"
+- "Generative AI & Automation CRM"
+- "CSAT, NPS, FCR"
+
+9. IMAGE INVENTORY
+IMAGE
+* File: H-nh-tr-nh-ki-n-t-o.png
+* Path: Remote
+* URL: https://i.ibb.co/ynnj4BXr/H-nh-tr-nh-ki-n-t-o.png
+* Component: Video2026Card
+* Page: Experience
+* Purpose: Video Poster
+* Alt: None (poster attribute)
+* Width: Auto
+* Height: Auto
+* Format: PNG
+* Local / Remote: Remote
+* Used / Unused: Used
+* Duplicate: No
+* Recommended action: Add alt text if used in img tag, optimize remote loading
+
+10. VIDEO INVENTORY
+VIDEO
+* Page: Experience
+* Component: Video2026Card
+* File: VIDEO_1_URL, VIDEO_2_URL
+* URL: Dynamic
+* Provider: HTML5 Video
+* Video ID: N/A
+* Type: MP4
+* Thumbnail: https://i.ibb.co/ynnj4BXr/H-nh-tr-nh-ki-n-t-o.png
+* Autoplay: Yes
+* Muted: Conditional
+* Loop: Conditional
+* Controls: Conditional
+* Lazy loading: No
+* Used / Unused: Used
+* Broken link: Valid
+* Notes: Mute/Unmute controlled by state
+
+11. LINK INVENTORY
+- No internal/external links in this card.
+
+12. SOCIAL LINKS
+- N/A
+
+13. DOCUMENT LINKS
+- N/A
+
+14. NAVIGATION
+- Action bar button toggles video state.
+
+15. COMPONENT INVENTORY
+COMPONENT
+* File: src/pages/Experience.tsx
+* Component name: Video2026Card
+* Purpose: Display 2026 future orientation video
+* Used by: Experience
+* Props: isVi (boolean)
+* State: isInterviewPlaying, isVideoAudioOn
+* Dependencies: React hooks, framer-motion, lucide-react
+* Data source: Props & Local State
+* CSS: Tailwind
+* Animation: Framer Motion (initial, animate, transition)
+* Reusable / Page-specific: Page-specific
+* Duplicate component: No
+* Unused component: No
+
+16. DATA INVENTORY
+DATA
+├── Experience (exp-8)
+* File: src/data/index.ts
+* Variable: experiences[7]
+* Type: Object
+* Used by: Experience page
+* Purpose: Content for 2026 Job Card
+* Duplicate: No
+* Missing fields: None
+
+17. DESIGN SYSTEM
+COLORS
+- border-slate-800, bg-slate-950, bg-gradient-to-t from-slate-950/80
+
+TYPOGRAPHY
+- text-xs, sm:text-sm, font-black
+
+SPACING
+- p-4, px-3.5, py-2, gap-2
+
+RADIUS
+- rounded-[15px], rounded-full
+
+SHADOW
+- shadow-lg, shadow-[0_0_25px_rgba(99,102,241,0.6)], shadow-md
+
+BREAKPOINT
+- sm:min-h-[440px], sm:h-7
+
+ANIMATION
+- duration-700, transition-all, hover:from-blue-500
+
+18. ANIMATION INVENTORY
+ANIMATION
+* Component: Video2026Card
+* Page: Experience
+* Library: Framer Motion
+* Trigger: Mount
+* Duration: 0.4s
+* Effect: Fade up (opacity: 0->1, y: 15->0)
+* Dependency: None
+
+19. RESPONSIVE ANALYSIS
+- Mobile: min-h-[380px], h-6, w-6, text-xs
+- Desktop (sm): min-h-[440px], h-7, w-7, text-sm
+
+20. UNUSED FILES
+- Safe: None
+
+21. DUPLICATE CONTENT
+- None
+
+22. BROKEN LINKS
+- None
+
+23. BROKEN MEDIA
+- None
+
+24. CONTENT QUALITY
+CONTENT QUALITY
+* Complete: Yes
+MEDIA QUALITY
+* Valid: Yes
+
+25. STRUCTURE ANALYSIS
+STRUCTURE QUALITY
+* Good
+
+26. RECOMMENDED DATA STRUCTURE
+content/
+├── vi/
+│   └── experience_2026.json
+└── en/
+    └── experience_2026.json
+
+27. RECOMMENDATIONS
+1. Content: Separate video URLs to config.
+2. Data: Move mock data to remote database if scaling.
+3. Components: Extract Video2026Card to a separate file for better maintainability.
+
+28. FINAL SUMMARY
+==================================================
+WEBSITE SUMMARY
+* Tổng số page: 1 (Filtered to Job 2026 Card)
+* Tổng số route: 1
+* Tổng số component: 1 (Video2026Card)
+* Tổng số image: 1
+* Tổng số video: 2
+* Tổng số link: 0
+* Tổng số data source: 1
+* Tổng số file: 1
+* Tổng số file chưa sử dụng: 0
+* Tổng số link lỗi: 0
+* Tổng số media lỗi: 0
+* Tổng số nội dung trùng: 0
+
+==================================================
+END OF REPORT
+=============

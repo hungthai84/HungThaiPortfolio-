@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the application",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "UserPreferences": {
+      "title": "UserPreferences",
+      "description": "User background wallpapers and preferences",
+      "type": "object",
+      "properties": {
+        "customWallpapers": { "type": "string" },
+        "selectedWallpaperId": { "type": "string", "maxLength": 128 },
+        "deletedWallpaperIds": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["updatedAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "users/{userId}/preferences/{prefId}": {
+      "schema": "UserPreferences",
+      "description": "User preferences and wallpaper storage"
+    }
+  }
+}
