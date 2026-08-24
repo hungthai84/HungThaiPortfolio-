@@ -21,6 +21,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Maximize2,
+  Save,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { PageLayout } from "../components/PageLayout";
 import { useLanguage } from "../context/LanguageContext";
@@ -72,6 +76,11 @@ export function Wallpapers() {
   // Search State
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Delayed apply states and refs
+  const applyTimeoutRef = useRef<any>(null);
+  const countdownIntervalRef = useRef<any>(null);
+  const [applyingWallpaper, setApplyingWallpaper] = useState<{ id: string; name: string; secondsLeft: number } | null>(null);
+
   // Modal / Add Wallpaper Dialog State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addMode, setAddMode] = useState<"url" | "file" | "presets">("url");
@@ -81,6 +90,7 @@ export function Wallpapers() {
   const [uploadedBase64, setUploadedBase64] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const jsonImportInputRef = useRef<HTMLInputElement>(null);
 
   // Fullscreen Preview Lightbox
   const [previewModalWp, setPreviewModalWp] = useState<WallpaperOption | null>(
@@ -89,6 +99,39 @@ export function Wallpapers() {
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Theme Mode State (For Giao Diện Sáng / Tối / Hệ Thống)
+  const [themeMode, setThemeMode] = useState<"light" | "dark" | "system">(() => {
+    return (localStorage.getItem("app_theme_mode") as any) || "system";
+  });
+
+  useEffect(() => {
+    const handleSync = (e: Event) => {
+      const customEvent = e as CustomEvent<"light" | "dark" | "system">;
+      if (customEvent.detail) {
+        setThemeMode(customEvent.detail);
+      }
+    };
+    window.addEventListener("app-theme-mode-synced", handleSync as EventListener);
+    return () => {
+      window.removeEventListener("app-theme-mode-synced", handleSync as EventListener);
+    };
+  }, []);
+
+  const handleChangeThemeMode = (mode: "light" | "dark" | "system") => {
+    playUiSound("click");
+    setThemeMode(mode);
+    window.dispatchEvent(new CustomEvent("app-set-theme-mode", { detail: mode }));
+    showToast(
+      language === "vi"
+        ? `Đã chuyển đổi thành công sang giao diện ${
+            mode === "light" ? "Sáng tinh tế" : mode === "dark" ? "Tối cao cấp" : "Đồng bộ hệ thống"
+          }!`
+        : `Successfully switched to ${
+            mode === "light" ? "Light theme" : mode === "dark" ? "Dark theme" : "System theme"
+          }!`
+    );
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -100,9 +143,10 @@ export function Wallpapers() {
   // Sync state on external events
   useEffect(() => {
     const handleWpChanged = (e: Event) => {
-      const custom = e as CustomEvent<{ wallpaperId: string }>;
-      if (custom.detail?.wallpaperId) {
-        setSelectedWallpaperId(custom.detail.wallpaperId);
+      const custom = e as CustomEvent<{ wallpaperId?: string; id?: string }>;
+      const targetId = custom.detail?.id || custom.detail?.wallpaperId;
+      if (targetId) {
+        setSelectedWallpaperId(targetId);
       }
     };
     const handleToggle = () => {
@@ -129,6 +173,8 @@ export function Wallpapers() {
         "app-set-wallpaper-hidden",
         handleSetHidden as EventListener,
       );
+      if (applyTimeoutRef.current) clearTimeout(applyTimeoutRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
   }, []);
 
@@ -181,9 +227,14 @@ export function Wallpapers() {
     window.dispatchEvent(
       new CustomEvent("wallpaperChanged", {
         detail: {
+          id: wp.id,
           wallpaperId: wp.id,
           url: wp.url,
+          customUrl: wp.url,
           name: wp.name,
+          customName: wp.name,
+          type: wp.type,
+          previewUrl: wp.previewUrl,
         },
       }),
     );
@@ -193,6 +244,83 @@ export function Wallpapers() {
         ? `Đã áp dụng hình nền "${wp.name}" thành công!`
         : `Applied wallpaper "${wp.name}" successfully!`,
     );
+  };
+
+
+
+  // Delayed Wallpaper Selection Handler (30 seconds)
+  const handleSelectWallpaperDeferred = (wp: WallpaperOption) => {
+    playUiSound("click");
+    setSelectedWallpaperId(wp.id);
+
+    // Clear any existing delayed apply timers
+    if (applyTimeoutRef.current) clearTimeout(applyTimeoutRef.current);
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+
+    showToast(
+      language === "vi"
+        ? `Đã lựa chọn "${wp.name}". Sẽ áp dụng sau 30 giây...`
+        : `Selected "${wp.name}". Wallpaper will be applied in 30 seconds...`,
+    );
+
+    let timeLeft = 30;
+    setApplyingWallpaper({
+      id: wp.id,
+      name: wp.name,
+      secondsLeft: timeLeft,
+    });
+
+    countdownIntervalRef.current = setInterval(() => {
+      timeLeft -= 1;
+      if (timeLeft <= 0) {
+        if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+        setApplyingWallpaper(null);
+      } else {
+        setApplyingWallpaper({
+          id: wp.id,
+          name: wp.name,
+          secondsLeft: timeLeft,
+        });
+      }
+    }, 1000);
+
+    applyTimeoutRef.current = setTimeout(() => {
+      // Actually apply the wallpaper
+      localStorage.setItem("app_selected_wallpaper", wp.id);
+      localStorage.setItem("app_wallpaper", wp.id);
+
+      if (wp.url) {
+        localStorage.setItem("app_custom_wallpaper_url", wp.url);
+      }
+      localStorage.setItem("app_custom_wallpaper_name", wp.name);
+
+      // If wallpaper was hidden, automatically unhide it when user selects a new one
+      if (isWallpaperHidden) {
+        setIsWallpaperHidden(false);
+        localStorage.setItem("app_wallpaper_hidden", "false");
+        window.dispatchEvent(
+          new CustomEvent("app-set-wallpaper-hidden", {
+            detail: { hidden: false },
+          }),
+        );
+      }
+
+      window.dispatchEvent(
+        new CustomEvent("wallpaperChanged", {
+          detail: {
+            wallpaperId: wp.id,
+            url: wp.url,
+            name: wp.name,
+          },
+        }),
+      );
+
+      showToast(
+        language === "vi"
+          ? `Đã áp dụng hình nền "${wp.name}" thành công!`
+          : `Applied wallpaper "${wp.name}" successfully!`,
+      );
+    }, 30000);
   };
 
   // Delete Wallpaper Handler
@@ -424,6 +552,95 @@ export function Wallpapers() {
     );
   };
 
+  // Import JSON configuration and Custom Wallpapers back
+  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const data = JSON.parse(content);
+
+        let importedCustoms: WallpaperOption[] = [];
+        let importedSelectedId = selectedWallpaperId;
+        let importedHidden = isWallpaperHidden;
+        let importedDeletedIds = deletedWallpaperIds;
+
+        if (data && typeof data === "object") {
+          if (Array.isArray(data)) {
+            importedCustoms = data;
+          } else {
+            if (Array.isArray(data.customWallpapers)) {
+              importedCustoms = data.customWallpapers;
+            } else if (Array.isArray(data.allLinks)) {
+              importedCustoms = data.allLinks.filter((wp: any) => wp.isCustom);
+            }
+            
+            if (typeof data.selectedWallpaperId === "string") {
+              importedSelectedId = data.selectedWallpaperId;
+            }
+            if (typeof data.isWallpaperHidden === "boolean") {
+              importedHidden = data.isWallpaperHidden;
+            }
+            if (Array.isArray(data.deletedWallpaperIds)) {
+              importedDeletedIds = data.deletedWallpaperIds;
+            }
+          }
+
+          const validCustoms = importedCustoms.filter(
+            (wp) => wp && typeof wp === "object" && wp.id && wp.url && wp.name
+          );
+
+          if (validCustoms.length === 0 && !data.selectedWallpaperId) {
+            throw new Error(
+              language === "vi"
+                ? "Không tìm thấy dữ liệu hình nền hợp lệ trong tệp JSON."
+                : "No valid wallpaper data found in JSON file."
+            );
+          }
+
+          setCustomWallpapers(validCustoms);
+          localStorage.setItem("app_custom_wallpapers", JSON.stringify(validCustoms));
+
+          if (importedSelectedId) {
+            setSelectedWallpaperId(importedSelectedId);
+            localStorage.setItem("app_selected_wallpaper", importedSelectedId);
+          }
+
+          setIsWallpaperHidden(importedHidden);
+          localStorage.setItem("app_wallpaper_hidden", String(importedHidden));
+
+          setDeletedWallpaperIds(importedDeletedIds);
+          localStorage.setItem("app_deleted_wallpaper_ids", JSON.stringify(importedDeletedIds));
+
+          playUiSound("success");
+          showToast(
+            language === "vi"
+              ? `Nhập thành công! Đã khôi phục ${validCustoms.length} hình nền.`
+              : `Import successful! Restored ${validCustoms.length} wallpapers.`
+          );
+        } else {
+          throw new Error(
+            language === "vi"
+              ? "Định dạng JSON không hợp lệ."
+              : "Invalid JSON format."
+          );
+        }
+      } catch (err: any) {
+        playUiSound("reset");
+        alert(
+          language === "vi"
+            ? `Lỗi khi nhập dữ liệu: ${err.message || "Định dạng JSON không đúng."}`
+            : `Error importing data: ${err.message || "Incorrect JSON format."}`
+        );
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   const categories = [
     { id: "all", labelVi: "Tất cả", labelEn: "All" },
     { id: "custom", labelVi: "Tùy chỉnh đã lưu", labelEn: "Custom Saved" },
@@ -438,10 +655,10 @@ export function Wallpapers() {
   return (
     <PageLayout
       id="wallpapers-main-card"
-      rootClassName="main-info-card w-full max-w-full !p-[5px] rounded-[15px] sm:rounded-[20px] border border-[var(--border)] relative flex flex-1 flex-col !bg-white/50 transition-all duration-300"
-      headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !rounded-full transition-all duration-300"
+      rootClassName="w-full max-w-full m-0 relative flex flex-1 flex-col transition-all duration-300"
+      headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 transition-all duration-300"
       headerContainerClassName="!px-0"
-      className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent"
+      className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto"
       pageId="wallpapers"
       pageName="Wallpapers Gallery Card"
       title={
@@ -512,20 +729,49 @@ export function Wallpapers() {
             </button>
           )}
 
-          {/* Permanent Save Button */}
+          {/* Hidden File Input for JSON Import */}
+          <input
+            ref={jsonImportInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImportJSON}
+            className="hidden"
+          />
+
+          {/* Import JSON Button */}
+          <button
+            type="button"
+            onClick={() => {
+              playUiSound("click");
+              jsonImportInputRef.current?.click();
+            }}
+            className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3.5 py-1.5 text-xs font-bold text-indigo-600 transition-all hover:bg-indigo-500/20 dark:text-indigo-400 shadow-sm"
+            title={
+              language === "vi"
+                ? "Nhập JSON: Phục hồi hình nền đã lưu từ tệp JSON"
+                : "Import JSON: Restore saved wallpapers from a JSON file"
+            }
+          >
+            <Upload size={14} className="text-indigo-500" />
+            <span>
+              {language === "vi" ? "Nhập JSON" : "Import JSON"}
+            </span>
+          </button>
+
+          {/* Permanent Save Button / Export JSON */}
           <button
             type="button"
             onClick={handlePermanentSave}
             className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-600 transition-all hover:bg-emerald-500/20 dark:text-emerald-400 shadow-sm"
             title={
               language === "vi"
-                ? "Lưu lâu dài: Xuất toàn bộ liên kết hình nền thành dữ liệu lưu trữ"
-                : "Permanent Save: Export all wallpaper links into persistent storage"
+                ? "Xuất JSON: Lưu trữ & Tải toàn bộ hình nền hiện tại về máy tính"
+                : "Export JSON: Save & download all current wallpapers to your computer"
             }
           >
             <Download size={14} className="text-emerald-500" />
             <span>
-              {language === "vi" ? "Lưu Lâu Dài" : "Permanent Save"}
+              {language === "vi" ? "Xuất JSON" : "Export JSON"}
             </span>
           </button>
 
@@ -674,7 +920,7 @@ export function Wallpapers() {
                         <div
                           key={tmpl.name}
                           onClick={() => handlePickTemplate(tmpl)}
-                          className="group relative cursor-pointer overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg)] transition-all hover:border-cyan-500 hover:shadow-md"
+                          className="group relative cursor-pointer overflow-hidden rounded-xl border-2 border-solid border-[var(--border)] bg-[var(--bg)] transition-all hover:border-cyan-500 hover:shadow-md"
                         >
                           <img
                             src={tmpl.url}
@@ -712,7 +958,7 @@ export function Wallpapers() {
                             setInputPreviewUrl(e.target.value);
                           }}
                           placeholder="https://images.unsplash.com/... hoặc https://i.ibb.co/..."
-                          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3.5 py-2.5 text-xs font-medium text-[var(--text-primary)] placeholder-[var(--muted)] focus:border-cyan-500 focus:outline-none"
+                          className="w-full rounded-xl border-2 border-solid border-[var(--border)] bg-[var(--bg)] px-3.5 py-2.5 text-xs font-medium text-[var(--text-primary)] placeholder-[var(--muted)] focus:border-cyan-500 focus:outline-none"
                         />
                       </div>
                     )}
@@ -766,7 +1012,7 @@ export function Wallpapers() {
                         <span className="text-[11px] font-bold text-[var(--muted)]">
                           {language === "vi" ? "Xem trước:" : "Preview:"}
                         </span>
-                        <div className="aspect-video max-w-sm overflow-hidden rounded-xl border border-[var(--border)] bg-slate-950">
+                        <div className="aspect-video max-w-sm overflow-hidden rounded-xl border-2 border-solid border-[var(--border)] bg-slate-950">
                           {inputPreviewUrl.startsWith("data:video/") || !!inputPreviewUrl.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video
                               autoPlay
@@ -807,7 +1053,7 @@ export function Wallpapers() {
                       <button
                         type="button"
                         onClick={() => setIsAddModalOpen(false)}
-                        className="rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-2 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--border)] cursor-pointer"
+                        className="rounded-xl border-2 border-solid border-[var(--border)] bg-[var(--bg)] px-4 py-2 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--border)] cursor-pointer"
                       >
                         {language === "vi" ? "Hủy" : "Cancel"}
                       </button>
@@ -829,56 +1075,133 @@ export function Wallpapers() {
         )}
       </AnimatePresence>
 
-      <div className="relative mx-auto flex w-full max-w-[1240px] flex-col gap-6 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-6 shadow-sm backdrop-blur-xl">
-        {/* TOP CONTROLS & SEARCH BAR */}
-        <div className="flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-[var(--card)]/90 p-4 shadow-sm backdrop-blur-md">
-          <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <Search
-                size={16}
-                className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[var(--muted)]"
-              />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={
-                  language === "vi"
-                    ? "Tìm kiếm hình nền theo tên, thẻ hoặc thể loại..."
-                    : "Search wallpapers by name, tag or category..."
-                }
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] py-2.5 pr-4 pl-10 text-xs font-semibold text-[var(--text-primary)] placeholder-[var(--muted)] transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none sm:text-sm"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--text-primary)]"
-                >
-                  <X size={15} />
-                </button>
-              )}
-            </div>
-
-            {/* Quick Stats */}
-            <div className="flex shrink-0 items-center gap-2 text-xs font-bold text-[var(--muted)]">
-              <span className="rounded-lg bg-[var(--border)] px-2.5 py-1 text-[var(--text-secondary)]">
-                {language === "vi"
-                  ? `Hiển thị: ${filteredWallpapers.length} / ${allWallpapers.length}`
-                  : `Showing: ${filteredWallpapers.length} / ${allWallpapers.length}`}
-              </span>
-              {customWallpapers.length > 0 && (
-                <span className="rounded-lg bg-cyan-500/10 px-2.5 py-1 font-extrabold text-cyan-600 dark:text-cyan-400">
-                  {language === "vi"
-                    ? `${customWallpapers.length} Tùy chỉnh`
-                    : `${customWallpapers.length} Custom`}
-                </span>
-              )}
-            </div>
+      {/* THEME SELECTION BLOCK (TRANG PHONG CÁCH THÊM GIAO DIỆN SÁNG) */}
+      <div className="relative mx-auto mb-5 flex w-full max-w-[1240px] flex-col gap-4 rounded-2xl border border-slate-200/85 dark:border-slate-800 bg-white/70 dark:bg-slate-900/75 p-5 backdrop-blur-[24px] shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+            <Palette size={18} />
+          </div>
+          <div>
+            <h4 className="text-sm font-black text-slate-900 dark:text-white sm:text-base">
+              {language === "vi" ? "Chủ Đề Giao Diện Hệ Thống (App Theme)" : "System Interface Theme"}
+            </h4>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              {language === "vi" 
+                ? "Tùy biến nhanh giữa giao diện sáng tinh tế, tối cao cấp hoặc tự động đồng bộ theo cấu hình thiết bị."
+                : "Quickly customize your experience with Light mode, premium Dark mode, or automatic System theme."}
+            </p>
           </div>
         </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* LIGHT THEME CARD */}
+          <button
+            type="button"
+            onClick={() => handleChangeThemeMode("light")}
+            className={cn(
+              "group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-300 hover:scale-[1.01] hover:shadow-md cursor-pointer",
+              themeMode === "light"
+                ? "border-cyan-500 bg-cyan-500/5 ring-1 ring-cyan-500/30"
+                : "border-slate-200 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 hover:border-cyan-500/30"
+            )}
+          >
+            <div className="flex w-full items-center justify-between mb-2">
+              <div className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                themeMode === "light" ? "bg-cyan-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-amber-500"
+              )}>
+                <Sun size={16} />
+              </div>
+              {themeMode === "light" && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500 text-white">
+                  <Check size={12} className="stroke-[3]" />
+                </span>
+              )}
+            </div>
+            <span className="text-xs font-black text-slate-900 dark:text-white">
+              {language === "vi" ? "Giao Diện Sáng" : "Light Theme"}
+            </span>
+            <span className="mt-1 text-[10px] leading-relaxed text-slate-500 dark:text-slate-400">
+              {language === "vi" 
+                ? "Tone sáng ngà & xám slate dịu mắt, tối ưu hóa độ sắc nét và độ tương phản ban ngày."
+                : "Gentle ivory & slate tones, optimized for daylight clarity and low reflection."}
+            </span>
+            <div className="absolute inset-x-0 bottom-0 h-1 rounded-b-xl bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </button>
+
+          {/* DARK THEME CARD */}
+          <button
+            type="button"
+            onClick={() => handleChangeThemeMode("dark")}
+            className={cn(
+              "group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-300 hover:scale-[1.01] hover:shadow-md cursor-pointer",
+              themeMode === "dark"
+                ? "border-cyan-500 bg-cyan-500/5 ring-1 ring-cyan-500/30"
+                : "border-slate-200 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 hover:border-cyan-500/30"
+            )}
+          >
+            <div className="flex w-full items-center justify-between mb-2">
+              <div className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                themeMode === "dark" ? "bg-cyan-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-indigo-400"
+              )}>
+                <Moon size={16} />
+              </div>
+              {themeMode === "dark" && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500 text-white">
+                  <Check size={12} className="stroke-[3]" />
+                </span>
+              )}
+            </div>
+            <span className="text-xs font-black text-slate-900 dark:text-white">
+              {language === "vi" ? "Giao Diện Tối" : "Dark Theme"}
+            </span>
+            <span className="mt-1 text-[10px] leading-relaxed text-slate-500 dark:text-slate-400">
+              {language === "vi"
+                ? "Mica đen huyền bí chống mỏi mắt ban đêm, tăng chiều sâu và độ sống động của màu sắc."
+                : "Mystic black mica prevents night eye strain, enhancing color depth and vividness."}
+            </span>
+            <div className="absolute inset-x-0 bottom-0 h-1 rounded-b-xl bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </button>
+
+          {/* SYSTEM AUTO CARD */}
+          <button
+            type="button"
+            onClick={() => handleChangeThemeMode("system")}
+            className={cn(
+              "group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-300 hover:scale-[1.01] hover:shadow-md cursor-pointer",
+              themeMode === "system"
+                ? "border-cyan-500 bg-cyan-500/5 ring-1 ring-cyan-500/30"
+                : "border-slate-200 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/40 hover:border-cyan-500/30"
+            )}
+          >
+            <div className="flex w-full items-center justify-between mb-2">
+              <div className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                themeMode === "system" ? "bg-cyan-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-cyan-500"
+              )}>
+                <Monitor size={16} />
+              </div>
+              {themeMode === "system" && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500 text-white">
+                  <Check size={12} className="stroke-[3]" />
+                </span>
+              )}
+            </div>
+            <span className="text-xs font-black text-slate-900 dark:text-white">
+              {language === "vi" ? "Đồng Bộ Hệ Thống" : "System Auto Sync"}
+            </span>
+            <span className="mt-1 text-[10px] leading-relaxed text-slate-500 dark:text-slate-400">
+              {language === "vi"
+                ? "Tự động thay đổi giao diện sáng hoặc tối đồng bộ theo hệ điều hành của thiết bị của bạn."
+                : "Automatically adapt light or dark interfaces depending on your device operating system."}
+            </span>
+            <div className="absolute inset-x-0 bottom-0 h-1 rounded-b-xl bg-gradient-to-r from-cyan-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </button>
+        </div>
+      </div>
+
+      <div className="relative mx-auto flex w-full max-w-[1240px] flex-col gap-[10px] rounded-2xl overflow-hidden border border-slate-200/85 dark:border-slate-800 bg-[rgba(255,255,255,0.7)] dark:bg-slate-900/70 p-4 sm:p-6 backdrop-blur-[24px] shadow-sm">
         {/* WALLPAPERS GRID */}
         {filteredWallpapers.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border)] bg-[var(--card)] p-12 text-center">
@@ -898,13 +1221,13 @@ export function Wallpapers() {
               onClick={() => {
                 setSearchQuery("");
               }}
-              className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-2 text-xs font-bold text-cyan-600 hover:bg-[var(--border)] dark:text-cyan-400"
+              className="mt-4 rounded-xl border-2 border-solid border-[var(--border)] bg-[var(--bg)] px-4 py-2 text-xs font-bold text-cyan-600 hover:bg-[var(--border)] dark:text-cyan-400"
             >
               {language === "vi" ? "Đặt lại bộ lọc" : "Reset Filter"}
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-3 sm:gap-4">
             {filteredWallpapers.map((wp) => {
               const isSelected = selectedWallpaperId === wp.id;
               const isCustom =
@@ -917,15 +1240,29 @@ export function Wallpapers() {
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.25 }}
+                  onClick={() => handleApplyWallpaper(wp)}
                   className={cn(
-                    "group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:z-[999] hover:scale-[1.03] hover:shadow-2xl",
+                    "group relative flex flex-col overflow-hidden rounded-[10px] border transition-all duration-300 hover:z-[999] hover:scale-[1.03] hover:shadow-2xl cursor-pointer aspect-video w-full",
                     isSelected
-                      ? "border-cyan-500 ring-2 ring-cyan-500/30 bg-cyan-500/5 shadow-lg shadow-cyan-500/10"
-                      : "border-[var(--border)] bg-[var(--surface)] hover:border-cyan-500/40 hover:shadow-md",
+                      ? "border-red-500 ring-2 ring-red-500/30 bg-red-500/5 shadow-lg shadow-red-500/10"
+                      : "border-[var(--border)] bg-[var(--surface)] hover:border-red-500/40 hover:shadow-md",
                   )}
                 >
+                  {/* Delete Wallpaper Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteWallpaper(wp.id, wp.name);
+                    }}
+                    className="absolute top-2 right-2 z-25 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600 shadow-md cursor-pointer"
+                    title={language === "vi" ? "Xóa hình nền này" : "Delete this wallpaper"}
+                  >
+                    <Trash2 size={12} />
+                  </button>
+
                   {/* Image Thumbnail Container */}
-                  <div className="relative aspect-video w-full overflow-hidden bg-white/50 dark:bg-slate-900/50">
+                  <div className="relative h-full w-full overflow-hidden rounded-[10px] bg-white/50 dark:bg-slate-900/50">
                     {wp.type === "css" || !wp.previewUrl ? (
                       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900">
                         <div className="flex flex-col items-center gap-1 text-[var(--muted)]">
@@ -941,133 +1278,30 @@ export function Wallpapers() {
                         loop
                         muted
                         playsInline
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="h-full w-full object-cover"
                       >
                         <source src={wp.previewUrl || wp.url} />
                       </video>
                     ) : (
                       <img
-                        src={wp.previewUrl}
-                        alt={wp.name}
+                        src={wp.id === "img-wp-18" ? "https://i.pinimg.com/1200x/da/78/3c/da783c1ae91c1810381cf8cbc5a234fd.jpg" : wp.previewUrl}
+                        alt={wp.id === "img-wp-18" ? "Hình nền #18" : wp.name}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="h-full w-full object-cover rounded-[10px]"
                       />
                     )}
 
-                    {/* Gradient Overlay on Hover */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                    {/* Active Selected Badge */}
-                    {isSelected && (
-                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-lg bg-cyan-600 px-2.5 py-1 text-[10px] font-black text-white shadow-md backdrop-blur-md">
-                        <Check size={12} strokeWidth={3} />
-                        <span>{language === "vi" ? "ĐANG DÙNG" : "ACTIVE"}</span>
-                      </div>
-                    )}
-
-                    {/* Custom Badge */}
-                    {isCustom && !isSelected && (
-                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded-lg bg-purple-600/90 px-2 py-0.5 text-[10px] font-extrabold text-white shadow-sm backdrop-blur-md">
-                        <Sparkles size={11} />
-                        <span>{language === "vi" ? "Tùy chỉnh" : "Custom"}</span>
-                      </div>
-                    )}
-
-                    {/* Quick Hover Action Tools */}
-                    <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                      {wp.url && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPreviewModalWp(wp);
-                          }}
-                          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-white shadow-sm backdrop-blur-md transition-transform hover:scale-110 hover:bg-black/80"
-                          title={
-                            language === "vi"
-                              ? "Xem trước toàn màn hình"
-                              : "Fullscreen preview"
-                          }
-                        >
-                          <Maximize2 size={13} />
-                        </button>
-                      )}
-
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteWallpaper(wp.id, wp.name);
-                        }}
-                        className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg bg-rose-600/80 text-white shadow-sm backdrop-blur-md transition-transform hover:scale-110 hover:bg-rose-600"
-                        title={
-                          language === "vi"
-                            ? isCustom
-                              ? "Xóa hình nền này"
-                              : "Ẩn hình nền mặc định này"
-                            : "Delete wallpaper"
-                        }
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Card Body */}
-                  <div className="flex flex-1 flex-col justify-between p-3.5">
-                    <div>
-                      <div className="flex items-center justify-between gap-2">
-                        <h4 className="line-clamp-1 text-xs font-black text-[var(--text-primary)] sm:text-sm">
-                          {wp.name}
-                        </h4>
-                        {wp.type === "image" && (
-                          <span className="shrink-0 rounded bg-[var(--border)] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[var(--muted)]">
-                            4K UHD
+                    {/* Countdown Overlay or Active Selected Badge */}
+                    {isSelected && applyingWallpaper?.id === wp.id && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-[2px]">
+                        <div className="flex flex-col items-center gap-2 rounded-2xl bg-black/70 px-4 py-3 text-center shadow-xl backdrop-blur-md border border-white/10">
+                          <div className="h-6 w-6 animate-spin rounded-full border-2 border-red-500 border-t-transparent" />
+                          <span className="text-[11px] font-black tracking-wider text-white uppercase">
+                            {language === "vi" ? `ÁP DỤNG SAU ${applyingWallpaper.secondsLeft}S` : `APPLY IN ${applyingWallpaper.secondsLeft}S`}
                           </span>
-                        )}
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Action Bar */}
-                    <div className="mt-3.5 flex items-center gap-2 border-t border-[var(--border)] pt-3">
-                      {isSelected ? (
-                        <button
-                          type="button"
-                          disabled
-                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-cyan-600/15 py-1.5 text-xs font-black text-cyan-600 dark:text-cyan-400"
-                        >
-                          <Check size={14} />
-                          <span>{language === "vi" ? "Đã áp dụng" : "Selected"}</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleApplyWallpaper(wp)}
-                          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-1.5 text-xs font-black text-white shadow-sm transition-all hover:scale-[1.02] active:scale-95"
-                        >
-                          <span>{language === "vi" ? "Áp Dụng" : "Apply"}</span>
-                        </button>
-                      )}
-
-                      {wp.url && (
-                        <a
-                          href={wp.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          download={wp.name}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex h-8 w-8 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--border)] hover:text-[var(--text-primary)]"
-                          title={
-                            language === "vi"
-                              ? "Mở ảnh gốc trong tab mới / Tải về"
-                              : "Open high-res in new tab"
-                          }
-                        >
-                          <Download size={13} />
-                        </a>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </motion.div>
               );

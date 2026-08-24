@@ -82,7 +82,7 @@ ${contentToAnalyze}
 Hãy trả về kết quả dưới dạng danh sách đối tượng JSON có cấu trúc rõ ràng.`;
 
     const result = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.7-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -163,7 +163,7 @@ Hãy tập trung vào việc mô tả chính xác về:
     }
 
     const result = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.7-flash",
       contents: contents,
       config: {
         systemInstruction: systemInstruction,
@@ -182,11 +182,75 @@ Hãy tập trung vào việc mô tả chính xác về:
   }
 });
 
+// API route for AI Chat Assistant
+app.post("/api/chat", async (req, res) => {
+  const { message, history } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: "Yêu cầu cung cấp tin nhắn." });
+  }
+
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY environment variable is missing");
+    }
+
+    const ai = new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+
+    const systemInstruction = `Bạn là Trí Nhân AI - Trợ lý thông minh của chuyên gia Nguyễn Hùng Thái.
+Nhiệm vụ của bạn là hỗ trợ người dùng tìm hiểu về hồ sơ năng lực, kinh nghiệm 22 năm và tư duy quản trị của anh Thái.
+
+THÔNG TIN VỀ ANH NGUYỄN HÙNG THÁI (HÀNH TRÌNH 22 NĂM):
+- Sinh năm: 1984.
+- Kinh nghiệm: 22 năm trong ngành Dịch vụ & Trải nghiệm Khách hàng (CX).
+- Các tập đoàn đã qua: Mobifone, V247, Garena (VED), Shopee, Prudential Vietnam, MoMo, Finviet.
+- Chuyên môn: Xây dựng hệ thống CSKH, chuẩn hóa quy trình SOP, quản trị dữ liệu, ứng dụng công nghệ/AI trong CX.
+- Triết lý: Hiệu quả – Nhân văn – Bền vững. Chữ "THẤU CẢM" là kim chỉ nam.
+- Dự án tiêu biểu: Tái cấu trúc hỗ trợ đa kênh tại MoMo (2018-2021).
+- Tính cách: Chuyên nghiệp, thực chiến, thấu hiểu, sẵn sàng chia sẻ.
+
+HƯỚNG DẪN TRẢ LỜI:
+- Luôn xưng "Trí Nhân" và gọi người dùng là "Anh/Chị" hoặc "Bạn".
+- Trả lời lịch sự, chuyên nghiệp nhưng thân thiện.
+- Sử dụng kiến thức về anh Thái để trả lời chính xác. Nếu không biết chắc chắn, hãy khéo léo đề nghị người dùng để lại thông tin để anh Thái liên hệ trực tiếp.
+- Khuyến khích người dùng xem Hồ sơ năng lực (CV) tại trang web nguyenhungthai.powerservice.one.
+- Trả lời bằng Tiếng Việt.`;
+
+    const chatHistory = history || [];
+    const chat = ai.chats.create({
+      model: "gemini-3.7-flash",
+      config: {
+        systemInstruction,
+      },
+      history: chatHistory.map((msg: any) => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }]
+      }))
+    });
+
+    const result = await chat.sendMessage({ message });
+    return res.json({ response: result.text });
+  } catch (err: any) {
+    console.error("Gemini chat failed:", err);
+    return res.status(500).json({ error: "Lỗi kết nối AI: " + err.message });
+  }
+});
+
 async function startServer() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        hmr: false 
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);

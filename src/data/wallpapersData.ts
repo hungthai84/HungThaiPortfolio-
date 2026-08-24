@@ -213,13 +213,13 @@ export const PRESET_WALLPAPERS: WallpaperOption[] = [
   },
   {
     id: "img-wp-18",
-    name: "Abstract Gradient Circle",
-    url: "https://i.ibb.co/r2w5qZCT/Download-Abstract-Gradient-Circle-Background-for-free.jpg",
+    name: "Hình nền #18",
+    url: "https://i.pinimg.com/1200x/da/78/3c/da783c1ae91c1810381cf8cbc5a234fd.jpg",
     previewUrl:
-      "https://i.ibb.co/r2w5qZCT/Download-Abstract-Gradient-Circle-Background-for-free.jpg",
+      "https://i.pinimg.com/1200x/da/78/3c/da783c1ae91c1810381cf8cbc5a234fd.jpg",
     type: "image",
-    category: "gradient",
-    tags: ["circle", "gradient", "colorful"],
+    category: "abstract",
+    tags: ["wallpaper18", "pinin", "aesthetic"],
   },
   {
     id: "img-wp-19",

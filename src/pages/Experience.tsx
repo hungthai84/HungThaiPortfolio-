@@ -279,7 +279,6 @@ export function Experience() {
   );
   const [isCopied, setIsCopied] = useState(false);
   const [subCardsOrder, setSubCardsOrder] = useState([
-    "chia-se",
     "quan-ly",
     "kpi",
     "nhiem-vu",
@@ -394,9 +393,9 @@ export function Experience() {
     <PageLayout
       id="experience-main-card"
       onScroll={handleScroll}
-      rootClassName="w-full max-w-full !p-[5px] rounded-[15px] sm:rounded-[20px] border relative flex flex-1 flex-col !bg-transparent transition-all duration-300"
-      headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !rounded-full transition-all duration-300"
-      className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent"
+      rootClassName="w-full max-w-full relative flex flex-1 flex-col transition-all duration-300"
+      headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 transition-all duration-300"
+      className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto"
       pageId="experience"
       pageName="Experience Main Card"
       title={isVi ? "Kinh Nghiệm Thực Chiến" : "Work Experience"}
@@ -453,9 +452,10 @@ export function Experience() {
         </div>
       }
     >
+      <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6">
         {/* View Mode 1: Masonry Grid View - Mobile & Desktop */}
         {viewMode === "masonry" ? (
-          <section className="flex h-auto min-h-0 w-full flex-col items-center gap-4 rounded-[15px]    bg-[var(--card)]/60 p-[10px]  backdrop-blur-xl sub-card with-ripple">
+          <section className="flex h-auto min-h-0 w-full flex-col items-center gap-6 rounded-2xl border border-slate-200/85 bg-[var(--card)]/60 p-5 md:p-6 backdrop-blur-xl sub-card with-ripple shadow-sm">
             {filteredExperiences.length === 0 ? (
               <div className="space-y-3 py-12 text-center">
                 <Search size={40} className="mx-auto text-[var(--muted)]/50" />
@@ -464,18 +464,17 @@ export function Experience() {
                 </p>
               </div>
             ) : (
-              /* Asymmetric Bento Grid (Bất Đối Xứng Sáng Tạo - Đan xen 1x1, 2x1 điểm nhấn) */
-              <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 transition-all duration-300">
+              /* Pinterest / Masonry 2-Column Grid View */
+              <div className="columns-1 md:columns-2 gap-6 w-full transition-all duration-300">
                 {gridExperiences.map((exp, idx) => {
                   const cardBrand = getBrandColorConfig(exp.company || exp.yearStart);
                   
                   const is2026 = exp.yearStart === "2026";
-                  const colSpanClass = is2026 ? "col-span-1 md:col-span-2" : "col-span-1";
 
                   return exp.yearStart === "2026" ? (
                     <div
                       key={exp.company + idx}
-                      className={cn("flex h-full w-full flex-col", colSpanClass)}
+                      className="break-inside-avoid inline-block w-full h-auto align-top mb-4 sm:mb-5"
                     >
                       <Video2026Card isVi={isVi} />
                     </div>
@@ -490,10 +489,7 @@ export function Experience() {
                         playUiSound("click");
                         setDetailModalExp(exp);
                       }}
-                      className={cn(
-                        "group relative cursor-pointer overflow-hidden rounded-[24px] p-2.5 sm:p-3 text-left transition-all duration-300 bg-white/90 backdrop-blur-2xl dark:bg-slate-900/90 hover:shadow-2xl hover:-translate-y-1 flex flex-col justify-between",
-                        colSpanClass
-                      )}
+                      className="break-inside-avoid inline-block w-full h-auto align-top mb-4 sm:mb-5 group relative cursor-pointer overflow-hidden rounded-[20px] p-4 text-left transition-all duration-300 bg-white/95 backdrop-blur-2xl dark:bg-slate-900/90 hover:shadow-xl border border-slate-200/90 dark:border-white/10 shadow-sm"
                       style={{
                         borderColor: cardBrand.hex,
                         borderWidth: "1.5px",
@@ -501,76 +497,76 @@ export function Experience() {
                         boxShadow: cardBrand.cardGlowStyle,
                       }}
                     >
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 h-full">
-                        {/* CORE INFO BOX */}
-                        <div className="flex flex-col justify-between gap-3 rounded-[18px] border border-slate-200/70 bg-white/90 p-4 sm:p-5 transition-colors group-hover:border-blue-300/60 dark:border-white/10 dark:bg-[#151921]/90 col-span-1 sm:col-span-3">
-                          <div className="flex items-start justify-between gap-2">
-                            {exp.logo ? (
-                              <div
-                                className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-2 ring-slate-100 dark:ring-white/10"
-                                style={{
-                                  borderColor: cardBrand.hex,
-                                  borderWidth: "1.5px",
-                                  borderStyle: "solid",
-                                  boxShadow: `0 0 10px ${cardBrand.hex}60`,
-                                }}
-                              >
-                                <img
-                                  src={exp.logo}
-                                  className="h-full w-full object-contain p-1"
-                                  alt={exp.company}
-                                  referrerPolicy="no-referrer"
-                                />
-                              </div>
-                            ) : (
-                              <div
-                                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-black text-sm text-white shadow-sm"
-                                style={{ backgroundColor: cardBrand.hex }}
-                              >
-                                {exp.yearStart}
-                              </div>
-                            )}
+                      <div className="flex flex-col gap-3.5 h-auto">
+                        {/* TOP ROW: LOGO & DATES */}
+                        <div className="flex items-start justify-between gap-2">
+                          {exp.logo ? (
+                            <div
+                              className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-2 ring-slate-100 dark:ring-white/10"
+                              style={{
+                                borderColor: cardBrand.hex,
+                                borderWidth: "1.5px",
+                                borderStyle: "solid",
+                                boxShadow: `0 0 10px ${cardBrand.hex}60`,
+                              }}
+                            >
+                              <img
+                                src={exp.logo}
+                                className="h-full w-full object-contain p-1"
+                                alt={exp.company}
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          ) : (
+                            <div
+                              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-black text-sm text-white shadow-sm"
+                              style={{ backgroundColor: cardBrand.hex }}
+                            >
+                              {exp.yearStart}
+                            </div>
+                          )}
 
-                            <div className="flex items-center gap-1.5">
-                              <div 
-                                className="rounded-bl-xl rounded-tr-xl px-2.5 py-1 text-[9px] font-black tracking-wider uppercase"
-                                style={{ backgroundColor: cardBrand.hex + "18", color: cardBrand.hex }}
-                              >
-                                {exp.yearStart ? `${exp.yearStart} - ${exp.yearEnd || "Nay"}` : "Kinh nghiệm"}
-                              </div>
+                          <div className="flex items-center gap-1.5">
+                            <div 
+                              className="rounded-bl-xl rounded-tr-xl px-2.5 py-1 text-[9px] font-black tracking-wider uppercase"
+                              style={{ backgroundColor: cardBrand.hex + "18", color: cardBrand.hex }}
+                            >
+                              {exp.yearStart ? `${exp.yearStart} - ${exp.yearEnd || "Nay"}` : "Kinh nghiệm"}
                             </div>
                           </div>
-                          
-                          <div className="flex flex-col gap-1 mt-1">
-                            <h4 className="text-lg sm:text-[20px] font-black leading-tight tracking-tight text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                              {exp.company}
-                            </h4>
-                            <p className="line-clamp-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400 font-medium">
-                              {getCleanDesc(exp.desc)}
-                            </p>
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                            {exp.projects && exp.projects.slice(0, 2).map((p, i) => (
-                              <span
-                                key={i}
-                                className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/5 dark:text-slate-300"
-                              >
-                                {p}
-                              </span>
-                            ))}
-                            <span 
-                              className="rounded-lg px-2.5 py-1 text-[10px] font-bold"
-                              style={{ backgroundColor: cardBrand.hex + "15", color: cardBrand.hex }}
-                            >
-                              {exp.categoryName || "Dự án"}
-                            </span>
-                          </div>
+                        </div>
+                        
+                        {/* COMPANY TITLE & DESCRIPTION */}
+                        <div className="flex flex-col gap-1">
+                          <h4 className="text-base sm:text-lg font-black leading-tight tracking-tight text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {exp.company}
+                          </h4>
+                          <p className="line-clamp-3 text-xs leading-relaxed text-slate-600 dark:text-slate-400 font-medium">
+                            {getCleanDesc(exp.desc)}
+                          </p>
                         </div>
 
-                        {/* BOX 2 (SIDE UTILITIES): Role & Time */}
-                        <div className="flex flex-col justify-between gap-3 rounded-[18px] border border-slate-200/70 bg-white/90 p-4 sm:p-5 transition-colors group-hover:border-blue-300/60 dark:border-white/10 dark:bg-[#151921]/90 col-span-1 sm:col-span-3">
-                          <div className="flex items-start justify-between">
+                        {/* TAGS */}
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {exp.projects && exp.projects.slice(0, 2).map((p, i) => (
+                            <span
+                              key={i}
+                              className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/5 dark:text-slate-300"
+                            >
+                              {p}
+                            </span>
+                          ))}
+                          <span 
+                            className="rounded-lg px-2.5 py-1 text-[10px] font-bold"
+                            style={{ backgroundColor: cardBrand.hex + "15", color: cardBrand.hex }}
+                          >
+                            {exp.categoryName || "Dự án"}
+                          </span>
+                        </div>
+
+                        {/* ROLE & RESPONSIBILITY */}
+                        <div className="flex flex-col gap-1.5 border-t border-slate-100 dark:border-white/10 pt-3">
+                          <div className="flex items-center justify-between">
                             <span 
                               className="text-[10px] font-black tracking-wider uppercase"
                               style={{ color: cardBrand.hex }}
@@ -578,92 +574,64 @@ export function Experience() {
                               Vai trò & Trách nhiệm
                             </span>
                             <div
-                              className="rounded-lg p-1.5"
+                              className="rounded-lg p-1"
                               style={{ backgroundColor: cardBrand.hex + "15", color: cardBrand.hex }}
                             >
-                              <Briefcase size={14} />
+                              <Briefcase size={13} />
                             </div>
                           </div>
 
-                          <div className="flex flex-col gap-1 mt-1">
-                            <h5 className="text-[15px] sm:text-[16px] font-black leading-tight text-slate-800 dark:text-slate-100">
+                          <div className="flex flex-col gap-0.5">
+                            <h5 className="text-sm font-black leading-tight text-slate-800 dark:text-slate-100">
                               {exp.subTitle || "Quản trị CX"}
                             </h5>
                             <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                               {exp.role}
                             </p>
                           </div>
-
-                          {/* Quick indicators */}
-                          <div className="space-y-1.5 mt-1">
-                            <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                              <span>Tiến độ & Hiệu suất</span>
-                              <span style={{ color: cardBrand.hex }}>100% SOP</span>
-                            </div>
-                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
-                              <div 
-                                className="h-full rounded-full transition-all duration-500" 
-                                style={{ width: "85%", backgroundColor: cardBrand.hex }}
-                              />
-                            </div>
-                          </div>
                         </div>
 
-                        {/* BOX 3 (MEDIA & PHOTOS): 1x1 Mini Bento button */}
-                        <button
-                          type="button"
-                          className="group/km flex items-center gap-3 rounded-[16px] border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/15 p-3 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] dark:border-rose-500/20 dark:bg-rose-950/30 dark:hover:bg-rose-950/50 backdrop-blur-xl shadow-xs hover:shadow-md col-span-1 text-left cursor-pointer w-full"
-                          onClick={(e) => {
-                            if (exp.photos && exp.photos.length > 0) {
+                        {/* BOTTOM ACTION BUTTONS / UTILITIES */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            className="flex items-center gap-2 rounded-[14px] border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/15 p-2.5 text-left cursor-pointer transition-all dark:border-rose-500/20 dark:bg-rose-950/30"
+                            onClick={(e) => {
+                              if (exp.photos && exp.photos.length > 0) {
+                                e.stopPropagation();
+                                playUiSound("click");
+                                setActivePhotoIndex(0);
+                                setShowGallery(true);
+                              }
+                            }}
+                          >
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-rose-500/20 text-rose-600 dark:text-rose-400">
+                              <ImageIcon size={14} />
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-[11px] font-bold text-slate-800 dark:text-slate-100 truncate">{isVi ? "Hình ảnh" : "Photos"}</span>
+                              <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                                {exp.photos && exp.photos.length > 0 ? `${exp.photos.length} hình` : "Không có"}
+                              </span>
+                            </div>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
                               e.stopPropagation();
                               playUiSound("click");
-                              setActivePhotoIndex(0);
-                              setShowGallery(true);
-                            }
-                          }}
-                        >
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-500/20 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 border border-rose-500/30 shadow-2xs group-hover/km:scale-105 transition-transform">
-                            <ImageIcon size={15} />
-                          </div>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{isVi ? "Hình ảnh" : "Photos"}</span>
-                            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">
-                              {exp.photos && exp.photos.length > 0 ? (isVi ? `${exp.photos.length} kỷ niệm` : `${exp.photos.length} photos`) : (isVi ? "Không có" : "None")}
-                            </span>
-                          </div>
-                        </button>
-
-                        {/* BOX 4 (PLATFORM/CATEGORY): 1x1 Mini Bento block */}
-                        <div className="flex items-center gap-3 rounded-[16px] border border-indigo-500/30 bg-indigo-500/10 p-3 transition-all duration-300 dark:border-indigo-500/20 dark:bg-indigo-950/30 backdrop-blur-xl shadow-xs col-span-1">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 border border-indigo-500/30 shadow-2xs">
-                            <Layers size={15} />
-                          </div>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{isVi ? "Nền tảng" : "Platform"}</span>
-                            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">
-                              {exp.categoryName || (isVi ? "Đa ngành" : "Multi-sector")}
-                            </span>
-                          </div>
+                              setDetailModalExp(exp);
+                            }}
+                            className="flex items-center justify-between rounded-[14px] border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15 p-2.5 text-left cursor-pointer transition-all dark:border-emerald-500/20 dark:bg-emerald-950/30"
+                          >
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 truncate">{isVi ? "Chi tiết" : "Details"}</span>
+                              <span className="text-[9px] font-medium text-slate-500 dark:text-slate-400 truncate">{isVi ? "Xem báo cáo" : "View report"}</span>
+                            </div>
+                            <Maximize2 size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          </button>
                         </div>
-
-                        {/* BOX 5 (DETAILS ACTION): 1x1 Mini Bento button */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            playUiSound("click");
-                            setDetailModalExp(exp);
-                          }}
-                          className="group/km flex items-center justify-between rounded-[16px] border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15 p-3 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] dark:border-emerald-500/20 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 backdrop-blur-xl shadow-xs hover:shadow-md col-span-1 text-left cursor-pointer w-full"
-                        >
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 truncate">{isVi ? "Chi tiết thẻ" : "Details"}</span>
-                            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">{isVi ? "Bấm xem báo cáo" : "View report"}</span>
-                          </div>
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/30 group-hover/km:scale-110 transition-transform shadow-2xs">
-                            <Maximize2 size={14} />
-                          </div>
-                        </button>
                       </div>
                     </motion.div>
                   );
@@ -872,9 +840,9 @@ export function Experience() {
                   exit={{ opacity: 0, y: -15 }}
                   className="flex min-h-0 w-full flex-1 flex-col items-center p-[10px]"
                 >
-                  {/* Company Overview Header Row */}
+                  {/* Company Overview Header Row - Styled Card */}
                   {selectedExp.yearStart !== "2026" && (
-                    <div className="flex w-full items-stretch justify-between gap-4   pb-6">
+                    <div className="flex w-full items-stretch justify-between gap-4 rounded-2xl border border-slate-200/80 bg-slate-50/90 p-4 sm:p-5 dark:border-white/10 dark:bg-slate-800/60 shadow-xs mb-6 transition-all hover:border-indigo-500/30">
                        {/* Cột trái: 4 Dòng */}
                       <div className="flex min-w-0 flex-1 flex-col justify-between gap-2.5 h-[130px] p-2.5">
                         {/* Dòng 1 : Từ Năm ... đến ... */}
@@ -915,7 +883,27 @@ export function Experience() {
 
                           {/* Cột chữ gồm Dòng 2, Dòng 3 và Dòng 4 */}
                           <div className="flex flex-col justify-between gap-1.5 min-w-0 flex-1">
-                            {/* Dòng 2 : Viễn thông */}
+                            {/* Dòng 2 : Tên công ty (20 px) */}
+                            <h2
+                              className="text-[20px] leading-tight font-black tracking-tight transition-colors duration-300 truncate"
+                              style={{ color: selectedBrand.hex }}
+                            >
+                              {selectedExp.company}
+                            </h2>
+
+                            {/* Dòng 3 : (Cty Ánh Hào Quang) (18 px) */}
+                            {selectedExp.subTitle && (
+                              <div className="flex items-center min-w-0">
+                                <div
+                                  className="text-[18px] font-black leading-tight truncate"
+                                  style={{ color: selectedBrand.hex }}
+                                >
+                                  {selectedExp.subTitle}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Dòng 4 : Viễn thông (nằm dưới Cty Ánh Hào Quang) */}
                             {selectedExp.categoryName && (
                               <div className="flex items-center min-w-0">
                                 <span
@@ -930,26 +918,6 @@ export function Experience() {
                                 >
                                   {selectedExp.categoryName}
                                 </span>
-                              </div>
-                            )}
-
-                            {/* Dòng 3 : Tên công ty (20 px) */}
-                            <h2
-                              className="text-[20px] leading-tight font-black tracking-tight transition-colors duration-300 truncate"
-                              style={{ color: selectedBrand.hex }}
-                            >
-                              {selectedExp.company}
-                            </h2>
-
-                            {/* Dòng 4 : (Cty Ánh Hào Quang) (18 px) */}
-                            {selectedExp.subTitle && (
-                              <div className="flex items-center min-w-0">
-                                <div
-                                  className="text-[18px] font-black leading-tight truncate"
-                                  style={{ color: selectedBrand.hex }}
-                                >
-                                  {selectedExp.subTitle}
-                                </div>
                               </div>
                             )}
                           </div>
@@ -992,6 +960,13 @@ export function Experience() {
                           <span>{isVi ? "Không có hình" : "No photos"}</span>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* Experience Description (Moved out of draggable subcards) */}
+                  {selectedExp.yearStart !== "2026" && selectedExp.desc && (
+                    <div className="w-full text-left rounded-2xl border border-slate-200/80 bg-white/95 p-5 sm:p-6 dark:border-white/10 dark:bg-slate-900/90 shadow-xs mb-6 prose prose-slate dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 leading-relaxed text-sm font-medium">
+                      <Markdown>{selectedExp.desc}</Markdown>
                     </div>
                   )}
 
@@ -1095,72 +1070,48 @@ export function Experience() {
                         axis="y"
                         values={subCardsOrder}
                         onReorder={setSubCardsOrder}
-                        className="m-0 w-full list-none grid grid-cols-1 gap-4 p-0 pt-1 md:grid-cols-12"
+                        className="m-0 w-full list-none columns-1 md:columns-2 gap-4 p-0 pt-1"
                       >
                         {subCardsOrder.map((cardId, cardIndex) => {
                           const badgeNum = cardIndex + 1;
                           switch (cardId) {
-                            case "chia-se":
-                              return (
-                                <Reorder.Item
-                                  value="chia-se"
-                                  key="chia-se"
-                                  className="md:col-span-12 lg:col-span-12 relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing"
-                                  whileHover={{ y: 0 }}
-                                  whileDrag={{ scale: 1, zIndex: 50 }}
-                                >
-                                  <div className="group magic-card relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border bg-amber-500/15 p-5 text-left backdrop-blur-3xl transition-all sm:p-6">
-                                    <div className="flex w-full shrink-0 items-center justify-between pb-3">
-                                      <div className="flex items-center gap-2.5">
-                                        <h3 className="flex items-center gap-2 text-[16px] md:text-[18px] font-black tracking-tight text-amber-700 dark:text-amber-400">
-                                          <ClipboardList size={18} />
-                                          <span>0{badgeNum} · Chia sẻ</span>
-                                        </h3>
-                                      </div>
-                                      <div className="cursor-grab text-[var(--muted)] hover:text-[var(--text-primary)] active:cursor-grabbing">
-                                        <GripVertical size={16} />
-                                      </div>
-                                    </div>
-                                    <div className="prose prose-slate dark:prose-invert relative w-full max-w-none space-y-3 text-sm leading-relaxed font-medium text-[var(--text-primary)]">
-                                      <Markdown>{selectedExp.desc}</Markdown>
-                                    </div>
-                                  </div>
-                                </Reorder.Item>
-                              );
                             case "quan-ly":
                               return (
                                 <Reorder.Item
                                   value="quan-ly"
                                   key="quan-ly"
-                                  className="md:col-span-12 lg:col-span-12 relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing"
+                                  className="relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing h-auto mb-4 align-top"
                                   whileHover={{ y: 0 }}
                                   whileDrag={{ scale: 1, zIndex: 50 }}
                                 >
-                                  <div className="group magic-card relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border bg-sky-500/15 p-5 text-left backdrop-blur-3xl transition-all sm:p-6">
-                                    <div className="flex w-full shrink-0 items-center justify-between pb-3">
-                                      <div className="flex items-center gap-2.5">
-                                        <h3 className="flex items-center gap-2 text-[16px] md:text-[18px] font-black tracking-tight text-sky-700 dark:text-sky-400">
+                                  <div className="group magic-card relative flex h-auto w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border border-sky-500/30 bg-white/90 p-5 text-left backdrop-blur-3xl transition-all sm:p-6 dark:border-sky-500/30 dark:bg-slate-900/90">
+                                    <div className="flex w-full shrink-0 items-center justify-between pb-3 border-b border-sky-500/20">
+                                      <span className="text-[16px] md:text-[18px] font-black tracking-tight text-sky-700 dark:text-sky-400">
+                                        0{badgeNum}
+                                      </span>
+                                      <div className="flex items-center gap-3 text-[16px] md:text-[18px] font-black tracking-tight text-sky-700 dark:text-sky-400">
+                                        <div className="flex items-center gap-1.5">
                                           <UserCheck size={18} />
-                                          <span>0{badgeNum} · Quản lý</span>
-                                        </h3>
-                                      </div>
-                                      <div className="cursor-grab text-[var(--muted)] hover:text-[var(--text-primary)] active:cursor-grabbing">
+                                          <span>Quản lý</span>
+                                        </div>
+                                        <div className="cursor-grab text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:cursor-grabbing">
                                         <GripVertical size={16} />
                                       </div>
+                                      </div>
                                     </div>
-                                    <div className="w-full min-w-0 flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700 sm:text-sm dark:text-slate-300">
-                                      <div className="flex items-start gap-3 rounded-[12px] border border-sky-500/25 bg-sky-500/10 p-3.5">
-                                        <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-sky-500" />
+                                    <div className="w-full min-w-0 flex-1 grid grid-cols-1 gap-3 text-xs text-slate-700 sm:text-sm dark:text-slate-300">
+                                      <div className="flex items-start gap-3 rounded-[12px] border border-sky-500/30 bg-sky-50/80 p-3.5 dark:border-sky-500/20 dark:bg-slate-800/80">
+                                        <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-sky-600 dark:text-sky-400" />
                                         <div className="flex flex-col gap-1 min-w-0">
-                                          <span className="font-bold text-[var(--text-primary)]">Chức danh quản trị:</span>
-                                          <span className="font-black text-sky-600 dark:text-sky-400 text-sm truncate">{selectedExp.role}</span>
+                                          <span className="font-bold text-slate-800 dark:text-slate-200">Chức danh quản trị:</span>
+                                          <span className="font-black text-sky-700 dark:text-sky-400 text-sm truncate">{selectedExp.role}</span>
                                         </div>
                                       </div>
-                                      <div className="flex items-start gap-3 rounded-[12px] border border-sky-500/25 bg-sky-500/10 p-3.5">
-                                        <Users size={18} className="mt-0.5 shrink-0 text-sky-500" />
+                                      <div className="flex items-start gap-3 rounded-[12px] border border-sky-500/30 bg-sky-50/80 p-3.5 dark:border-sky-500/20 dark:bg-slate-800/80">
+                                        <Users size={18} className="mt-0.5 shrink-0 text-sky-600 dark:text-sky-400" />
                                         <div className="flex flex-col gap-1 min-w-0">
-                                          <span className="font-bold text-[var(--text-primary)]">Quy mô nhân sự quản lý:</span>
-                                          <span className="font-black text-sky-600 dark:text-sky-400 text-sm truncate">{selectedExp.staff || 0} nhân sự trực thuộc</span>
+                                          <span className="font-bold text-slate-800 dark:text-slate-200">Quy mô nhân sự quản lý:</span>
+                                          <span className="font-black text-sky-700 dark:text-sky-400 text-sm truncate">{selectedExp.staff || 0} nhân sự trực thuộc</span>
                                         </div>
                                       </div>
                                     </div>
@@ -1172,32 +1123,35 @@ export function Experience() {
                                 <Reorder.Item
                                   value="kpi"
                                   key="kpi"
-                                  className="md:col-span-6 lg:col-span-6 relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing"
+                                  className="relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing h-auto mb-4 align-top"
                                   whileHover={{ y: 0 }}
                                   whileDrag={{ scale: 1, zIndex: 50 }}
                                 >
-                                  <div className="group magic-card relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border bg-emerald-500/15 p-5 text-left backdrop-blur-3xl transition-all sm:p-6">
-                                    <div className="flex w-full shrink-0 items-center justify-between pb-3">
-                                      <div className="flex items-center gap-2.5">
-                                        <h3 className="flex items-center gap-2 text-[16px] md:text-[18px] font-black tracking-tight text-emerald-700 dark:text-emerald-400">
+                                  <div className="group magic-card relative flex h-auto w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border border-emerald-500/30 bg-white/90 p-5 text-left backdrop-blur-3xl transition-all sm:p-6 dark:border-emerald-500/30 dark:bg-slate-900/90">
+                                    <div className="flex w-full shrink-0 items-center justify-between pb-3 border-b border-emerald-500/20">
+                                      <span className="text-[16px] md:text-[18px] font-black tracking-tight text-emerald-700 dark:text-emerald-400">
+                                        0{badgeNum}
+                                      </span>
+                                      <div className="flex items-center gap-3 text-[16px] md:text-[18px] font-black tracking-tight text-emerald-700 dark:text-emerald-400">
+                                        <div className="flex items-center gap-1.5">
                                           <Trophy size={18} />
-                                          <span>0{badgeNum} · Kết quả & KPI</span>
-                                        </h3>
-                                      </div>
-                                      <div className="cursor-grab text-[var(--muted)] hover:text-[var(--text-primary)] active:cursor-grabbing">
+                                          <span>Kết quả & KPI</span>
+                                        </div>
+                                        <div className="cursor-grab text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:cursor-grabbing">
                                         <GripVertical size={16} />
+                                      </div>
                                       </div>
                                     </div>
                                     {selectedExp.achievements && selectedExp.achievements.length > 0 ? (
                                       <div className="w-full min-w-0 flex-1 space-y-3">
                                         {selectedExp.achievements.map((ach, i) => (
-                                          <div key={i} className="space-y-1.5 rounded-[12px] border border-emerald-500/30 bg-emerald-500/10 p-3">
+                                          <div key={i} className="space-y-1.5 rounded-[12px] border border-emerald-500/30 bg-emerald-50/80 p-3 dark:border-emerald-500/20 dark:bg-slate-800/80">
                                             <div className="flex items-center justify-between text-xs font-bold">
                                               <span className="text-slate-800 dark:text-slate-200">{ach.name}</span>
-                                              <span className="text-emerald-700 dark:text-emerald-400">{ach.score}%</span>
+                                              <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">{ach.score}%</span>
                                             </div>
-                                            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-emerald-950">
-                                              <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600" style={{ width: `${ach.score}%` }}></div>
+                                            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-emerald-950">
+                                              <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600" style={{ width: `${ach.score}%` }}></div>
                                             </div>
                                           </div>
                                         ))}
@@ -1215,30 +1169,33 @@ export function Experience() {
                                 <Reorder.Item
                                   value="nhiem-vu"
                                   key="nhiem-vu"
-                                  className="md:col-span-6 lg:col-span-6 relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing"
+                                  className="relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing h-auto mb-4 align-top"
                                   whileHover={{ y: 0 }}
                                   whileDrag={{ scale: 1, zIndex: 50 }}
                                 >
-                                  <div className="group magic-card relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border bg-purple-500/15 p-5 text-left backdrop-blur-3xl transition-all sm:p-6">
-                                    <div className="flex w-full shrink-0 items-center justify-between pb-3">
-                                      <div className="flex items-center gap-2.5">
-                                        <h3 className="flex items-center gap-2 text-[16px] md:text-[18px] font-black tracking-tight text-purple-700 dark:text-purple-400">
+                                  <div className="group magic-card relative flex h-auto w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border border-purple-500/30 bg-white/90 p-5 text-left backdrop-blur-3xl transition-all sm:p-6 dark:border-purple-500/30 dark:bg-slate-900/90">
+                                    <div className="flex w-full shrink-0 items-center justify-between pb-3 border-b border-purple-500/20">
+                                      <span className="text-[16px] md:text-[18px] font-black tracking-tight text-purple-700 dark:text-purple-400">
+                                        0{badgeNum}
+                                      </span>
+                                      <div className="flex items-center gap-3 text-[16px] md:text-[18px] font-black tracking-tight text-purple-700 dark:text-purple-400">
+                                        <div className="flex items-center gap-1.5">
                                           <ListChecks size={18} />
-                                          <span>0{badgeNum} · Công việc</span>
-                                        </h3>
-                                      </div>
-                                      <div className="cursor-grab text-[var(--muted)] hover:text-[var(--text-primary)] active:cursor-grabbing">
+                                          <span>Công việc</span>
+                                        </div>
+                                        <div className="cursor-grab text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:cursor-grabbing">
                                         <GripVertical size={16} />
+                                      </div>
                                       </div>
                                     </div>
                                     {selectedExp.tasks && selectedExp.tasks.length > 0 ? (
                                       <div className="w-full min-w-0 flex-1 space-y-3 text-xs text-slate-700 sm:text-sm dark:text-slate-300">
                                         {selectedExp.tasks.map((task, i) => (
-                                          <div key={i} className="flex items-start gap-3">
-                                            <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-purple-500/20 text-purple-600">
+                                          <div key={i} className="flex items-start gap-3 rounded-[12px] border border-purple-500/30 bg-purple-50/80 p-3.5 shadow-xs dark:border-purple-500/20 dark:bg-slate-800/80">
+                                            <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-400">
                                               <span className="text-[10px] font-black">{i + 1}</span>
                                             </div>
-                                            <span className="font-medium tracking-tight">{task}</span>
+                                            <span className="font-semibold tracking-tight text-slate-800 dark:text-slate-200">{task}</span>
                                           </div>
                                         ))}
                                       </div>
@@ -1255,27 +1212,30 @@ export function Experience() {
                                 <Reorder.Item
                                   value="du-an"
                                   key="du-an"
-                                  className="md:col-span-6 lg:col-span-6 relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing"
+                                  className="relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing h-auto mb-4 align-top"
                                   whileHover={{ y: 0 }}
                                   whileDrag={{ scale: 1, zIndex: 50 }}
                                 >
-                                  <div className="group magic-card relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border bg-indigo-500/15 p-5 text-left backdrop-blur-3xl transition-all sm:p-6">
-                                    <div className="flex w-full shrink-0 items-center justify-between pb-3">
-                                      <div className="flex items-center gap-2.5">
-                                        <h3 className="flex items-center gap-2 text-[16px] md:text-[18px] font-black tracking-tight text-indigo-700 dark:text-indigo-400">
+                                  <div className="group magic-card relative flex h-auto w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border border-indigo-500/30 bg-white/90 p-5 text-left backdrop-blur-3xl transition-all sm:p-6 dark:border-indigo-500/30 dark:bg-slate-900/90">
+                                    <div className="flex w-full shrink-0 items-center justify-between pb-3 border-b border-indigo-500/20">
+                                      <span className="text-[16px] md:text-[18px] font-black tracking-tight text-indigo-700 dark:text-indigo-400">
+                                        0{badgeNum}
+                                      </span>
+                                      <div className="flex items-center gap-3 text-[16px] md:text-[18px] font-black tracking-tight text-indigo-700 dark:text-indigo-400">
+                                        <div className="flex items-center gap-1.5">
                                           <FolderGit2 size={18} />
-                                          <span>0{badgeNum} · Dự án</span>
-                                        </h3>
-                                      </div>
-                                      <div className="cursor-grab text-[var(--muted)] hover:text-[var(--text-primary)] active:cursor-grabbing">
+                                          <span>Dự án</span>
+                                        </div>
+                                        <div className="cursor-grab text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:cursor-grabbing">
                                         <GripVertical size={16} />
+                                      </div>
                                       </div>
                                     </div>
                                     {selectedExp.projects && selectedExp.projects.length > 0 ? (
                                       <div className="w-full min-w-0 flex-1 space-y-3">
                                         {selectedExp.projects.map((proj, i) => (
-                                          <div key={i} className="flex items-center gap-3 rounded-[12px] border border-indigo-500/30 bg-indigo-500/10 px-4 py-2.5">
-                                            <FolderGit2 size={15} className="shrink-0 text-indigo-500" />
+                                          <div key={i} className="flex items-center gap-3 rounded-[12px] border border-indigo-500/30 bg-indigo-50/80 px-4 py-2.5 dark:border-indigo-500/20 dark:bg-slate-800/80">
+                                            <FolderGit2 size={15} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
                                             <span className="text-xs font-bold text-slate-800 sm:text-sm dark:text-slate-200">{proj}</span>
                                           </div>
                                         ))}
@@ -1293,32 +1253,35 @@ export function Experience() {
                                 <Reorder.Item
                                   value="cam-ket"
                                   key="cam-ket"
-                                  className="md:col-span-6 lg:col-span-6 relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing"
+                                  className="relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing h-auto mb-4 align-top"
                                   whileHover={{ y: 0 }}
                                   whileDrag={{ scale: 1, zIndex: 50 }}
                                 >
-                                  <div className="group magic-card relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border bg-teal-500/15 p-5 text-left backdrop-blur-3xl transition-all sm:p-6">
-                                    <div className="flex w-full shrink-0 items-center justify-between pb-3">
-                                      <div className="flex items-center gap-2.5">
-                                        <h3 className="flex items-center gap-2 text-[16px] md:text-[18px] font-black tracking-tight text-teal-700 dark:text-teal-400">
+                                  <div className="group magic-card relative flex h-auto w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border border-teal-500/30 bg-white/90 p-5 text-left backdrop-blur-3xl transition-all sm:p-6 dark:border-teal-500/30 dark:bg-slate-900/90">
+                                    <div className="flex w-full shrink-0 items-center justify-between pb-3 border-b border-teal-500/20">
+                                      <span className="text-[16px] md:text-[18px] font-black tracking-tight text-teal-700 dark:text-teal-400">
+                                        0{badgeNum}
+                                      </span>
+                                      <div className="flex items-center gap-3 text-[16px] md:text-[18px] font-black tracking-tight text-teal-700 dark:text-teal-400">
+                                        <div className="flex items-center gap-1.5">
                                           <ShieldCheck size={18} />
-                                          <span>0{badgeNum} · Cam kết</span>
-                                        </h3>
-                                      </div>
-                                      <div className="cursor-grab text-[var(--muted)] hover:text-[var(--text-primary)] active:cursor-grabbing">
+                                          <span>Cam kết</span>
+                                        </div>
+                                        <div className="cursor-grab text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:cursor-grabbing">
                                         <GripVertical size={16} />
+                                      </div>
                                       </div>
                                     </div>
                                     <div className="w-full min-w-0 flex-1 space-y-3 text-xs text-slate-700 sm:text-sm dark:text-slate-300">
-                                      <div className="flex items-start gap-3">
-                                        <CheckCircle2 size={16} className="mt-1 shrink-0 text-teal-500" />
-                                        <span className="font-medium tracking-tight">
+                                      <div className="flex items-start gap-3 rounded-[12px] border border-teal-500/30 bg-teal-50/80 p-3.5 shadow-xs dark:border-teal-500/20 dark:bg-slate-800/80">
+                                        <CheckCircle2 size={16} className="mt-1 shrink-0 text-teal-600 dark:text-teal-400" />
+                                        <span className="font-semibold tracking-tight text-slate-800 dark:text-slate-200">
                                           Chuẩn hóa SOP quy trình dịch vụ khách hàng đa kênh
                                         </span>
                                       </div>
-                                      <div className="flex items-start gap-3">
-                                        <CheckCircle2 size={16} className="mt-1 shrink-0 text-teal-500" />
-                                        <span className="font-medium tracking-tight">
+                                      <div className="flex items-start gap-3 rounded-[12px] border border-teal-500/30 bg-teal-50/80 p-3.5 shadow-xs dark:border-teal-500/20 dark:bg-slate-800/80">
+                                        <CheckCircle2 size={16} className="mt-1 shrink-0 text-teal-600 dark:text-teal-400" />
+                                        <span className="font-semibold tracking-tight text-slate-800 dark:text-slate-200">
                                           Đào tạo & Quản trị năng suất đội ngũ theo chỉ số CSAT & NPS
                                         </span>
                                       </div>
@@ -1331,33 +1294,36 @@ export function Experience() {
                                 <Reorder.Item
                                   value="ky-niem"
                                   key="ky-niem"
-                                  className="md:col-span-12 lg:col-span-12 relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing"
+                                  className="relative z-10 inline-block w-full cursor-grab break-inside-avoid select-none active:cursor-grabbing h-auto mb-4 align-top"
                                   whileHover={{ y: 0 }}
                                   whileDrag={{ scale: 1, zIndex: 50 }}
                                 >
-                                  <div className="group magic-card relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border bg-rose-500/15 p-5 text-left backdrop-blur-3xl transition-all sm:p-6">
-                                    <div className="flex w-full shrink-0 items-center justify-between pb-3">
-                                      <div className="flex items-center gap-2.5">
-                                        <h3 className="flex items-center gap-2 text-[16px] md:text-[18px] font-black tracking-tight text-rose-700 dark:text-rose-400">
+                                  <div className="group magic-card relative flex h-auto w-full flex-col items-start gap-4 overflow-hidden rounded-[16px] border border-rose-500/30 bg-white/90 p-5 text-left backdrop-blur-3xl transition-all sm:p-6 dark:border-rose-500/30 dark:bg-slate-900/90">
+                                    <div className="flex w-full shrink-0 items-center justify-between pb-3 border-b border-rose-500/20">
+                                      <span className="text-[16px] md:text-[18px] font-black tracking-tight text-rose-700 dark:text-rose-400">
+                                        0{badgeNum}
+                                      </span>
+                                      <div className="flex items-center gap-3 text-[16px] md:text-[18px] font-black tracking-tight text-rose-700 dark:text-rose-400">
+                                        <div className="flex items-center gap-1.5">
                                           <ImageIcon size={18} />
-                                          <span>0{badgeNum} · Kỷ niệm</span>
-                                        </h3>
-                                      </div>
-                                      <div className="flex items-center gap-2">
+                                          <span>Kỷ niệm</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
                                         <button
                                           onClick={() => {
                                             playUiSound("click");
                                             setShowGallery(true);
                                           }}
-                                          className="cursor-pointer rounded-full border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 px-3 py-1 text-[11px] font-black text-rose-700 dark:text-rose-300 backdrop-blur-md transition-all hover:scale-105 active:scale-95 shadow-xs"
+                                          className="cursor-pointer rounded-full border border-rose-500/30 bg-rose-50/80 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 px-3 py-1 text-[11px] font-black text-rose-700 dark:text-rose-300 backdrop-blur-md transition-all hover:scale-105 active:scale-95 shadow-xs"
                                         >
                                           {isVi ? `Xem tất cả (${selectedExp.photos.length})` : `View all (${selectedExp.photos.length})`}
                                         </button>
-                                        <div className="cursor-grab text-[var(--muted)] hover:text-[var(--text-primary)] active:cursor-grabbing">
+                                        <div className="cursor-grab text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:cursor-grabbing">
                                           <GripVertical size={16} />
                                         </div>
                                       </div>
                                     </div>
+                                      </div>
                                     <div className="w-full">
                                       <div className="group/carousel relative w-full overflow-hidden">
                                         <div className="no-scrollbar flex snap-x gap-2.5 overflow-x-auto py-1">
@@ -1467,16 +1433,7 @@ export function Experience() {
 
                       {/* Cột chữ gồm Dòng 2, Dòng 3 và Dòng 4 */}
                       <div className="flex flex-col justify-between gap-1.5 min-w-0 flex-1">
-                        {/* Dòng 2 : Viễn thông */}
-                        {detailModalExp.categoryName && (
-                          <div className="flex items-center min-w-0">
-                            <span className="rounded-full border  bg-amber-500/15 px-2.5 py-0.5 text-[10px] font-black text-amber-900 dark:text-amber-300">
-                              {detailModalExp.categoryName}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Dòng 3 : Tên công ty (20px) */}
+                        {/* Dòng 2 : Tên công ty (20px) */}
                         <h2
                           className="text-[20px] leading-tight font-black tracking-tight truncate"
                           style={{ color: detailModalBrand?.hex }}
@@ -1484,7 +1441,7 @@ export function Experience() {
                           {detailModalExp.company}
                         </h2>
 
-                        {/* Dòng 4 : (Cty Ánh Hào Quang) (18px) */}
+                        {/* Dòng 3 : (Cty Ánh Hào Quang) (18px) */}
                         {detailModalExp.subTitle && (
                           <div className="flex items-center min-w-0">
                             <div
@@ -1493,6 +1450,15 @@ export function Experience() {
                             >
                               {detailModalExp.subTitle}
                             </div>
+                          </div>
+                        )}
+
+                        {/* Dòng 4 : Viễn thông (nằm dưới Cty Ánh Hào Quang) */}
+                        {detailModalExp.categoryName && (
+                          <div className="flex items-center min-w-0">
+                            <span className="rounded-full border bg-amber-500/15 px-2.5 py-0.5 text-[10px] font-black text-amber-900 dark:text-amber-300">
+                              {detailModalExp.categoryName}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -1808,6 +1774,7 @@ export function Experience() {
           </motion.button>
         )}
       </AnimatePresence>
+      </div>
     </PageLayout>
   );
 }

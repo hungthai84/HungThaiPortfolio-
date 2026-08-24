@@ -221,7 +221,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
       onTouchEnd={handleTouchEnd}
     >
       {/* TOP SLIDER CONTROLS BAR */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/70 p-3 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-900/60">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/70 p-3 shadow-xs dark:border-white/10 dark:bg-slate-900/60">
         {/* Slide Navigation Tabs */}
         <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto py-0.5 custom-scrollbar">
           {slidesMeta.map((slide, idx) => {
@@ -358,7 +358,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
                 {/* Main Content Box */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-center">
                   <div className="space-y-4 lg:col-span-8">
-                    <div className="rounded-2xl border border-black/5 bg-slate-50/70 p-5 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">
+                    <div className="rounded-2xl border border-black/5 bg-slate-50/70 p-5 shadow-xs dark:border-white/10 dark:bg-white/[0.03]">
                       <p className="text-sm leading-relaxed text-slate-700 sm:text-base dark:text-slate-200">
                         {t.coverLetter.introPrefix}
                         <strong className="text-base font-black text-blue-700 sm:text-lg dark:text-amber-400">
@@ -455,7 +455,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-center">
                   {/* Left: Big Quote Card */}
-                  <div className="relative overflow-hidden rounded-2xl border border-sky-500/30 bg-gradient-to-br from-sky-500/15 via-blue-500/10 to-transparent p-6 shadow-sm backdrop-blur-md sm:p-8 lg:col-span-7 dark:border-sky-400/30">
+                  <div className="relative overflow-hidden rounded-2xl border border-sky-500/30 bg-gradient-to-br from-sky-500/15 via-blue-500/10 to-transparent p-6 shadow-sm sm:p-8 lg:col-span-7 dark:border-sky-400/30">
                     <Quote className="absolute -top-3 -left-3 h-24 w-24 text-sky-500/10 dark:text-sky-400/10" />
                     <div className="relative z-10">
                       <p className="mb-3 text-xs font-extrabold tracking-widest text-sky-700 uppercase dark:text-sky-300">
@@ -473,7 +473,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
                   </div>
 
                   {/* Right: Tech & Automation Systems */}
-                  <div className="space-y-4 rounded-2xl border border-black/5 bg-slate-50/70 p-6 shadow-xs backdrop-blur-md lg:col-span-5 dark:border-white/10 dark:bg-white/[0.03]">
+                  <div className="space-y-4 rounded-2xl border border-black/5 bg-slate-50/70 p-6 shadow-xs lg:col-span-5 dark:border-white/10 dark:bg-white/[0.03]">
                     <div className="flex items-center gap-2">
                       <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400">
                         <Settings size={18} />
@@ -732,7 +732,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
                           )}
                         >
                           <div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
                               <span className={cn(
                                 "flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-r text-white shadow-xs",
                                 item.color,
@@ -762,7 +762,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
 
                 {/* Active Milestone Highlight Card */}
                 {timelineData[activeMilestoneIndex] && (
-                  <div className="rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent p-4 shadow-xs backdrop-blur-md dark:border-amber-400/20">
+                  <div className="rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent p-4 shadow-xs dark:border-amber-400/20">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
@@ -837,7 +837,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
 
                         <div className="relative z-10">
                           <div className="flex items-center justify-between">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md shadow-xs">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 shadow-xs">
                               <IconComponent size={22} className="text-white" />
                             </div>
                             <span className="text-2xl font-black text-white/40 tracking-wider">
@@ -901,7 +901,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-center">
                   {/* Left: Closing Manifesto */}
-                  <div className="space-y-4 rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-slate-50/60 to-transparent p-6 shadow-xs backdrop-blur-md sm:p-8 lg:col-span-8 dark:border-emerald-400/20 dark:from-emerald-500/15 dark:via-white/[0.02]">
+                  <div className="space-y-4 rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-slate-50/60 to-transparent p-6 shadow-xs sm:p-8 lg:col-span-8 dark:border-emerald-400/20 dark:from-emerald-500/15 dark:via-white/[0.02]">
                     <p className="text-sm leading-relaxed font-semibold text-slate-800 sm:text-base dark:text-slate-200">
                       {t.coverLetter.closingText}
                       <strong className="font-extrabold text-[#0b2853] dark:text-sky-300">
@@ -935,7 +935,7 @@ export function CoverLetterSlider({ onSwitchToDocView: _ }: CoverLetterSliderPro
                   </div>
 
                   {/* Right: Signature Card */}
-                  <div className="flex flex-col items-center justify-center rounded-2xl border border-black/5 bg-slate-50/70 p-6 text-center shadow-xs backdrop-blur-md lg:col-span-4 dark:border-white/10 dark:bg-white/[0.03]">
+                  <div className="flex flex-col items-center justify-center rounded-2xl border border-black/5 bg-slate-50/70 p-6 text-center shadow-xs lg:col-span-4 dark:border-white/10 dark:bg-white/[0.03]">
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                       {t.coverLetter.sincerely}
                     </p>

@@ -10,13 +10,14 @@ export const pageSequence: string[] = [
   "coverLetter",
   "about",
   "experience",
-  "education",
   "skills",
   "industries",
   "projects",
-  "systems",
-  "interview",
-  "astrology",
   "memories",
+  "systems",
+  "websiteManagement",
+  "interview",
+
   "wallpapers",
+  "templateTest",
 ].filter((v, i, a) => a.indexOf(v) === i);

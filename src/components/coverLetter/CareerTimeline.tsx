@@ -1,270 +1,321 @@
 import React from "react";
 import { motion } from "motion/react";
-import { LucideIcon } from "lucide-react";
-import { timelineData } from "../../data/coverLetterData";
+import {
+  Radio,
+  Users,
+  Monitor,
+  Gamepad2,
+  ShoppingCart,
+  ShieldCheck,
+  Smartphone,
+  LucideIcon,
+} from "lucide-react";
 import { useLanguageContent } from "../../hooks/useCoverLetter";
 import { cn } from "../../lib/utils";
-import { getBrandColorConfig } from "../../lib/brandColors";
 
-const renderTextWithLogos = (text: string) => {
-  const companyKeywords = [
-    { name: "MobiFone", url: "https://i.ibb.co/qYBWg57r/Mobifone.png" },
-    { name: "Viễn Liên V247", url: "https://i.ibb.co/2Y3tNsnd/Call-V247.png" },
-    { name: "V247", url: "https://i.ibb.co/2Y3tNsnd/Call-V247.png" },
-    { name: "HTV LBC", url: "https://i.ibb.co/DDYsQ20B/LBC.png" },
-    { name: "LBC – HTV Cable", url: "https://i.ibb.co/DDYsQ20B/LBC.png" },
-    { name: "HTV Cable", url: "https://i.ibb.co/DDYsQ20B/LBC.png" },
-    { name: "LBC", url: "https://i.ibb.co/DDYsQ20B/LBC.png" },
-    { name: "Garena", url: "https://i.ibb.co/BHxMzQFk/Garena.png" },
-    { name: "Shopee", url: "https://i.ibb.co/F4T7Zr0k/Shoppe.png" },
-    { name: "AirPay", url: "https://i.ibb.co/HTPmHMMQ/Airpay.png" },
-    { name: "ShopeePay", url: "https://i.ibb.co/RTPz5Cc3/Shopee-Pay.png" },
-    { name: "Prudential", url: "https://i.ibb.co/LThmXHs/Prudentinal.png" },
-    { name: "MoMo", url: "https://i.ibb.co/jXJXLvT/Momo.png" },
-    { name: "Ví ECO", url: "https://i.ibb.co/mVfX9RkG/Finviet.png" },
-    { name: "FinViet", url: "https://i.ibb.co/mVfX9RkG/Finviet.png" },
-  ];
-
-  const sortedKeywords = [...companyKeywords].sort(
-    (a, b) => b.name.length - a.name.length,
-  );
-  const regexParts = sortedKeywords.map((k) =>
-    k.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"),
-  );
-  const regex = new RegExp(`(${regexParts.join("|")})`, "g");
-
-  const parts = text.split(regex);
-  return parts.map((part, index) => {
-    const matched = sortedKeywords.find(
-      (k) => k.name.toLowerCase() === part.toLowerCase(),
-    );
-    if (matched) {
-      return (
-        <span
-          key={index}
-          className="mx-1 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200/50 bg-white px-1.5 py-0.5 align-middle font-black text-slate-800 shadow-2xs transition-all hover:scale-105 dark:border-slate-700/50 dark:bg-slate-800 dark:text-slate-200"
-        >
-          <img
-            src={matched.url}
-            alt={matched.name}
-            className="inline-block h-6 w-6 shrink-0 rounded-full border border-slate-200 object-cover shadow-xs dark:border-slate-700"
-            referrerPolicy="no-referrer"
-          />
-          <span>{part}</span>
-        </span>
-      );
-    }
-    return part;
-  });
-};
-
-interface TimelineItemProps {
+export interface TimelineMilestone {
   year: string;
   company: string;
-  role: string;
-  desc: string;
+  roleVi: string;
+  roleEn: string;
+  descVi: string;
+  descEn: string;
   icon: LucideIcon;
-  color: string;
-  isSelected: boolean;
-  isLast: boolean;
-  onToggle: () => void;
+  iconBg: string;
+  iconColor: string;
+  tag?: string;
+  logos: { name: string; url: string }[];
 }
 
-const TimelineItem = React.memo(function TimelineItem({
-  year,
-  company,
-  role,
-  desc,
-  icon: IconComponent,
-  color: _color,
-  isSelected,
-  isLast,
-  onToggle,
-}: TimelineItemProps) {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onToggle();
-    }
-  };
+export const TIMELINE_MILESTONES: TimelineMilestone[] = [
+  {
+    year: "2003",
+    company: "MobiFone",
+    roleVi: "Chuyên viên Tổng đài CSKH",
+    roleEn: "Customer Service Specialist",
+    descVi:
+      "Bắt đầu sự nghiệp từ năm 2003 tại MobiFone, nơi tôi được đào tạo nền tảng về dịch vụ khách hàng, quản lý tổng đài, xử lý sự cố và xây dựng quy trình phục vụ theo tiêu chuẩn viễn thông.",
+    descEn:
+      "Started career in 2003 at MobiFone, receiving rigorous training in customer service standards, call center operations, incident management, and telecom service workflows.",
+    icon: Radio,
+    iconBg: "bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800",
+    iconColor: "text-blue-600 dark:text-blue-400",
+    logos: [
+      { name: "MobiFone", url: "https://i.ibb.co/qYBWg57r/Mobifone.png" },
+    ],
+  },
+  {
+    year: "2007",
+    company: "Viễn Liên V247",
+    roleVi: "Giám sát Vận hành CSKH",
+    roleEn: "CS Operations Supervisor",
+    descVi:
+      "Tiếp đó, tại Viễn Liên V247, tôi phát triển năng lực quản lý đội ngũ, giám sát chất lượng dịch vụ và tối ưu hiệu quả vận hành của trung tâm chăm sóc khách hàng.",
+    descEn:
+      "At Vien Lien V247, advanced into leadership by overseeing team performance, QA monitoring, and optimizing contact center operational efficiency.",
+    icon: Users,
+    iconBg: "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800",
+    iconColor: "text-indigo-600 dark:text-indigo-400",
+    logos: [
+      { name: "Viễn Liên V247", url: "https://i.ibb.co/2Y3tNsnd/Call-V247.png" },
+    ],
+  },
+  {
+    year: "2011",
+    company: "LBC – HTV Cable",
+    roleVi: "Trưởng phòng CSKH",
+    roleEn: "Head of Customer Care",
+    descVi:
+      "Lần đầu tiên đảm nhiệm vị trí Trưởng phòng Chăm sóc Khách hàng. Đây là giai đoạn giúp tôi chuyển mình từ một nhà quản lý vận hành sang một nhà quản trị toàn diện: xây dựng quy trình, phát triển đội ngũ, thiết lập KPI và tối ưu trải nghiệm khách hàng.",
+    descEn:
+      "First role as Head of Customer Care. A key transformative era evolving from operational supervisor to comprehensive executive: standardizing SOPs, setting KPIs, and leading talent development.",
+    icon: Monitor,
+    iconBg: "bg-sky-50 dark:bg-sky-950/60 border-sky-200 dark:border-sky-800",
+    iconColor: "text-sky-600 dark:text-sky-400",
+    logos: [
+      { name: "LBC – HTV Cable", url: "https://i.ibb.co/DDYsQ20B/LBC.png" },
+    ],
+  },
+  {
+    year: "2013",
+    company: "Garena",
+    roleVi: "Head of Customer Support",
+    roleEn: "Head of Customer Support",
+    descVi:
+      "Quản lý hoạt động chăm sóc khách hàng trong lĩnh vực eSports & game, đòi hỏi tốc độ xử lý nhanh, chính xác và khả năng đáp ứng khối lượng khách hàng cực lớn.",
+    descEn:
+      "Spearheaded 24/7 gamer support operations in high-velocity eSports & digital entertainment, mastering rapid ticket resolution and high-volume surge management.",
+    icon: Gamepad2,
+    iconBg: "bg-purple-50 dark:bg-purple-950/60 border-purple-200 dark:border-purple-800",
+    iconColor: "text-purple-600 dark:text-purple-400",
+    logos: [
+      { name: "Garena", url: "https://i.ibb.co/BHxMzQFk/Garena.png" },
+    ],
+  },
+  {
+    year: "2015",
+    company: "Shopee / AirPay",
+    roleVi: "CS & Operations Lead",
+    roleEn: "CS & Operations Lead",
+    descVi:
+      "Tham gia xây dựng trải nghiệm khách hàng trong lĩnh vực thương mại điện tử và thanh toán số, với định hướng lấy khách hàng làm trung tâm.",
+    descEn:
+      "Built hyper-growth customer experience ecosystems for top-tier E-commerce and digital payments (AirPay/ShopeePay) centered on customer obsession.",
+    icon: ShoppingCart,
+    iconBg: "bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800",
+    iconColor: "text-blue-600 dark:text-blue-400",
+    logos: [
+      { name: "Shopee", url: "https://i.ibb.co/F4T7Zr0k/Shoppe.png" },
+      { name: "AirPay", url: "https://i.ibb.co/HTPmHMMQ/Airpay.png" },
+    ],
+  },
+  {
+    year: "2016",
+    company: "Prudential",
+    roleVi: "Quality & Project Manager",
+    roleEn: "Quality & Project Manager",
+    descVi:
+      "Hiểu sâu sắc về trải nghiệm khách hàng ngành Bảo hiểm nhân thọ, đòi hỏi sự chính xác, minh bạch và củng cố niềm tin tuyệt đối.",
+    descEn:
+      "Mastered premium Life Insurance CX standards, requiring absolute precision, strict regulatory compliance, trust-building, and seamless claim support.",
+    icon: ShieldCheck,
+    iconBg: "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800",
+    iconColor: "text-indigo-600 dark:text-indigo-400",
+    logos: [
+      { name: "Prudential", url: "https://i.ibb.co/LThmXHs/Prudentinal.png" },
+    ],
+  },
+  {
+    year: "2018",
+    company: "MoMo",
+    roleVi: "FinTech CS Manager",
+    roleEn: "FinTech CS Manager",
+    descVi:
+      "Mở rộng kinh nghiệm trong lĩnh vực dịch vụ tài chính số, tối ưu quy trình hỗ trợ khách hàng và nâng cao hiệu quả vận hành trên nền tảng công nghệ.",
+    descEn:
+      "Scaled digital wallet and payment gateway CX, automating workflows, reducing ticket latency, and elevating CSAT across millions of FinTech users.",
+    icon: Smartphone,
+    iconBg: "bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800",
+    iconColor: "text-rose-600 dark:text-rose-400",
+    logos: [
+      { name: "MoMo", url: "https://i.ibb.co/jXJXLvT/Momo.png" },
+    ],
+  },
+  {
+    year: "2023",
+    company: "VI ECO",
+    roleVi: "Operations & CS Advisor",
+    roleEn: "Operations & CS Advisor",
+    descVi:
+      "Hiểu sâu hơn về trải nghiệm khách hàng trong lĩnh vực tài chính, nơi sự chính xác, minh bạch và niềm tin luôn được đặt lên hàng đầu.",
+    descEn:
+      "Deepened strategic insights in FinTech & digital banking, where operational rigor, financial compliance, and unwavering client trust remain paramount.",
+    icon: Smartphone,
+    iconBg: "bg-violet-50 dark:bg-violet-950/60 border-violet-200 dark:border-violet-800",
+    iconColor: "text-violet-600 dark:text-violet-400",
+    logos: [
+      { name: "Ví ECO", url: "https://i.ibb.co/mVfX9RkG/Finviet.png" },
+    ],
+  },
+];
 
-  const brand = getBrandColorConfig(company || year);
+interface MilestoneCardProps {
+  item: TimelineMilestone;
+  isVi: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
+}
+
+function MilestoneCard({ item, isVi, isSelected, onSelect }: MilestoneCardProps) {
+  const Icon = item.icon;
 
   return (
-    <div className="relative pb-2 sm:pb-3" id={`timeline-item-${year}`}>
-      {/* Connection Line & Dots (only if not last) */}
-      {!isLast && (
-        <div className="absolute top-[44px] bottom-[-8px] left-[24px] z-0 flex flex-col items-center py-1 opacity-70">
-          <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#c59b27] dark:bg-amber-400" />
-          <div className="my-1 w-0.5 flex-grow bg-gradient-to-b from-[#0b2853] via-[#c59b27] to-[#0b2853] dark:from-amber-400 dark:to-sky-400" />
-          <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0b2853] dark:bg-sky-400" />
-        </div>
-      )}
-
-      <motion.div
-        whileHover={{ x: 2 }}
-        onClick={onToggle}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
-        role="button"
-        aria-expanded={isSelected}
-        aria-label={`Chi tiết năm ${year} tại ${company}`}
-        className={cn(
-          "group relative z-10 flex cursor-pointer items-start gap-3 rounded-xl border p-2.5 outline-hidden transition-all",
-          !isSelected && "border-transparent hover:bg-black/5 dark:hover:bg-white/5"
-        )}
-        style={
-          isSelected
-            ? {
-                borderColor: brand.hex,
-                borderWidth: "1.5px",
-                borderStyle: "solid",
-                boxShadow: brand.cardGlowStyle,
-              }
-            : undefined
-        }
-      >
+    <div className="relative flex items-start gap-3 sm:gap-4 group">
+      {/* Node icon on vertical line */}
+      <div className="relative z-10 flex flex-col items-center">
         <div
           className={cn(
-            "relative z-20 flex h-9 w-9 min-w-[36px] shrink-0 items-center justify-center rounded-full bg-white shadow-md transition-transform group-hover:scale-110 dark:bg-slate-900"
+            "flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full border shadow-sm transition-all duration-300 group-hover:scale-110",
+            item.iconBg,
+            item.iconColor,
+            isSelected && "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900"
           )}
-          style={
-            isSelected
-              ? {
-                  borderColor: brand.hex,
-                  borderWidth: "1.5px",
-                  borderStyle: "solid",
-                  color: brand.hex,
-                  boxShadow: brand.logoGlowStyle,
-                }
-              : {
-                  borderColor: "rgba(11, 40, 83, 0.4)",
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                }
-          }
         >
-          <IconComponent size={15} />
+          <Icon size={18} />
+        </div>
+      </div>
+
+      {/* Card Content */}
+      <motion.div
+        whileHover={{ y: -2 }}
+        onClick={onSelect}
+        className={cn(
+          "flex-1 rounded-[18px] border bg-white/35 dark:bg-slate-900/60 backdrop-blur-[10px] p-4 sm:p-4.5 shadow-[0_2px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_15px_rgba(0,0,0,0.35)] transition-all duration-300 border-white/40 dark:border-white/10 hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/40 mb-3",
+          isSelected && "border-indigo-400/80 dark:border-indigo-500 bg-indigo-50/30 dark:bg-indigo-950/40 ring-1 ring-indigo-400/50"
+        )}
+      >
+        {/* Header: Year + Logos + Company */}
+        <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+              {item.year}
+            </span>
+            <div className="flex items-center gap-1.5">
+              {item.logos.map((logo, idx) => (
+                <div key={idx} className="flex items-center gap-1">
+                  <img
+                    src={logo.url}
+                    alt={logo.name}
+                    className="h-4.5 w-4.5 rounded-full object-contain border border-slate-200/60 dark:border-slate-700 bg-white"
+                    referrerPolicy="no-referrer"
+                  />
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-200">
+                    {logo.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="flex-grow pt-0.5 text-left">
-          <div className="flex flex-wrap items-center justify-between gap-1.5">
-            <span className="flex flex-wrap items-center gap-1 text-xs font-extrabold text-[#0b2853] dark:text-amber-300">
-              <span>{year} - </span>
-              {renderTextWithLogos(company)}
-            </span>
-            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-400 dark:bg-slate-800">
-              {role}
-            </span>
-          </div>
-          <div className="mt-2 rounded-xl border border-indigo-500/25 bg-gradient-to-r from-indigo-500/10 via-sky-500/5 to-transparent p-3 shadow-2xs backdrop-blur-md dark:border-indigo-400/25 dark:from-indigo-950/40 dark:via-sky-950/20">
-            <p className="text-xs leading-relaxed font-bold text-slate-900 dark:text-slate-100">
-              {renderTextWithLogos(desc)}
-            </p>
-          </div>
-        </div>
+        {/* Role title */}
+        <p className="text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-400 mb-2">
+          {isVi ? item.roleVi : item.roleEn}
+        </p>
+
+        {/* Description */}
+        <p className="text-xs sm:text-[13px] leading-relaxed text-slate-700 dark:text-slate-300 font-normal">
+          {isVi ? item.descVi : item.descEn}
+        </p>
       </motion.div>
     </div>
   );
-});
-
-interface CareerTimelineProps {
-  activeYear: string | null;
-  onToggleYear: (year: string) => void;
 }
 
-export function CareerTimeline({
-  activeYear,
-  onToggleYear,
-}: CareerTimelineProps) {
-  const { t, language } = useLanguageContent();
+interface CareerTimelineProps {
+  activeYear?: string | null;
+  onToggleYear?: (year: string) => void;
+}
+
+export function CareerTimeline({ activeYear, onToggleYear }: CareerTimelineProps) {
+  const { language } = useLanguageContent();
   const isVi = language === "vi";
 
-  const phase1Items = timelineData.slice(0, 4);
-  const phase2Items = timelineData.slice(4, 8);
+  const phase1 = TIMELINE_MILESTONES.slice(0, 4);
+  const phase2 = TIMELINE_MILESTONES.slice(4, 8);
 
   return (
-    <div className="relative my-2 w-full space-y-4" id="career-timeline">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
-        {/* Phase 1: 2003 - 2013 */}
-        <div className="relative space-y-3 rounded-2xl border border-black/5 bg-slate-50/50 p-3 sm:p-4 backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.02]">
-          <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5 dark:border-slate-800">
+    <div className="relative w-full py-4">
+      {/* 2-Column Grid */}
+      <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
+        {/* Column 1: Phase 2003 - 2013 */}
+        <div className="relative flex flex-col">
+          {/* Phase Header */}
+          <div className="flex items-center justify-between mb-4 px-1">
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-              <span className="text-xs font-black tracking-wider text-[#0b2853] uppercase dark:text-amber-300">
-                {isVi ? "Giai đoạn 2003 – 2013" : "Phase 2003 – 2013"}
-              </span>
+              <span className="h-2.5 w-2.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+              <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                {isVi ? "GIAI ĐOẠN 2003 – 2013" : "PERIOD 2003 – 2013"}
+              </h4>
             </div>
-            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-extrabold text-amber-700 dark:text-amber-300">
-              {isVi ? "Nền Tảng & Tăng Trưởng" : "Foundation & Operations"}
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/50">
+              {isVi ? "Nền Tảng & Tăng Trưởng" : "Foundation & Growth"}
             </span>
           </div>
 
-          <div className="relative pt-1">
-            {phase1Items.map((evt, idx) => {
-              const isSelected = activeYear === evt.year;
-              const isLast = idx === phase1Items.length - 1;
-              const localizedEvent = t.timeline[idx] || { role: "", desc: "" };
+          {/* Timeline track container */}
+          <div className="relative pl-0">
+            {/* Vertical connector line */}
+            <div className="absolute left-[18px] sm:left-[20px] top-5 bottom-8 w-0.5 bg-gradient-to-b from-blue-300 via-indigo-300 to-purple-300 dark:from-blue-800 dark:via-indigo-800 dark:to-purple-800 z-0" />
 
-              return (
-                <TimelineItem
-                  key={evt.year}
-                  year={evt.year}
-                  company={evt.company}
-                  role={localizedEvent.role}
-                  desc={localizedEvent.desc}
-                  icon={evt.icon}
-                  color={evt.color}
-                  isSelected={isSelected}
-                  isLast={isLast}
-                  onToggle={() => onToggleYear(evt.year)}
+            <div className="space-y-0.5">
+              {phase1.map((item) => (
+                <MilestoneCard
+                  key={item.year}
+                  item={item}
+                  isVi={isVi}
+                  isSelected={activeYear === item.year}
+                  onSelect={() => onToggleYear?.(item.year)}
                 />
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Phase 2: 2015 - 2023 */}
-        <div className="relative space-y-3 rounded-2xl border border-black/5 bg-slate-50/50 p-3 sm:p-4 backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.02]">
-          <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5 dark:border-slate-800">
+        {/* Column 2: Phase 2015 - 2023 */}
+        <div className="relative flex flex-col">
+          {/* Phase Header */}
+          <div className="flex items-center justify-between mb-4 px-1">
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-sky-500 animate-pulse" />
-              <span className="text-xs font-black tracking-wider text-[#0b2853] uppercase dark:text-sky-300">
-                {isVi ? "Giai đoạn 2015 – 2023" : "Phase 2015 – 2023"}
-              </span>
+              <span className="h-2.5 w-2.5 rounded-full bg-blue-600 dark:bg-sky-400" />
+              <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                {isVi ? "GIAI ĐOẠN 2015 – 2023" : "PERIOD 2015 – 2023"}
+              </h4>
             </div>
-            <span className="rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-[10px] font-extrabold text-sky-700 dark:text-sky-300">
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-800 dark:text-sky-300 border border-blue-200/80 dark:border-blue-800/50">
               {isVi ? "FinTech & Công Nghệ Số" : "FinTech & Digital Scale"}
             </span>
           </div>
 
-          <div className="relative pt-1">
-            {phase2Items.map((evt, idx) => {
-              const originalIdx = idx + 4;
-              const isSelected = activeYear === evt.year;
-              const isLast = idx === phase2Items.length - 1;
-              const localizedEvent = t.timeline[originalIdx] || {
-                role: "",
-                desc: "",
-              };
+          {/* Timeline track container */}
+          <div className="relative pl-0">
+            {/* Vertical connector line */}
+            <div className="absolute left-[18px] sm:left-[20px] top-5 bottom-8 w-0.5 bg-gradient-to-b from-blue-300 via-indigo-300 to-purple-300 dark:from-blue-800 dark:via-indigo-800 dark:to-purple-800 z-0" />
 
-              return (
-                <TimelineItem
-                  key={evt.year}
-                  year={evt.year}
-                  company={evt.company}
-                  role={localizedEvent.role}
-                  desc={localizedEvent.desc}
-                  icon={evt.icon}
-                  color={evt.color}
-                  isSelected={isSelected}
-                  isLast={isLast}
-                  onToggle={() => onToggleYear(evt.year)}
+            <div className="space-y-0.5">
+              {phase2.map((item) => (
+                <MilestoneCard
+                  key={item.year}
+                  item={item}
+                  isVi={isVi}
+                  isSelected={activeYear === item.year}
+                  onSelect={() => onToggleYear?.(item.year)}
                 />
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );

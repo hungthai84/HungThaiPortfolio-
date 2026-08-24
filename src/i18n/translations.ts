@@ -8,43 +8,43 @@ export const translations = {
       coverLetter: "Thư ngỏ",
       about: "Giới thiệu",
       experience: "Kinh nghiệm",
-      education: "Học vấn",
       skills: "Kỹ năng",
       industries: "Lĩnh vực",
       projects: "Dự án",
-      systems: "Hệ thống",
-      astrology: "Tử vi",
       memories: "Kỷ niệm",
+      systems: "Hệ thống năng lực",
+      websiteSystem: "Quản trị Website",
+      education: "Học vấn",
       interview: "Phỏng vấn",
       aiChat: "Trợ lý AI",
       wallpapers: "Hình nền",
+      templateTest: "Trang Mẫu (Test)",
     },
     navDesc: {
       home: "Tổng quan lý lịch, thành tựu & chỉ số năng lực điều hành nổi bật",
       coverLetter:
         "Thư ngỏ ứng tuyển & tuyên ngôn sứ mệnh nâng tầm trải nghiệm khách hàng",
       about:
-        "Thông tin cá nhân, triết lý quản trị & định hướng phát triển sự nghiệp",
+        "Hồ sơ năng lực, triết lý quản trị CX & định hướng hợp tác phát triển",
       experience:
         "22+ năm lịch sử công tác thực chiến tại Ví MoMo, Prudential, Mobifone, Garena...",
-      education:
-        "Bằng cấp đại học, chứng chỉ quốc tế & các khóa đào tạo quản lý cao cấp",
       skills:
         "Bản đồ kỹ năng quản trị Contact Center, CRM Omnichannel, AI Chatbot & lãnh đạo",
       industries:
         "6+ Lĩnh vực hoạt động: FinTech, Bảo hiểm, Bưu chính, Game, Viễn thông...",
       projects:
         "Các dự án trọng điểm: Xây dựng Tổng đài, Chuyển đổi số & AI Automation",
+      memories: "Kho lưu trữ hình ảnh kỷ niệm, sự kiện & dấu ấn hành trình 22 năm làm việc",
       systems:
-        "Mô phỏng kiến trúc hệ thống CRM Omnichannel, Call Center & AI Bot",
-      astrology: "Khám phá tử vi, bản đồ sao & chỉ số phong thủy nghề nghiệp",
-      memories:
-        "Bộ sưu tập hình ảnh kỷ niệm, sự kiện & hoạt động làm việc đội ngũ",
+        "Bản đồ kiến trúc năng lực cốt lõi: Chuyên môn CRM, Lãnh đạo, Đổi mới & Trải nghiệm khách hàng",
+      education:
+        "Hành trình học tập & phát triển chuyên môn: Cử nhân CNTT, Quản trị mạng, Quản lý cấp cao...",
       interview:
         "Mô phỏng phỏng vấn trực tiếp cùng trợ lý AI chuyên sâu về CX/CS",
       aiChat: "Trợ lý AI thông minh sẵn sàng tư vấn & giải đáp thông tin 24/7",
       wallpapers:
         "Bộ sưu tập hình nền 4K, tùy chỉnh tải ảnh lên & quản lý không gian làm việc",
+      templateTest: "Trang mẫu kiểm thử giao diện, hiệu ứng ánh sáng & tính năng X-Ray",
     },
     // Header & Quick Actions
     header: {
@@ -98,11 +98,6 @@ export const translations = {
       staffManaged: "Nhân sự quản lý",
       keyTasks: "Nhiệm vụ trọng tâm",
       keyAchievements: "Thành tựu chính",
-    },
-    // Education Page
-    educationPage: {
-      title: "Học Vấn & Chứng Chỉ Chuyên Sâu",
-      subtitle: "Nền tảng tri thức và quá trình đào tạo liên tục",
     },
     // Skills Page
     skillsPage: {
@@ -198,7 +193,6 @@ export const translations = {
         "Lãnh đạo và Chuyên gia Trải nghiệm Khách hàng (Head of CX / CS Director) với 22 năm kinh nghiệm thực chiến trong các ngành Viễn thông, FinTech, Thương mại điện tử, Bảo hiểm và eSports (Mobifone, Ví MoMo, Prudential, VED/Garena, HTVC, Finviet). Sở trường kiến tạo hạ tầng Contact Center quy mô lớn, xây dựng hệ thống CRM & AI Chatbot tự động hóa, quản lý đội ngũ nhân sự lên đến 150+ thành viên, tối ưu hóa chi phí vận hành và thúc đẩy văn hóa dịch vụ lấy khách hàng làm trung tâm.",
       skillsTitle: "Kỹ Năng & Năng Lực Cốt Lõi",
       expTitle: "Kinh Nghiệm Làm Việc Thực Chiến",
-      eduTitle: "Trình Độ Học Vấn & Đào Tạo Chuyên Sâu",
     },
   },
   en: {
@@ -208,41 +202,40 @@ export const translations = {
       coverLetter: "Cover Letter",
       about: "About Me",
       experience: "Career Experience",
-      education: "Education",
       skills: "Skills",
       industries: "Industries",
       projects: "Projects",
-      systems: "Systems",
-      astrology: "Astrology",
       memories: "Memories",
+      systems: "Capability Systems",
+      websiteSystem: "Website Management",
+      education: "Education",
       interview: "AI Interview",
       aiChat: "AI Assistant",
       wallpapers: "Wallpapers",
+      templateTest: "Template Test",
     },
     navDesc: {
       home: "Executive overview, key achievements & management metrics",
       coverLetter: "Application letter & CX elevation mission statement",
-      about: "Personal background, leadership philosophy & career direction",
+      about: "Executive background, CX leadership philosophy & strategic collaboration",
       experience:
         "22+ years hands-on track record at MoMo, Prudential, Mobifone, Garena...",
-      education:
-        "Academic degrees, international certifications & executive training",
       skills: "Competency map in Contact Center, CRM, AI Chatbot & Leadership",
       industries:
         "6+ Industry domains: FinTech, Insurance, Telecom, Gaming, Logistics...",
       projects:
         "Key initiatives: Call center setup, Digital transformation & AI Automation",
+      memories: "Gallery of memories, events & milestones from 22 years of career journey",
       systems:
-        "Interactive CRM, Omnichannel Contact Center & AI Bot architecture",
-      astrology:
-        "Career astrology, natal chart & professional feng shui insights",
-      memories:
-        "Photo gallery of team milestones, events & operational memories",
+        "Core competency architecture: CRM expertise, Leadership, Innovation & Customer Experience",
+      education:
+        "Educational journey & professional development: Bachelor of IT, Networking, Executive Management...",
       interview: "AI-powered mock interview simulator for CX/CS leadership",
       aiChat:
         "Smart 24/7 AI Assistant ready to answer questions about Hung Thai",
       wallpapers:
         "4K wallpaper gallery, custom image uploads & workspace visual canvas manager",
+      templateTest: "Template page for testing UI components, magical lighting, and X-Ray",
     },
     // Header & Quick Actions
     header: {
@@ -295,11 +288,6 @@ export const translations = {
       staffManaged: "Team Size",
       keyTasks: "Core Responsibilities",
       keyAchievements: "Key Achievements",
-    },
-    // Education Page
-    educationPage: {
-      title: "Education & Professional Certifications",
-      subtitle: "Academic foundation and continuous executive training",
     },
     // Skills Page
     skillsPage: {
@@ -395,7 +383,6 @@ export const translations = {
         "Executive & Customer Experience Expert (Head of CX / CS Director) with 22 years of hands-on leadership in Telecom, FinTech, E-Commerce, Insurance, and eSports (Mobifone, MoMo E-Wallet, Prudential, VED/Garena, HTVC, Finviet). Specializing in building large-scale Contact Center infrastructure, AI Chatbot & Omnichannel CRM deployment, managing teams up to 150+ members, optimizing operational costs, and cultivating a customer-centric service culture.",
       skillsTitle: "Core Competencies & Skills",
       expTitle: "Professional Work Experience",
-      eduTitle: "Education & Professional Certifications",
     },
   },
 };

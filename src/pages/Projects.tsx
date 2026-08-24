@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import {
   FolderGit2,
   Filter,
@@ -14,6 +13,8 @@ import {
   Calendar,
   UserCheck,
   Building2,
+  Users,
+  Target,
   ShieldCheck,
   Award,
 } from "lucide-react";
@@ -43,6 +44,7 @@ import { ProjectCard } from "../components/projects/ProjectCard";
 import { EmptyState } from "../components/projects/EmptyState";
 import { MindMapCard } from "../components/projects/MindMapCard";
 import { GenericProjectDetails } from "../components/projects/ProjectDetails/GenericProjectDetails";
+import { ProjectDiscussionPlayer } from "../components/projects/ProjectDiscussionPlayer";
 
 export function Projects() {
   const { language } = useLanguage();
@@ -165,10 +167,10 @@ export function Projects() {
     <ErrorBoundary>
       <PageLayout
         id="projects-main-card"
-        rootClassName="w-full max-w-full !p-[5px] rounded-[15px] sm:rounded-[20px] border border-[var(--border)] relative flex flex-1 flex-col !bg-transparent !shadow-none transition-all duration-300"
-        headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !rounded-full !shadow-none transition-all duration-300"
+        rootClassName="w-full max-w-full relative flex flex-1 flex-col transition-all duration-300"
+        headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !shadow-none"
         headerContainerClassName="!px-0"
-        className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent !shadow-none"
+        className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto"
         pageId="projects"
         pageName="Projects Main Card"
         title={
@@ -219,31 +221,13 @@ export function Projects() {
                   backToList();
                 }
               }}
-              className="flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-xs font-black tracking-widest text-[var(--text-primary)] uppercase shadow-none transition-all hover:bg-[var(--border)]"
+              className="flex cursor-pointer items-center gap-2 rounded-xl border-2 border-solid border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-xs font-black tracking-widest text-[var(--text-primary)] uppercase shadow-none hover:bg-[var(--border)]"
             >
               <X size={14} />
               <span>{isVi ? "Quay lại" : "Back"}</span>
             </button>
           ) : (
             <div className="flex w-full flex-wrap items-center justify-end gap-2.5 sm:w-auto">
-              {/* Badges */}
-              <div className="hidden sm:flex items-center gap-2">
-                <div className="flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-black text-indigo-700 dark:text-indigo-300 shadow-xs backdrop-blur-md">
-                  <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-                  <span>
-                    {isVi
-                      ? `${filteredProjects.length} Dự án Chiến lược`
-                      : `${filteredProjects.length} Strategic Projects`}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-black text-emerald-700 dark:text-emerald-300 shadow-xs backdrop-blur-md">
-                  <ShieldCheck size={13} className="text-emerald-600 dark:text-emerald-400" />
-                  <span>
-                    {isVi ? "100% Thực Chiến SOP" : "100% Applied SOPs"}
-                  </span>
-                </div>
-              </div>
-
               {/* View Mode Toggle Pill Bar */}
               <div className="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white/80 p-1 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-slate-900/80">
                 <button
@@ -253,7 +237,7 @@ export function Projects() {
                     setProjectListViewMode("grid");
                   }}
                   className={cn(
-                    "flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all",
+                    "flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black",
                     projectListViewMode === "grid"
                       ? "bg-indigo-600 text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800",
@@ -275,7 +259,7 @@ export function Projects() {
                     setProjectListViewMode("stacked");
                   }}
                   className={cn(
-                    "flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all",
+                    "flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black",
                     projectListViewMode === "stacked"
                       ? "bg-indigo-600 text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800",
@@ -292,261 +276,232 @@ export function Projects() {
           )
         }
       >
-        <AnimatePresence mode="wait">
-          {selectedProject ? (
-            <motion.div
-              key="detail"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25 }}
-              className="flex w-full flex-col"
-            >
-              {/* Integrated Project Content Area */}
-              <div className="relative w-full border-none bg-transparent p-[5px] !shadow-none shadow-none transition-colors duration-300">
-                <div className="mx-auto w-full max-w-4xl space-y-10">
-                  {/* Integrated Hero Section inside the card */}
-                  <div className="space-y-6">
-                    {/* Featured Image - Integrated Hero Section */}
-                    <div className="group relative aspect-video w-full overflow-hidden rounded-[15px] border border-slate-200/90 bg-slate-100 shadow-xl sm:aspect-[21/9] dark:border-white/10 dark:bg-slate-800">
-                      {selectedProject.img && (
-                        <img
-                          src={selectedProject.img}
-                          alt={selectedProject.title}
-                          className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                      )}
-
-                      {/* Clear Banner Overlay with Crisp Glass UI */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
-
-                      {/* Content inside Banner with Glass UI card */}
-                      <div className="absolute inset-0 flex flex-col justify-end gap-3 p-4 sm:p-8">
-                        <div className="flex flex-wrap gap-2">
-                          <span className="rounded-full border border-white/30 bg-slate-900/60 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase shadow-md backdrop-blur-md">
-                            {selectedProject.group}
-                          </span>
-                          <span className="rounded-full border border-amber-300/60 bg-amber-500/80 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase shadow-md backdrop-blur-md">
-                            {selectedProject.phase}
-                          </span>
-                        </div>
-
-                        <div className="max-w-3xl space-y-1.5 rounded-2xl border border-white/15 bg-slate-950/40 p-4 sm:p-5 shadow-xl backdrop-blur-md">
-                          <h3 className="text-xl leading-tight font-black text-white drop-shadow-md sm:text-3xl">
-                            {selectedProject.title}
-                          </h3>
-                          <p className="line-clamp-2 text-xs leading-relaxed font-medium text-slate-100 sm:text-sm">
-                            {selectedProject.desc}
-                          </p>
-
-                          <div className="flex items-center gap-6 pt-1">
-                            <div className="flex items-center gap-2 text-white/90">
-                              <Tag size={15} className="text-violet-300" />
-                              <span className="text-[11px] font-bold tracking-wider uppercase">
-                                {selectedProject.group}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 text-white/90">
-                              <Sparkles size={15} className="text-amber-300" />
-                              <span className="text-[11px] font-bold tracking-wider uppercase">
-                                {isVi ? "Hoàn tất" : "Completed"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content Detail Section */}
-                  <div className="w-full space-y-8">
-                    {/* Executive Experience Query Card (Thời gian & Vai trò) */}
-                    <div className="magic-card grid grid-cols-1 gap-3.5 rounded-[15px] border border-[var(--border)] bg-[var(--card)] p-4 shadow-[0_15px_35px_rgba(0,0,0,0.05)] backdrop-blur-md transition-all sm:grid-cols-3 sm:p-6 dark:border-white/10 dark:bg-[var(--card)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)]">
-                      <div className="flex items-center gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3.5 transition-colors duration-300 dark:border-white/10 dark:bg-[var(--surface)]">
-                        <div className="shrink-0 rounded-xl bg-amber-500/10 p-3 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400">
-                          <Calendar size={22} />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[10px] font-black tracking-wider text-[var(--muted)] dark:text-slate-400 uppercase">
-                            {isVi ? "Thời gian" : "Period"}
-                          </div>
-                          <div className="mt-0.5 truncate text-sm font-extrabold text-[var(--text-primary)]">
-                            {selectedProject.period}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3.5 transition-colors duration-300 dark:border-white/10 dark:bg-[var(--surface)]">
-                        <div className="shrink-0 rounded-xl bg-indigo-500/10 p-3 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-400">
-                          <UserCheck size={22} />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[10px] font-black tracking-wider text-[var(--muted)] dark:text-slate-400 uppercase">
-                            {isVi ? "Vai trò" : "Role"}
-                          </div>
-                          <div className="mt-0.5 truncate text-sm font-extrabold text-indigo-600 dark:text-indigo-400">
-                            {selectedProject.role}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3.5 transition-colors duration-300 dark:border-white/10 dark:bg-[var(--surface)]">
-                        <div className="shrink-0 rounded-xl bg-emerald-500/10 p-3 text-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400">
-                          <Building2 size={22} />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[10px] font-black tracking-wider text-[var(--muted)] dark:text-slate-400 uppercase">
-                            {isVi
-                              ? "Thực chiến kinh nghiệm"
-                              : "Experience Context"}
-                          </div>
-                          <div className="mt-0.5 truncate text-xs font-extrabold text-[var(--text-primary)] sm:text-sm">
-                            {selectedProject.company || "Đơn vị CSKH"}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* MindMap Frame - Sơ đồ tư duy nằm trên 1. Yêu cầu dự án */}
-                    {selectedProject.mindmapImg && (
-                      <MindMapCard
-                        imageUrl={selectedProject.mindmapImg}
-                        title={selectedProject.title}
+      <div className="mx-auto flex h-full w-full max-w-[1240px] flex-col gap-4">
+        {selectedProject ? (
+          <div
+            key="detail"
+            className="flex w-full flex-col"
+          >
+            {/* Integrated Project Content Area */}
+            <div className="relative w-full border-none bg-transparent p-[5px] !shadow-none shadow-none">
+              <div className="mx-auto w-full max-w-4xl space-y-10">
+                {/* Integrated Hero Section inside the card */}
+                <div className="space-y-6">
+                  {/* Featured Image - Integrated Hero Section */}
+                  <div className="relative aspect-video w-full overflow-hidden rounded-[15px] border border-slate-200/90 bg-slate-100 shadow-md sm:aspect-[21/9] dark:border-white/10 dark:bg-slate-800">
+                    {selectedProject.img && (
+                      <img
+                        src={selectedProject.img}
+                        alt={selectedProject.title}
+                        className="h-full w-full object-cover"
+                        referrerPolicy="no-referrer"
                       />
                     )}
 
-                    {/* Content Sections - Sử dụng cấu trúc 10 phần tiêu chuẩn */}
-                    <div className="pt-4">
-                      <GenericProjectDetails project={selectedProject} />
-                    </div>
-                  </div>
+                    {/* Clear Banner Overlay Badges */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent"></div>
 
-                  {selectedProject.tags && (
-                    <div className="flex flex-wrap gap-2 border-t border-[var(--border)] pt-10">
-                      {selectedProject.tags.split(" ").map((tag, tIdx) => (
-                        <span
-                          key={tIdx}
-                          className="rounded-xl border border-[var(--border)] bg-[var(--glass-xs-bg)] px-4 py-2 text-[11px] font-bold text-[var(--muted)]"
-                        >
-                          {tag.startsWith("#") ? tag : `#${tag}`}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="flex justify-center pt-8 pb-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        playUiSound("click");
-                        backToList();
-                      }}
-                      className="flex cursor-pointer items-center gap-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-10 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl transition-all hover:from-indigo-700 hover:to-violet-700 active:scale-95"
-                    >
-                      <LayoutGrid size={18} />
-                      {isVi
-                        ? "Quay lại danh sách dự án"
-                        : "Back to Projects List"}
-                    </button>
+                    {/* Project Discussion Listen Button (Music Player Style) */}
+                    <ProjectDiscussionPlayer
+                      title={isVi ? "Thảo luận dự án" : "Project Discussion"}
+                      artist={isVi ? "Giọng đọc AI (Podcast)" : "AI Voice (Podcast)"}
+                      className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 z-20"
+                    />
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="list"
-              initial={{ opacity: 0, y: -15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 15 }}
-              transition={{ duration: 0.25 }}
-              className="w-full space-y-6"
-            >
-              {/* Empty Search Result State */}
-              {filteredProjects.length === 0 ? (
-                <EmptyState onReset={handleResetFiltersAndSearch} />
-              ) : projectListViewMode === "stacked" ? (
-                /* Grouped Stacked Deck Cards View */
-                <div className="space-y-8 transition-all duration-300">
-                  {Object.entries(groupedProjects).map(
-                    ([groupName, groupProjects]) => (
-                      <div
-                        key={groupName}
-                        className="space-y-2 rounded-[15px] border border-slate-200/80 bg-white/80 p-4 text-left shadow-sm backdrop-blur-xl sm:p-5 dark:border-white/10 dark:bg-slate-900/60"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <span
-                            className={cn(
-                              "rounded-full border px-3 py-1 text-xs font-black shadow-sm",
-                              getGroupColorClass(groupName),
-                            )}
-                          >
-                            {groupName}
-                          </span>
-                          <span className="text-xs font-extrabold text-[var(--muted)]">
-                            • {groupProjects.length}{" "}
-                            {isVi ? "dự án" : "projects"}
-                          </span>
+                {/* Content Detail Section */}
+                <div className="w-full space-y-8">
+                  {/* Executive Experience Query Card (4 Mục: Giai đoạn, Thời gian, Nhóm, Vai trò) */}
+                  <div className="flex flex-col gap-4 rounded-[15px] border border-slate-200/90 bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:p-6 dark:border-white/10 dark:bg-slate-900/90">
+                    {/* 1. Giai đoạn (Phase) */}
+                    <div className="flex flex-1 items-center gap-3.5 min-w-[180px]">
+                      <div className="shrink-0 rounded-xl bg-emerald-500/10 p-3 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                        <Target size={22} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[10px] font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+                          {isVi ? "Giai đoạn" : "Phase"}
                         </div>
-
-                        <div className="no-scrollbar flex min-h-[340px] items-center overflow-x-auto scroll-smooth px-4 py-6">
-                          {groupProjects.map((project, idx) => {
-                            const originalIndex =
-                              projectsData.findIndex(
-                                (p) => p.title === project.title,
-                              ) + 1;
-                            const formattedIndex =
-                              originalIndex < 10
-                                ? `0${originalIndex}`
-                                : `${originalIndex}`;
-
-                            return (
-                              <ProjectCard
-                                key={originalIndex}
-                                project={project}
-                                originalIndex={originalIndex}
-                                formattedIndex={formattedIndex}
-                                viewMode="stacked"
-                                indexInGroup={idx}
-                                onClick={() => selectProject(originalIndex)}
-                              />
-                            );
-                          })}
+                        <div className="mt-0.5 truncate text-sm font-extrabold text-emerald-700 dark:text-emerald-400">
+                          {selectedProject.phase}
                         </div>
                       </div>
-                    ),
+                    </div>
+
+                    <div className="hidden h-12 w-px bg-slate-200 dark:bg-slate-700 sm:block"></div>
+
+                    {/* 2. Thời gian (Period) */}
+                    <div className="flex flex-1 items-center gap-3.5 min-w-[180px]">
+                      <div className="shrink-0 rounded-xl bg-amber-500/10 p-3 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
+                        <Calendar size={22} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[10px] font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+                          {isVi ? "Thời gian" : "Period"}
+                        </div>
+                        <div className="mt-0.5 truncate text-sm font-extrabold text-slate-900 dark:text-slate-100">
+                          {selectedProject.period}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="hidden h-12 w-px bg-slate-200 dark:bg-slate-700 lg:block"></div>
+
+                    {/* 3. Nhóm (Group) */}
+                    <div className="flex flex-1 items-center gap-3.5 min-w-[180px]">
+                      <div className="shrink-0 rounded-xl bg-blue-500/10 p-3 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                        <Users size={22} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[10px] font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+                          {isVi ? "Nhóm" : "Group"}
+                        </div>
+                        <div className="mt-0.5 truncate text-sm font-extrabold text-blue-700 dark:text-blue-400">
+                          {selectedProject.group}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="hidden h-12 w-px bg-slate-200 dark:bg-slate-700 sm:block"></div>
+
+                    {/* 4. Vai trò (Role) */}
+                    <div className="flex flex-1 items-center gap-3.5 min-w-[180px]">
+                      <div className="shrink-0 rounded-xl bg-indigo-500/10 p-3 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
+                        <UserCheck size={22} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[10px] font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+                          {isVi ? "Vai trò" : "Role"}
+                        </div>
+                        <div className="mt-0.5 truncate text-sm font-extrabold text-indigo-700 dark:text-indigo-400">
+                          {selectedProject.role}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* MindMap Frame - Sơ đồ tư duy nằm trên 1. Yêu cầu dự án */}
+                  {selectedProject.mindmapImg && (
+                    <MindMapCard
+                      imageUrl={selectedProject.mindmapImg}
+                      title={selectedProject.title}
+                    />
                   )}
-                </div>
-              ) : (
-                /* Grid View */
-                <div className="grid grid-cols-1 gap-[15px] transition-all duration-300 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {filteredProjects.map((project) => {
-                    const originalIndex =
-                      projectsData.findIndex((p) => p.title === project.title) +
-                      1;
-                    const formattedIndex =
-                      originalIndex < 10
-                        ? `0${originalIndex}`
-                        : `${originalIndex}`;
 
-                    return (
-                      <ProjectCard
-                        key={originalIndex}
-                        project={project}
-                        originalIndex={originalIndex}
-                        formattedIndex={formattedIndex}
-                        viewMode="grid"
-                        onClick={() => selectProject(originalIndex)}
-                      />
-                    );
-                  })}
+                  {/* Content Sections - Sử dụng cấu trúc 10 phần tiêu chuẩn */}
+                  <div className="pt-4">
+                    <GenericProjectDetails project={selectedProject} />
+                  </div>
                 </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-      </PageLayout>
+                {/* Tags section removed as per user request */}
+
+                <div className="flex justify-center pt-8 pb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playUiSound("click");
+                      backToList();
+                    }}
+                    className="flex cursor-pointer items-center gap-3 rounded-2xl bg-indigo-600 px-10 py-4 text-xs font-black tracking-widest text-white uppercase shadow-md hover:bg-indigo-700"
+                  >
+                    <LayoutGrid size={18} />
+                    {isVi
+                      ? "Quay lại danh sách dự án"
+                      : "Back to Projects List"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            key="list"
+            className="w-full space-y-6"
+          >
+            {/* Empty Search Result State */}
+            {filteredProjects.length === 0 ? (
+              <EmptyState onReset={handleResetFiltersAndSearch} />
+            ) : projectListViewMode === "stacked" ? (
+              /* Grouped Stacked Deck Cards View */
+              <div className="space-y-8">
+                {Object.entries(groupedProjects).map(
+                  ([groupName, groupProjects]) => (
+                    <div
+                      key={groupName}
+                      className="space-y-2 rounded-[15px] border border-slate-200/80 bg-white/80 p-4 text-left shadow-sm backdrop-blur-xl sm:p-5 dark:border-white/10 dark:bg-slate-900/60"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className={cn(
+                            "rounded-full border px-3 py-1 text-xs font-black shadow-sm",
+                            getGroupColorClass(groupName),
+                          )}
+                        >
+                          {groupName}
+                        </span>
+                        <span className="text-xs font-extrabold text-[var(--muted)]">
+                          • {groupProjects.length}{" "}
+                          {isVi ? "dự án" : "projects"}
+                        </span>
+                      </div>
+
+                      <div className="no-scrollbar flex min-h-[340px] items-center overflow-x-auto scroll-smooth px-4 py-6">
+                        {groupProjects.map((project, idx) => {
+                          const originalIndex =
+                            projectsData.findIndex(
+                              (p) => p.title === project.title,
+                            ) + 1;
+                          const formattedIndex =
+                            originalIndex < 10
+                              ? `0${originalIndex}`
+                              : `${originalIndex}`;
+
+                          return (
+                            <ProjectCard
+                              key={originalIndex}
+                              project={project}
+                              originalIndex={originalIndex}
+                              formattedIndex={formattedIndex}
+                              viewMode="stacked"
+                              indexInGroup={idx}
+                              onClick={() => selectProject(originalIndex)}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ),
+                )}
+              </div>
+            ) : (
+              /* Grid View */
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-fr">
+                {filteredProjects.map((project) => {
+                  const originalIndex =
+                    projectsData.findIndex((p) => p.title === project.title) +
+                    1;
+                  const formattedIndex =
+                    originalIndex < 10
+                      ? `0${originalIndex}`
+                      : `${originalIndex}`;
+
+                  return (
+                    <ProjectCard
+                      key={originalIndex}
+                      project={project}
+                      originalIndex={originalIndex}
+                      formattedIndex={formattedIndex}
+                      viewMode="grid"
+                      onClick={() => selectProject(originalIndex)}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </PageLayout>
     </ErrorBoundary>
   );
 }

@@ -26,21 +26,12 @@ export interface ExperienceItem {
   projects?: string[];
   photos?: string[];
   logo?: string;
-  memoriesTag?: string;
+
   icon: string;
   color: string;
   bg: string;
   glow: string;
   pulse?: boolean;
-}
-
-export interface EducationItem {
-  year: string;
-  title: string;
-  school: string;
-  desc: string;
-  icon?: string;
-  color?: string;
 }
 
 export interface SkillItem {
@@ -62,27 +53,22 @@ export interface IndustryItem {
   logos?: { name: string; url: string }[];
 }
 
-export interface MemoryItem {
-  company: string;
-  img: string;
-  desc: string;
-}
-
 export type PageId =
   | "home"
   | "coverLetter"
   | "about"
   | "experience"
-  | "education"
   | "skills"
   | "industries"
   | "projects"
-  | "systems"
-  | "astrology"
   | "memories"
+  | "systems"
+  | "education"
   | "interview"
   | "aiChat"
-  | "wallpapers";
+  | "wallpapers"
+  | "websiteManagement"
+  | "templateTest";
 
 export interface BookmarkItem {
   id: string;

@@ -1,282 +1,167 @@
-import { useState, useEffect, useCallback } from "react";
-import {
-  Images,
-  Expand,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  Camera,
-  Sparkles,
-} from "lucide-react";
-import { contentData } from "../data";
-import { PageLayout } from "../components/PageLayout";
-import { motion, AnimatePresence } from "motion/react";
-import { cn } from "../lib/utils";
-import { playUiSound } from "../lib/sound";
+import React from "react";
+import { motion } from "motion/react";
+import { Images, CalendarDays, Heart, Sparkles, MapPin, Camera } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+import { cn } from "../lib/utils";
+
+const memories = [
+  { url: "https://i.ibb.co/6Rp6rqXt/Mobifone-1.webp", title: "Mobifone 1", category: "Mobifone" },
+  { url: "https://i.ibb.co/0HHrmyz/Mobifone-2.webp", title: "Mobifone 2", category: "Mobifone" },
+  { url: "https://i.ibb.co/TDgZqxG9/Mobifone-3.webp", title: "Mobifone 3", category: "Mobifone" },
+  { url: "https://i.ibb.co/ZzjXpjsX/HTVC-1.webp", title: "HTVC 1", category: "HTVC" },
+  { url: "https://i.ibb.co/BKjZQfY5/HTVC-2.webp", title: "HTVC 2", category: "HTVC" },
+  { url: "https://i.ibb.co/357kHb63/HTVC-3.webp", title: "HTVC 3", category: "HTVC" },
+  { url: "https://i.ibb.co/39Sjm7S0/HTVC-4.webp", title: "HTVC 4", category: "HTVC" },
+  { url: "https://i.ibb.co/ds1qm1WD/VED-1.webp", title: "VED 1", category: "VED (Garena)" },
+  { url: "https://i.ibb.co/7d9BFsS6/VED-2.webp", title: "VED 2", category: "VED (Garena)" },
+  { url: "https://i.ibb.co/1f4dHTyV/VED-3.webp", title: "VED 3", category: "VED (Garena)" },
+  { url: "https://i.ibb.co/7xNbsP5j/VED-4.webp", title: "VED 4", category: "VED (Garena)" },
+  { url: "https://i.ibb.co/CK2Y62Zy/Prudential-1.webp", title: "Prudential 1", category: "Prudential" },
+  { url: "https://i.ibb.co/HD71024V/Prudential-2.webp", title: "Prudential 2", category: "Prudential" },
+  { url: "https://i.ibb.co/TM32Dg85/Prudential-3.webp", title: "Prudential 3", category: "Prudential" },
+  { url: "https://i.ibb.co/sd8bZfsk/Prudential-4.webp", title: "Prudential 4", category: "Prudential" },
+  { url: "https://i.ibb.co/XZXnp2Dw/Prudential-5.webp", title: "Prudential 5", category: "Prudential" },
+  { url: "https://i.ibb.co/1t8kkHGm/Prudential-6.webp", title: "Prudential 6", category: "Prudential" },
+  { url: "https://i.ibb.co/Mk5S8vYR/Prudential-7.webp", title: "Prudential 7", category: "Prudential" },
+  { url: "https://i.ibb.co/S7ySGnvC/Momo-1.webp", title: "Momo 1", category: "Momo" },
+  { url: "https://i.ibb.co/v6K5jLsQ/Momo-2.webp", title: "Momo 2", category: "Momo" },
+  { url: "https://i.ibb.co/DsvVt9C/Momo-3.webp", title: "Momo 3", category: "Momo" },
+  { url: "https://i.ibb.co/gLdK4ss8/Momo-4.webp", title: "Momo 4", category: "Momo" },
+  { url: "https://i.ibb.co/svYWnsHK/Momo-5.webp", title: "Momo 5", category: "Momo" },
+  { url: "https://i.ibb.co/BVH5GdtT/Momo-6.webp", title: "Momo 6", category: "Momo" },
+  { url: "https://i.ibb.co/G3MgYJp3/Momo-7.webp", title: "Momo 7", category: "Momo" },
+  { url: "https://i.ibb.co/398WZf65/Momo-8.webp", title: "Momo 8", category: "Momo" },
+  { url: "https://i.ibb.co/Rp4jmTWF/Finviet-1.webp", title: "Finviet 1", category: "Finviet" },
+  { url: "https://i.ibb.co/gM7nPptY/V247-3.jpg", title: "V247-3", category: "V247" },
+  { url: "https://i.ibb.co/vr4hB1m/V247-2.jpg", title: "V247-2", category: "V247" },
+  { url: "https://i.ibb.co/s9gsmSHs/V247-4.jpg", title: "V247-4", category: "V247" },
+  { url: "https://i.ibb.co/WNQkxzYQ/V247-5.jpg", title: "V247-5", category: "V247" },
+  { url: "https://i.ibb.co/9HwPTKGg/V247-1.jpg", title: "V247-1", category: "V247" },
+];
 
 export function Memories() {
-  const { language } = useLanguage();
-  const isVi = language === "vi";
-  const [activeLightboxIdx, setActiveLightboxIdx] = useState<number | null>(
-    null,
-  );
-
-  // Lightbox handlers
-  const openLightbox = (index: number) => {
-    playUiSound("click");
-    setActiveLightboxIdx(index);
-  };
-
-  const closeLightbox = () => {
-    playUiSound("click");
-    setActiveLightboxIdx(null);
-  };
-
-  const prevLightbox = useCallback(() => {
-    playUiSound("click");
-    if (activeLightboxIdx !== null) {
-      setActiveLightboxIdx((prev) =>
-        prev === 0
-          ? contentData.memories.length - 1
-          : prev !== null
-            ? prev - 1
-            : 0,
-      );
-    }
-  }, [activeLightboxIdx]);
-
-  const nextLightbox = useCallback(() => {
-    playUiSound("click");
-    if (activeLightboxIdx !== null) {
-      setActiveLightboxIdx((prev) =>
-        prev === contentData.memories.length - 1
-          ? 0
-          : prev !== null
-            ? prev + 1
-            : 0,
-      );
-    }
-  }, [activeLightboxIdx]);
-
-  // Keyboard navigation for lightbox
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (activeLightboxIdx === null) return;
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") prevLightbox();
-      if (e.key === "ArrowRight") nextLightbox();
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeLightboxIdx, prevLightbox, nextLightbox]);
-
-  const getCompanyColor = (company: string) => {
-    switch (company.toLowerCase()) {
-      case "mobifone":
-        return "bg-amber-500 text-white";
-      case "v247":
-        return "bg-sky-500 text-white";
-      case "htvc":
-        return "bg-purple-600 text-white";
-      case "ved":
-        return "bg-red-500 text-white";
-      case "prudential":
-        return "bg-emerald-600 text-white";
-      case "momo":
-        return "bg-pink-600 text-white";
-      case "finviet":
-        return "bg-cyan-600 text-white";
-      default:
-        return "bg-violet-600 text-white";
-    }
-  };
+  const { language, t } = useLanguage();
 
   return (
-    <PageLayout
-      id="memories-main-card"
-      rootClassName="w-full max-w-full !p-[5px] rounded-[15px] sm:rounded-[20px] border border-[var(--border)] relative flex flex-1 flex-col !bg-transparent transition-all duration-300"
-      headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !rounded-full transition-all duration-300"
-      headerContainerClassName="!px-0"
-      className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent"
-      pageId="memories"
-      pageName="Memories Main Card"
-      title={
-        isVi
-          ? "Nhật Ký Hành Trình & Kho Ảnh Kỷ Niệm Đồng Hành"
-          : "Operational Chronicles & Professional Milestone Gallery"
-      }
-      subtitle={
-        isVi
-          ? "Bộ sưu tập hình ảnh kỷ niệm và các cột mốc."
-          : "A gallery collection of memorable photos and professional milestones."
-      }
-      icon={Images}
-      headerActions={
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-black text-violet-700 dark:text-violet-300 shadow-xs backdrop-blur-md">
-            <span className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
-            <span>{isVi ? `${contentData.memories.length} Khoảnh Khắc Kỷ Niệm` : `${contentData.memories.length} Milestone Photos`}</span>
-          </div>
-          <div className="flex items-center gap-1.5 rounded-full border border-pink-500/30 bg-pink-500/10 px-3 py-1.5 text-xs font-black text-pink-700 dark:text-pink-300 shadow-xs backdrop-blur-md">
-            <Camera size={13} className="text-pink-600 dark:text-pink-400" />
-            <span>{isVi ? "Tập Thể & Đối Tác" : "Team & Partners"}</span>
-          </div>
+    <div className="min-h-screen w-full px-4 py-12 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        {/* Header Section */}
+        <div className="mb-12 flex flex-col items-center text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 text-xs font-black text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
+          >
+            <Sparkles size={14} />
+            <span className="uppercase tracking-widest">
+              {language === "vi" ? "Kho lưu trữ dấu ấn" : "Gallery of Milestones"}
+            </span>
+          </motion.div>
+          
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mt-4 text-4xl font-black tracking-tighter text-slate-900 md:text-6xl dark:text-white"
+          >
+            {t.nav.memories}
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-4 max-w-2xl text-lg font-bold text-slate-500 dark:text-slate-400"
+          >
+            {t.navDesc.memories}
+          </motion.p>
         </div>
-      }
-    >
-      <div className="flex w-full flex-col gap-6 pb-12 text-left">
-        {/* PHOTO GRID */}
-        <div className="columns-1 gap-5 space-y-5 transition-all duration-300 md:columns-2 lg:columns-3 xl:columns-4">
-          {contentData.memories.map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: Math.min(index * 0.03, 0.3) }}
-              onClick={() => openLightbox(index)}
-              className="group relative cursor-pointer break-inside-avoid overflow-hidden rounded-[10px] border border-slate-200/50 bg-[var(--card)] shadow-xs backdrop-blur-xl transition-all hover:border-violet-400 hover:shadow-md dark:border-slate-800/50 dark:bg-[var(--card)] dark:hover:border-violet-500"
-            >
-              <img
-                src={item.img}
-                alt={item.desc}
-                className="block h-auto w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
 
-              {/* Company Tag Top Corner */}
-              <div className="absolute top-2.5 left-2.5 opacity-90 transition-opacity group-hover:opacity-100">
-                <span
-                  className={cn(
-                    "rounded-lg px-2.5 py-0.5 text-[10px] font-black tracking-wider uppercase shadow-sm",
-                    getCompanyColor(item.company),
-                  )}
-                >
-                  {item.company}
-                </span>
+        {/* Masonry Layout */}
+        <div className="masonry-grid w-full">
+          {memories.map((photo, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: idx % 10 * 0.05 }}
+              viewport={{ once: true }}
+              className="masonry-item group relative mb-6 break-inside-avoid overflow-hidden rounded-3xl border border-white/20 bg-white/5 shadow-xl transition-all duration-500 hover:shadow-amber-500/20"
+            >
+              <div className="aspect-auto overflow-hidden">
+                <img
+                  src={photo.url}
+                  alt={photo.title}
+                  loading="lazy"
+                  className="w-full h-auto transition-transform duration-700 group-hover:scale-110"
+                />
               </div>
 
-              {/* Hover Caption Overlay */}
-              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/85 via-black/30 to-transparent p-3.5 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <p className="mb-1.5 text-xs leading-snug font-bold text-white sm:text-sm">
-                  {item.desc}
-                </p>
-                <div className="flex items-center gap-1.5 text-[10px] font-extrabold tracking-wider text-amber-300">
-                  <Expand size={12} />
-                  <span>Xem ảnh kích thước lớn</span>
+              {/* Overlay on Hover */}
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <div className="translate-y-4 transition-transform duration-300 group-hover:translate-y-0">
+                  <div className="flex items-center gap-2 text-amber-400">
+                    <Camera size={14} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      {photo.category}
+                    </span>
+                  </div>
+                  <h3 className="mt-1 text-xl font-black text-white tracking-tight">
+                    {photo.title}
+                  </h3>
                 </div>
               </div>
+
+              {/* Subtle Border Glow */}
+              <div className="absolute inset-0 rounded-3xl border-2 border-transparent transition-colors duration-300 group-hover:border-amber-500/30" />
             </motion.div>
           ))}
         </div>
-
-        {/* ENTERPRISE MEMORIES BANNER */}
       </div>
 
-      {/* FULLSCREEN LIGHTBOX MODAL */}
-      <AnimatePresence>
-        {activeLightboxIdx !== null &&
-          contentData.memories[activeLightboxIdx] && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-slate-950/90 p-4 backdrop-blur-xl sm:p-6"
-              onClick={closeLightbox}
-            >
-              {/* Lightbox Top Header Bar */}
-              <div
-                className="z-10 flex w-full max-w-5xl items-center justify-between text-white"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={cn(
-                      "rounded-xl px-3 py-1 text-xs font-extrabold uppercase shadow-sm",
-                      getCompanyColor(
-                        contentData.memories[activeLightboxIdx].company,
-                      ),
-                    )}
-                  >
-                    {contentData.memories[activeLightboxIdx].company}
-                  </span>
-                  <span className="text-xs font-extrabold text-slate-300">
-                    {activeLightboxIdx + 1} {"/"} {contentData.memories.length}
-                  </span>
-                </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .masonry-grid {
+          columns: 1;
+          column-gap: 1.5rem;
+        }
+        
+        @media (min-width: 640px) {
+          .masonry-grid {
+            columns: 2;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .masonry-grid {
+            columns: 3;
+          }
+        }
 
-                <div className="flex items-center gap-2">
-                  <a
-                    href={contentData.memories[activeLightboxIdx].img}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cursor-pointer rounded-xl bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
-                    title="Mở ảnh gốc trong tab mới"
-                  >
-                    <ExternalLink size={18} />
-                  </a>
-                  <button
-                    onClick={closeLightbox}
-                    className="cursor-pointer rounded-xl bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
-                    title="Đóng (ESC)"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              </div>
+        @supports (grid-template-rows: masonry) {
+          .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-rows: masonry;
+            gap: 1.5rem;
+          }
+          
+          @media (min-width: 640px) {
+            .masonry-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+          
+          @media (min-width: 1024px) {
+            .masonry-grid {
+              grid-template-columns: repeat(3, 1fr);
+            }
+          }
 
-              {/* Main Lightbox Image Viewport */}
-              <div
-                className="relative my-auto flex max-h-[75vh] w-full max-w-5xl items-center justify-center"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Prev Button */}
-                <button
-                  onClick={prevLightbox}
-                  className="absolute top-1/2 left-2 z-20 -translate-y-1/2 cursor-pointer rounded-[10px] bg-white/10 p-3 text-white shadow-lg backdrop-blur-md transition-all hover:bg-white/25 sm:-left-12"
-                  title="Ảnh trước (Mũi tên trái)"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-
-                {/* Image */}
-                <motion.img
-                  key={activeLightboxIdx}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                  src={contentData.memories[activeLightboxIdx].img}
-                  alt={contentData.memories[activeLightboxIdx].desc}
-                  className="max-h-[75vh] max-w-full rounded-[10px] border border-white/10 object-contain shadow-2xl"
-                />
-
-                {/* Next Button */}
-                <button
-                  onClick={nextLightbox}
-                  className="absolute top-1/2 right-2 z-20 -translate-y-1/2 cursor-pointer rounded-[10px] bg-white/10 p-3 text-white shadow-lg backdrop-blur-md transition-all hover:bg-white/25 sm:-right-12"
-                  title="Ảnh tiếp theo (Mũi tên phải)"
-                >
-                  <ChevronRight size={24} />
-                </button>
-              </div>
-
-              {/* Lightbox Bottom Caption Bar */}
-              <div
-                className="z-10 w-full max-w-2xl space-y-1 rounded-[10px] border border-slate-800 bg-slate-900/90 p-4 text-center text-white shadow-xl backdrop-blur-xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <p className="text-sm font-bold text-amber-300 sm:text-base">
-                  {contentData.memories[activeLightboxIdx].desc}
-                </p>
-                <p className="text-xs text-slate-400">
-                  Nhấn phím mũi tên Trái / Phải để chuyển ảnh • Nhấn ESC để đóng
-                </p>
-              </div>
-            </motion.div>
-          )}
-      </AnimatePresence>
-    </PageLayout>
+          .masonry-item {
+            margin-bottom: 0;
+          }
+        }
+      `}} />
+    </div>
   );
 }

@@ -29,7 +29,7 @@ function getAnalogousPalette(baseHue: number, count: number = 6): HSL[] {
 
   for (let i = 0; i < count; i++) {
     const h = (startHue + i * step + 360) % 360;
-    palette.push({ h, s: 65, l: 55 });
+    palette.push({ h, s: 70, l: 80 }); // Increased lightness for pastel look
   }
   return palette;
 }
@@ -114,12 +114,14 @@ export function generateGenerativeSvgData(
   const width = 1920;
   const height = 1080;
   const numWaves = 7;
+  // Favor Blue (200) to Purple (280) spectrum
   const baseHue =
-    customHue !== undefined ? customHue : Math.floor(Math.random() * 360);
+    customHue !== undefined ? customHue : 220 + Math.floor(Math.random() * 60);
   const colors = getAnalogousPalette(baseHue, 6);
 
   const randomColor = colors[Math.floor(Math.random() * colors.length)];
-  const bgColor = hslToHex(darken(randomColor, 40));
+  // Softer, lighter background for pastel theme
+  const bgColor = hslToHex(lighten(desaturate(randomColor, 30), 10));
 
   const waves: WaveData[] = [];
   const seed = Date.now();
@@ -133,12 +135,12 @@ export function generateGenerativeSvgData(
     let color = { ...colors[Math.floor(Math.random() * colors.length)] };
 
     if (i < 3) {
-      color = desaturate(darken(color, 50), 10);
+      color = lighten(color, 5); // Ensure early waves are soft too
     }
 
     const gradientOffset = mapValue(i, 0, numWaves, 0.1, 1);
-    const colorStart = hslToHex(lighten(color, 30));
-    const colorEnd = hslToHex(spin(color, 60));
+    const colorStart = hslToHex(lighten(color, 10));
+    const colorEnd = hslToHex(spin(color, 40));
 
     const numSteps = Math.floor(Math.random() * 5) + 4; // 4..8
     const randomRange = Math.random() * 32 + 32; // 32..64

@@ -31,17 +31,9 @@ export const standardPageTitles: Record<string, { vi: string; en: string }> = {
     vi: "Thư Ngỏ",
     en: "Cover Letter",
   },
-  about: {
-    vi: "Giới Thiệu",
-    en: "About Me",
-  },
   experience: {
     vi: "Kinh Nghiệm",
     en: "Experience",
-  },
-  education: {
-    vi: "Học Vấn",
-    en: "Education",
   },
   skills: {
     vi: "Kỹ Năng",
@@ -55,18 +47,7 @@ export const standardPageTitles: Record<string, { vi: string; en: string }> = {
     vi: "Dự Án",
     en: "Projects",
   },
-  systems: {
-    vi: "Hệ Thống",
-    en: "Systems",
-  },
-  astrology: {
-    vi: "Tử Vi",
-    en: "Astrology",
-  },
-  memories: {
-    vi: "Kỷ Niệm",
-    en: "Memories",
-  },
+
   interview: {
     vi: "Phỏng Vấn",
     en: "Interview",
@@ -83,6 +64,10 @@ export const standardPageTitles: Record<string, { vi: string; en: string }> = {
     vi: "Hình Nền",
     en: "Wallpapers",
   },
+  websiteManagement: {
+    vi: "Quản trị Website",
+    en: "Website Management",
+  },
 };
 
 export const shortSubtitles: Record<string, { vi: string; en: string }> = {
@@ -94,21 +79,13 @@ export const shortSubtitles: Record<string, { vi: string; en: string }> = {
     vi: "Sứ mệnh của tôi là phụng sự và tạo giá trị thực.",
     en: "My mission is to serve and create real value.",
   },
-  about: {
-    vi: "Lắng nghe là nền tảng của mọi mối quan hệ bền vững.",
-    en: "Listening is the foundation of every lasting relationship.",
-  },
   experience: {
     vi: "Mỗi thử thách là một bài học đắt giá trên hành trình trưởng thành.",
     en: "Every challenge is a valuable lesson on the journey of growth.",
   },
-  education: {
-    vi: "Kiến thức là sức mạnh, nhưng áp dụng kiến thức mới là quyền năng.",
-    en: "Knowledge is power, but applying knowledge is true mastery.",
-  },
   skills: {
-    vi: "Công nghệ thay đổi, nhưng thái độ phục vụ là vĩnh cửu.",
-    en: "Technology changes, but service attitude is eternal.",
+    vi: "Sự chuẩn bị tốt nhất cho tương lai chính là phát triển bản thân ở hiện tại.",
+    en: "The best preparation for tomorrow is developing yourself today.",
   },
   industries: {
     vi: "Sự đa dạng mang lại góc nhìn đa chiều và đột phá.",
@@ -118,18 +95,7 @@ export const shortSubtitles: Record<string, { vi: string; en: string }> = {
     vi: "Chi tiết làm nên sự hoàn hảo, và hoàn hảo không phải là chi tiết.",
     en: "Details make perfection, and perfection is not a detail.",
   },
-  systems: {
-    vi: "Hệ thống tốt là hệ thống phục vụ con người, không phải ngược lại.",
-    en: "A good system serves people, not the other way around.",
-  },
-  astrology: {
-    vi: "Hiểu mình để vươn xa, hiểu người để bao dung.",
-    en: "Understand yourself to go far, understand others to be tolerant.",
-  },
-  memories: {
-    vi: "Kỷ niệm là tài sản tinh thần quý giá nhất của mỗi chúng ta.",
-    en: "Memories are our most precious spiritual assets.",
-  },
+
   interview: {
     vi: "Chuẩn bị kỹ lưỡng là 50% của thành công.",
     en: "Thorough preparation is 50% of success.",
@@ -146,12 +112,16 @@ export const shortSubtitles: Record<string, { vi: string; en: string }> = {
     vi: "Không gian làm việc đẹp khơi nguồn cảm hứng sáng tạo bất tận.",
     en: "A beautiful workspace sparks endless creative inspiration.",
   },
+  websiteManagement: {
+    vi: "Hệ thống quản trị và kiểm soát cấu trúc website tập trung.",
+    en: "Centralized website structure control and management system.",
+  },
 };
 
 interface PageLayoutProps {
   id?: string;
   pageId?: PageId;
-  pageName?: string; // e.g. "Home Main Card", "About Main Card"
+  pageName?: string; // e.g. "Home Main Card", "Experience Main Card"
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   icon?: ElementType;
@@ -301,7 +271,7 @@ export function PageLayout({
       id={mainCardId}
       data-card-name={displayCardName}
       className={cn(
-        "relative mx-auto box-border flex min-h-full w-full max-w-full flex-1 flex-col items-center justify-start gap-2.5 sm:gap-3.5 md:gap-4 overflow-x-hidden rounded-xl sm:rounded-2xl border-none !bg-transparent !p-[5px] !shadow-none transition-all duration-300",
+        "relative mx-auto box-border flex min-h-full w-full max-w-full flex-1 flex-col items-center justify-start gap-2.5 sm:gap-3.5 md:gap-4 overflow-x-hidden !bg-transparent !p-0 !border-none !rounded-none !shadow-none transition-all duration-300",
         rootClassName,
       )}
     >
@@ -317,21 +287,21 @@ export function PageLayout({
 
       {/* 2.2 MAIN INFO CARD AND HEADER */}
       <motion.main
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
         role="main"
         data-view-mode={viewMode}
         onScroll={onScroll}
         className={cn(
           "main-info-card mx-auto box-border h-full min-h-0 w-full max-w-full min-w-0 flex-1",
-          "relative z-10 flex flex-col items-center justify-start gap-3 sm:gap-4 overflow-x-hidden border-none !bg-transparent !p-[10px] !shadow-none backdrop-blur-none transition-all duration-300",
+          "relative z-10 flex flex-col items-center justify-start gap-3 sm:gap-4 overflow-x-hidden transition-all duration-300",
           className,
         )}
       >
         <div
           className={cn(
-            "relative mx-auto flex w-full flex-col gap-4 pb-6 px-1 sm:px-2 md:px-0",
+            "relative mx-auto flex w-full flex-col gap-6 pb-8 px-4 sm:px-6 md:px-0",
             pageId === "home" ? "max-w-full h-full min-h-full flex-1" : "max-w-[1240px]"
           )}
         >
@@ -339,7 +309,7 @@ export function PageLayout({
           {!shouldHideHeader && (
             <div
               className={cn(
-                "relative z-20 w-full px-0 !bg-transparent",
+                "relative z-20 w-full px-0 !bg-[#ffffff]/0 h-[70px]",
                 headerContainerClassName,
               )}
             >
@@ -348,10 +318,10 @@ export function PageLayout({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
                 className={cn(
-                  "relative overflow-hidden w-full px-4 sm:px-6 shadow-xs",
-                  "border border-[var(--border)] transition-all duration-300",
+                  "relative overflow-hidden w-full px-4 sm:px-6",
+                  "transition-all duration-300",
                   "flex flex-col items-center justify-between gap-2 md:flex-row",
-                  "h-[60px] py-0 mb-0 !rounded-full !bg-white dark:!bg-slate-900",
+                  "h-[70px] py-0 mb-0 !bg-[#ffffff]/0",
                   headerClassName,
                 )}
               >
@@ -376,7 +346,7 @@ export function PageLayout({
                         <Icon
                           size={20}
                           className={cn(
-                            "shrink-0 text-current w-5 h-5 min-w-5 min-h-5",
+                            "shrink-0 text-current w-5 h-5 min-w-5 min-h-5 my-auto",
                             iconContainerClassName,
                           )}
                         />
@@ -478,6 +448,14 @@ export function PageLayout({
                   )}
                 </div>
               </motion.header>
+
+              {/* Refined Horizontal Divider */}
+              <motion.div 
+                initial={{ opacity: 0, scaleX: 0.5 }}
+                animate={{ opacity: 1, scaleX: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="mx-auto mt-4 mb-2 w-4/5 max-w-lg h-[1px] bg-gradient-to-r from-transparent via-[var(--border)] to-transparent opacity-60 dark:opacity-40"
+              />
             </div>
           )}
 
@@ -490,50 +468,60 @@ export function PageLayout({
       {/* POPUP VIDEO MODAL */}
       <AnimatePresence>
         {isVideoModalOpen && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center  modal-backdrop  p-3   sm:p-6">
+          <div className="animate-fadeIn fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 15 }}
-              className="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-[10px] border border-purple-500/40 bg-[var(--surface)] shadow-2xl"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative flex w-[80vw] max-w-[80vw] flex-col items-center space-y-5 overflow-hidden rounded-[15px] border border-purple-500/40 bg-[var(--card)] p-6 shadow-2xl"
             >
+              <div className="absolute top-4 left-4 h-3 w-3 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)] animate-pulse" />
+
               {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg)] p-3.5 sm:p-4">
-                <div className="flex items-center gap-2">
-                  <Video size={18} className="text-rose-500" />
-                  <h3 className="m-0 text-sm font-black text-[var(--text-primary)] sm:text-base">
-                    {videoTitle ||
-                      (language === "vi"
-                        ? "Video Giới Thiệu Hồ Sơ Năng Lực"
-                        : "Portfolio Video Presentation")}
-                  </h3>
+              <div className="flex w-full items-center justify-between border-b border-[var(--border)] pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-2 text-purple-600 dark:text-purple-400">
+                    <Video size={18} />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-sm font-black text-[var(--text-primary)] sm:text-base">
+                      {videoTitle ||
+                        (language === "vi"
+                          ? "Video Giới Thiệu Hồ Sơ Năng Lực"
+                          : "Portfolio Video Presentation")}
+                    </h3>
+                  </div>
                 </div>
                 <button
                   onClick={() => setIsVideoModalOpen(false)}
-                  className="cursor-pointer rounded-lg bg-[var(--text-primary)]/10 p-1.5 text-[var(--text-primary)] transition-colors hover:bg-[var(--text-primary)]/20"
+                  className="cursor-pointer rounded-full p-1.5 text-[var(--muted)] transition-colors hover:bg-[var(--border)] hover:text-[var(--text-primary)]"
                 >
-                  <X size={18} />
+                  <X size={24} />
                 </button>
               </div>
 
-              {/* Video Player Box */}
-              <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden bg-black">
-                <video
-                  src={videoUrl}
-                  controls
-                  autoPlay
-                  className="h-full w-full object-contain"
-                />
+              {/* CIRCULAR VIDEO PLAYER IN POPUP */}
+              <div className="relative my-3">
+                <div className="relative h-56 w-56 overflow-hidden rounded-full border-4 border-purple-500/80 bg-black shadow-[0_0_35px_rgba(168,85,247,0.45)] ring-4 ring-purple-500/30 sm:h-64 sm:w-64">
+                  <video
+                    src={videoUrl}
+                    controls
+                    autoPlay
+                    loop
+                    playsInline
+                    className="h-full w-full object-cover object-center"
+                  />
+                </div>
+                <div className="animate-spin-slow pointer-events-none absolute -inset-3 rounded-full border border-dashed border-purple-500/50" />
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-between border-t border-[var(--border)] bg-[var(--bg)] p-3 text-xs font-medium text-[var(--muted)] sm:p-4">
-                <span>Nguyễn Hùng Thái • Head of Customer Experience</span>
+              <div className="flex w-full items-center justify-center pt-2">
                 <button
                   onClick={() => setIsVideoModalOpen(false)}
-                  className="cursor-pointer rounded-xl bg-purple-600 px-3 py-1.5 font-bold text-white transition-colors hover:bg-purple-500"
+                  className="cursor-pointer rounded-full bg-purple-600 px-6 py-2 font-bold text-white transition-colors hover:bg-purple-500"
                 >
-                  {language === "vi" ? "Đóng" : "Close"}
+                  {language === "vi" ? "Đóng Video" : "Close Video"}
                 </button>
               </div>
             </motion.div>
@@ -543,3 +531,5 @@ export function PageLayout({
     </div>
   );
 }
+
+export default PageLayout;

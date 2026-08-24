@@ -1,4 +1,5 @@
 import { useGlobalRipple } from "./hooks/useGlobalRipple";
+import { useScrollPosition } from "./hooks/useScrollPosition";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import {
@@ -70,16 +71,18 @@ import { Home as HomePage } from "./pages/Home";
 import { CoverLetter } from "./pages/CoverLetter";
 import { About } from "./pages/About";
 import { Experience } from "./pages/Experience";
-import { Education } from "./pages/Education";
-import { Skills } from "./pages/Skills";
 import { Industries } from "./pages/Industries";
 import { Projects } from "./pages/Projects";
-import { Systems } from "./pages/Systems";
-import { Astrology } from "./pages/Astrology";
 import { Memories } from "./pages/Memories";
+import { Systems } from "./pages/Systems";
+import { Education } from "./pages/Education";
+import { Skills } from "./pages/Skills";
 import { Interview } from "./pages/Interview";
 import { AIChat } from "./pages/AIChat";
 import { Wallpapers } from "./pages/Wallpapers";
+import { WebsiteManagement } from "./pages/WebsiteManagement";
+import { TemplateTest } from "./pages/TemplateTest";
+
 import { cn } from "./lib/utils";
 import {
   getDefaultVietnameseVoice,
@@ -89,6 +92,8 @@ import { PageId } from "./types";
 import { pageSequence } from "./lib/utils";
 import { XRayPromptEditor } from "./components/xray/XRayPromptEditor";
 import { GenerativeWaveWallpaper } from "./components/GenerativeWaveWallpaper";
+import { GlassSoundEffect } from "./components/GlassSoundEffect";
+import { MouseMagicCursor } from "./components/MouseMagicCursor";
 
 export interface WallpaperOption {
   id: string;
@@ -799,19 +804,17 @@ export default function App() {
     const pageTitleMap: Record<string, { vi: string; en: string }> = {
       home: { vi: "Trang Chủ", en: "Home" },
       coverLetter: { vi: "Thư Ngỏ", en: "Cover Letter" },
-      about: { vi: "Giới Thiệu", en: "About" },
+      about: { vi: "Giới Thiệu", en: "About Me" },
       experience: { vi: "Kinh Nghiệm", en: "Experience" },
-      education: { vi: "Học Vấn", en: "Education" },
       skills: { vi: "Kỹ Năng", en: "Skills" },
       industries: { vi: "Lĩnh Vực", en: "Industries" },
       projects: { vi: "Dự Án", en: "Projects" },
-      systems: { vi: "Hệ Thống", en: "Systems" },
-      astrology: { vi: "Tử Vi", en: "Astrology" },
       memories: { vi: "Kỷ Niệm", en: "Memories" },
       interview: { vi: "Phỏng Vấn", en: "Interview" },
       settings: { vi: "Cài Đặt", en: "Settings" },
       aiChat: { vi: "Trợ Lý AI", en: "AI Assistant" },
       wallpapers: { vi: "Hình Nền", en: "Wallpapers" },
+      templateTest: { vi: "Trang Mẫu (Test)", en: "Template Test" },
     };
     const pageInfo = pageTitleMap[activePage] || { vi: "Trang Chủ", en: "Home" };
     const pageName = language === "vi" ? pageInfo.vi : pageInfo.en;
@@ -1015,13 +1018,13 @@ export default function App() {
 
   // UI Styles Detailed Customizations
   const [glassBlur, setGlassBlur] = useState<number>(() => {
-    return parseInt(localStorage.getItem("app_glass_blur") || "24", 10);
+    return parseInt(localStorage.getItem("app_glass_blur") || "0", 10);
   });
   const [glassOpacity, setGlassOpacity] = useState<number>(() => {
-    return parseInt(localStorage.getItem("app_glass_opacity") || "40", 10);
+    return parseInt(localStorage.getItem("app_glass_opacity") || "55", 10);
   });
   const [glassSaturate, setGlassSaturate] = useState<number>(() => {
-    return parseInt(localStorage.getItem("app_glass_saturate") || "150", 10);
+    return parseInt(localStorage.getItem("app_glass_saturate") || "180", 10);
   });
   const [glassContrast, setGlassContrast] = useState<number>(() => {
     return parseInt(localStorage.getItem("app_glass_contrast") || "100", 10);
@@ -1060,13 +1063,48 @@ export default function App() {
     return parseInt(localStorage.getItem("app_soft_opacity") || "85", 10);
   });
   const [uiRadius, setUiRadius] = useState<number>(() => {
-    return parseInt(localStorage.getItem("app_ui_radius") || "24", 10);
+    return parseInt(localStorage.getItem("app_ui_radius") || "32", 10);
   });
+
+  // Auto-Showcase Mode (Video Wallpaper cycling)
+  const [isAutoShowcaseActive, setIsAutoShowcaseActive] = useState<boolean>(true);
+  
+  useEffect(() => {
+    const handleInteraction = () => {
+      if (isAutoShowcaseActive) {
+        setIsAutoShowcaseActive(false);
+      }
+    };
+    
+    window.addEventListener("mousemove", handleInteraction, { passive: true });
+    window.addEventListener("mousedown", handleInteraction, { passive: true });
+    window.addEventListener("keydown", handleInteraction, { passive: true });
+    window.addEventListener("touchstart", handleInteraction, { passive: true });
+    window.addEventListener("wheel", handleInteraction, { passive: true });
+    
+    return () => {
+      window.removeEventListener("mousemove", handleInteraction);
+      window.removeEventListener("mousedown", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+      window.removeEventListener("touchstart", handleInteraction);
+      window.removeEventListener("wheel", handleInteraction);
+    };
+  }, [isAutoShowcaseActive]);
+
+  const handleNextWallpaper = () => {
+    const currentIndex = wallpapers.findIndex(wp => wp.id === selectedWallpaperId);
+    if (currentIndex === -1) return;
+    
+    const nextIndex = (currentIndex + 1) % wallpapers.length;
+    const nextWallpaper = wallpapers[nextIndex];
+    
+    setSelectedWallpaperId(nextWallpaper.id);
+  };
 
   // Video Background Tuning States
   const [videoDimmer, setVideoDimmer] = useState<number>(() => {
     const saved = localStorage.getItem("app_video_dimmer");
-    return saved ? parseInt(saved, 10) : 15;
+    return saved ? parseInt(saved, 10) : 0;
   });
   const [videoBlur, setVideoBlur] = useState<number>(() => {
     const saved = localStorage.getItem("app_video_blur");
@@ -1907,26 +1945,7 @@ export default function App() {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = (_e: React.UIEvent<HTMLDivElement>) => {
-    // Scroll state tracking
-  };
-
-  useEffect(() => {
-    const scrollToTop = () => {
-      if (scrollContainerRef.current) {
-        scrollContainerRef.current.scrollTop = 0;
-      }
-      window.scrollTo({ top: 0, behavior: "instant" });
-    };
-
-    scrollToTop();
-    const timer1 = setTimeout(scrollToTop, 20);
-    const timer2 = setTimeout(scrollToTop, 100);
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
-  }, [activePage]);
+  useScrollPosition(scrollContainerRef, activePage);
 
   const toggleThemeWithTransition = (_theme: string = "light", _clickEvent?: any) => {
     if (_theme === "dark") {
@@ -2012,21 +2031,28 @@ export default function App() {
   useEffect(() => {
     const handleWallpaperChanged = (e: Event) => {
       const customEvent = e as CustomEvent<{
-        id: string;
+        id?: string;
+        wallpaperId?: string;
         customUrl?: string;
+        url?: string;
         customName?: string;
+        name?: string;
         type?: "image" | "video" | "css";
         previewUrl?: string;
       }>;
       if (customEvent.detail) {
-        if (customEvent.detail.id) {
-          setSelectedWallpaperId(customEvent.detail.id);
+        const wpId = customEvent.detail.id || customEvent.detail.wallpaperId;
+        const wpUrl = customEvent.detail.customUrl || customEvent.detail.url;
+        const wpName = customEvent.detail.customName || customEvent.detail.name;
+
+        if (wpId) {
+          setSelectedWallpaperId(wpId);
         }
-        if (customEvent.detail.customUrl) {
-          setCustomWallpaperUrl(customEvent.detail.customUrl);
+        if (wpUrl) {
+          setCustomWallpaperUrl(wpUrl);
         }
-        if (customEvent.detail.customName) {
-          setCustomWallpaperName(customEvent.detail.customName);
+        if (wpName) {
+          setCustomWallpaperName(wpName);
         }
         // Refresh custom wallpapers from localStorage
         try {
@@ -2321,24 +2347,25 @@ export default function App() {
 
   useEffect(() => {
     if (isFontOverrideActive) {
-      let fontVal = '"Play", sans-serif';
+      let fontVal = '"Plus Jakarta Sans", sans-serif';
       if (fontFamily === "font-system" || fontFamily === "system")
-        fontVal = '"Play", system-ui, -apple-system, sans-serif';
+        fontVal = '"Plus Jakarta Sans", system-ui, -apple-system, sans-serif';
       else if (fontFamily === "font-roboto" || fontFamily === "roboto")
         fontVal = '"Roboto", sans-serif';
       else if (
         fontFamily === "font-play" ||
         fontFamily === "play" ||
+        fontFamily === "'Playfair Display', serif" ||
         fontFamily === "'Play', sans-serif"
       )
-        fontVal = '"Play", sans-serif';
+        fontVal = '"Playfair Display", serif';
       else if (fontFamily === "font-samsung" || fontFamily === "samsung")
         fontVal = '"Samsung Sans", "Segoe UI", sans-serif';
       else if (fontFamily === "font-googlesans" || fontFamily === "googlesans")
         fontVal =
           '"Google Sans", "Product Sans", "Plus Jakarta Sans", sans-serif';
       else if (fontFamily === "font-sans")
-        fontVal = '"Play", "Poppins", sans-serif';
+        fontVal = '"Plus Jakarta Sans", "Poppins", sans-serif';
       else if (fontFamily === "font-serif")
         fontVal = '"Playfair Display", Georgia, serif';
       else if (fontFamily === "font-mono") fontVal = "monospace";
@@ -3147,6 +3174,9 @@ export default function App() {
       )}
       style={{ fontFamily: "var(--font-play), sans-serif" }}
     >
+      {/* Physical Glassmorphism Sound Effect Engine */}
+      <GlassSoundEffect defaultClickType="tink" defaultHoverType="hover" />
+
       {/* Subtle Language Change Toast Notification */}
       <AnimatePresence>
         {langToast && (
@@ -3154,9 +3184,9 @@ export default function App() {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="pointer-events-none fixed top-5 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2.5 rounded-[10px] border border-white/20 bg-slate-900/95 px-4 py-2.5 text-xs font-bold tracking-wide text-white shadow-2xl backdrop-blur-xl sm:text-sm dark:border-slate-800 dark:bg-white/95 dark:text-slate-900"
+            className="pointer-events-none fixed top-5 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2.5 rounded-[12px] border border-slate-200/90 bg-white/95 px-4 py-2.5 text-xs font-bold tracking-wide text-slate-800 shadow-2xl backdrop-blur-xl sm:text-sm dark:border-white/10 dark:bg-[#12161C]/95 dark:text-slate-100"
           >
-            <Sparkles size={16} className="shrink-0 text-amber-400" />
+            <Sparkles size={16} className="shrink-0 text-amber-500 dark:text-amber-400" />
             <span>{langToast.message}</span>
           </motion.div>
         )}
@@ -3218,9 +3248,14 @@ export default function App() {
                   <video
                     ref={videoBgRef}
                     autoPlay
-                    loop
+                    loop={!isAutoShowcaseActive}
                     muted
                     playsInline
+                    onEnded={() => {
+                      if (isAutoShowcaseActive) {
+                        handleNextWallpaper();
+                      }
+                    }}
                     poster={activeWallpaper.previewUrl}
                     className={cn(
                       "absolute inset-0 h-full w-full object-cover transition-all duration-[1200ms]",
@@ -3265,7 +3300,7 @@ export default function App() {
         )}
 
         {/* Crisp Soft Ambient Tint Overlay for UI readability (without blurring background image) */}
-        <div className="pointer-events-none absolute inset-0 bg-black/5 transition-colors duration-700 dark:bg-black/25" />
+        <div className="pointer-events-none absolute inset-0 bg-transparent transition-colors duration-700 dark:bg-transparent" />
       </div>
 
       <div
@@ -3285,22 +3320,22 @@ export default function App() {
               ? {
                   transform: `scale(${scaleRatio})`,
                   transformOrigin: "center center",
-                  width: "1280px",
-                  height: "700px",
-                  minWidth: "1280px",
-                  minHeight: "700px",
+                  width: "1250px",
+                  height: "750px",
+                  minWidth: "1250px",
+                  minHeight: "750px",
                 }
               : {
-                  height: "700px",
+                  height: "750px",
                 }),
             backdropFilter:
               uiStyle === "glass"
                 ? `blur(var(--glass-blur, ${glassBlur}px)) contrast(${glassContrast}%) saturate(var(--glass-saturate, ${glassSaturate}%))`
-                : `blur(12px)`,
+                : `blur(0px)`,
             WebkitBackdropFilter:
               uiStyle === "glass"
                 ? `blur(var(--glass-blur, ${glassBlur}px)) contrast(${glassContrast}%) saturate(var(--glass-saturate, ${glassSaturate}%))`
-                : `blur(12px)`,
+                : `blur(0px)`,
             backgroundColor:
               uiStyle === "glass"
                 ? `rgba(255, 255, 255, var(--opacity-app-container, ${glassOpacity / 100}))`
@@ -3324,7 +3359,7 @@ export default function App() {
                 : "border-white/70 shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)]"
               : "border-slate-200/90 shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)]",
             isResponsive
-              ? "mx-auto flex h-full max-h-[750px] w-full flex-col gap-[5px] overflow-hidden border border-white/80 p-[10px] shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)] lg:h-[750px] lg:max-w-[1280px] lg:flex-row"
+              ? "mx-auto flex h-full max-h-[750px] w-full flex-col gap-[5px] overflow-hidden border border-white/80 p-[10px] shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)] !rounded-[32px] lg:h-[750px] lg:max-w-[1250px] lg:flex-row"
               : "flex gap-[5px] border-white/80 p-[10px] shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)] dark:border-white/15 dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.85),0_10px_25px_-5px_rgba(0,0,0,0.6)]",
           )}
         >
@@ -3349,7 +3384,6 @@ export default function App() {
               <AnimatePresence mode="popLayout" custom={navDirection}>
                 <motion.div
                   ref={scrollContainerRef}
-                  onScroll={handleScroll}
                   key={activePage}
                   custom={navDirection}
                   style={{ zoom: `${mainCardScale}%`, width: "100%" }}
@@ -3383,23 +3417,24 @@ export default function App() {
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  className="custom-scrollbar relative mx-auto flex h-full w-full max-w-[1280px] flex-1 flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto bg-transparent p-0 transition-all duration-300"
+                  className="custom-scrollbar relative mx-auto flex h-full w-full max-w-[1250px] flex-1 flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto bg-transparent p-0 transition-all duration-300"
                 >
                   {activePage === "home" && (
                     <HomePage uiStyle={uiStyle} onNavigate={handleNavigate} />
                   )}
                   {activePage === "coverLetter" && <CoverLetter />}
-                  {activePage === "about" && <About />}
+                  {activePage === "about" && <About onNavigate={handleNavigate} />}
                   {activePage === "experience" && <Experience />}
-                  {activePage === "education" && <Education />}
                   {activePage === "skills" && <Skills />}
                   {activePage === "industries" && <Industries />}
                   {activePage === "projects" && <Projects />}
-                  {activePage === "systems" && <Systems />}
-                  {activePage === "astrology" && <Astrology />}
                   {activePage === "memories" && <Memories />}
+                  {activePage === "systems" && <Systems />}
+                  {activePage === "education" && <Education />}
                   {activePage === "interview" && <Interview />}
                   {activePage === "wallpapers" && <Wallpapers />}
+                  {activePage === "websiteManagement" && <WebsiteManagement />}
+                  {activePage === "templateTest" && <TemplateTest />}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -3749,6 +3784,7 @@ export default function App() {
       />
 
       <XRayPromptEditor />
+      <MouseMagicCursor />
     </main>
   );
 }

@@ -1,6 +1,5 @@
 import React from "react";
 import { RotateCcw, FolderX } from "lucide-react";
-import { motion } from "motion/react";
 import { buttonVariants } from "../../lib/theme";
 
 export interface EmptyStateProps {
@@ -10,9 +9,7 @@ export interface EmptyStateProps {
 export const EmptyState: React.FC<EmptyStateProps> = React.memo(
   ({ onReset }) => {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+      <div
         className="magic-card mx-auto my-6 max-w-lg space-y-4 rounded-[15px] border border-slate-200/90 bg-white/90 p-8 text-center shadow-sm backdrop-blur-xl sm:p-12 dark:border-white/10 dark:bg-slate-900/80"
       >
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg)] text-[var(--muted)]">
@@ -37,7 +34,7 @@ export const EmptyState: React.FC<EmptyStateProps> = React.memo(
           <RotateCcw size={14} />
           <span>Đặt lại bộ lọc</span>
         </button>
-      </motion.div>
+      </div>
     );
   },
 );

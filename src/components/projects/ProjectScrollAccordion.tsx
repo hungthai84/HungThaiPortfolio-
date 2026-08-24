@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import {
   Info,
   Globe,
@@ -162,36 +161,36 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
           <p className="text-sm leading-relaxed font-medium text-[var(--text-secondary)] sm:text-base">
             {cs?.summary || project.desc}
           </p>
-          <div className="grid grid-cols-2 gap-4 border-t border-[var(--border)] pt-4 md:grid-cols-4">
-            <div>
+          <div className="grid grid-cols-2 gap-3 border-t border-[var(--border)] pt-4 md:grid-cols-4">
+            <div className="flex h-full flex-col justify-center rounded-xl bg-slate-50/80 p-3 border border-slate-100/80 dark:bg-white/5 dark:border-white/10 min-w-0">
               <div className="text-[10px] font-black tracking-wider text-[var(--muted)] uppercase">
                 {isVi ? "Phạm vi" : "Scope"}
               </div>
-              <div className="mt-1 text-sm font-bold text-[var(--text-primary)]">
+              <div className="mt-0.5 truncate text-xs sm:text-sm font-bold text-[var(--text-primary)]">
                 {project.group}
               </div>
             </div>
-            <div>
+            <div className="flex h-full flex-col justify-center rounded-xl bg-slate-50/80 p-3 border border-slate-100/80 dark:bg-white/5 dark:border-white/10 min-w-0">
               <div className="text-[10px] font-black tracking-wider text-[var(--muted)] uppercase">
                 {isVi ? "Thời gian" : "Period"}
               </div>
-              <div className="mt-1 text-sm font-bold text-amber-500">
+              <div className="mt-0.5 truncate text-xs sm:text-sm font-bold text-amber-500">
                 {project.period || emptyText}
               </div>
             </div>
-            <div>
+            <div className="flex h-full flex-col justify-center rounded-xl bg-slate-50/80 p-3 border border-slate-100/80 dark:bg-white/5 dark:border-white/10 min-w-0">
               <div className="text-[10px] font-black tracking-wider text-[var(--muted)] uppercase">
                 {isVi ? "Vai trò" : "Role"}
               </div>
-              <div className="mt-[5px] text-sm font-bold text-indigo-500">
+              <div className="mt-0.5 truncate text-xs sm:text-sm font-bold text-indigo-500">
                 {project.role || emptyText}
               </div>
             </div>
-            <div>
+            <div className="flex h-full flex-col justify-center rounded-xl bg-slate-50/80 p-3 border border-slate-100/80 dark:bg-white/5 dark:border-white/10 min-w-0">
               <div className="text-[10px] font-black tracking-wider text-[var(--muted)] uppercase">
                 {isVi ? "Học tại" : "At"}
               </div>
-              <div className="mt-[5px] text-sm font-bold text-[var(--text-primary)]">
+              <div className="mt-0.5 truncate text-xs sm:text-sm font-bold text-[var(--text-primary)]">
                 {project.company || emptyText}
               </div>
             </div>
@@ -211,8 +210,8 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
       content: (
         <div className="pt-2">
           {cs?.context ? (
-            <div className="space-y-4">
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="flex h-full flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4 shadow-xs space-y-2">
                 <div className="mb-1 text-sm font-bold text-[var(--text-primary)]">
                   {isVi ? "Hiện trạng:" : "Current Status:"}
                 </div>
@@ -220,10 +219,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                   {cs.context.currentStatus}
                 </div>
               </div>
-              <div className="flex items-center justify-center text-sky-500/50">
-                <ArrowRight size={20} className="rotate-90 sm:rotate-0" />
-              </div>
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+              <div className="flex h-full flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4 shadow-xs space-y-2">
                 <div className="mb-1 text-sm font-bold text-[var(--text-primary)]">
                   {isVi ? "Nguyên nhân:" : "Cause:"}
                 </div>
@@ -231,10 +227,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                   {cs.context.cause}
                 </div>
               </div>
-              <div className="flex items-center justify-center text-sky-500/50">
-                <ArrowRight size={20} className="rotate-90 sm:rotate-0" />
-              </div>
-              <div className="rounded-xl border border-sky-500/20 bg-sky-500/10 p-4">
+              <div className="flex h-full flex-col justify-between rounded-xl border border-sky-500/20 bg-sky-500/10 p-4 shadow-xs space-y-2">
                 <div className="mb-1 text-sm font-bold text-sky-600 dark:text-sky-400">
                   {isVi ? "Nhu cầu thay đổi:" : "Need for Change:"}
                 </div>
@@ -263,7 +256,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
               {cs.problems.map((p, i) => (
                 <div
                   key={i}
-                  className="space-y-3 rounded-2xl border border-rose-400/30 bg-gradient-to-r from-rose-500 via-pink-600 to-red-700 p-5 text-white shadow-md transition-all duration-300 hover:scale-[1.02]"
+                  className="flex h-full flex-col justify-between space-y-3 rounded-2xl border border-rose-400/30 bg-gradient-to-r from-rose-500 via-pink-600 to-red-700 p-5 text-white shadow-md"
                 >
                   <div className="flex items-start gap-2 text-sm font-bold text-white">
                     <AlertTriangle size={16} className="mt-0.5 shrink-0 text-white" />
@@ -304,7 +297,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
           {cs?.objectives ? (
             <>
               {cs.objectives.strategic && (
-                <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
                   <div className="mb-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
                     {isVi ? "Chiến lược" : "Strategic"}
                   </div>
@@ -325,7 +318,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 </div>
               )}
               {cs.objectives.operational && (
-                <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
                   <div className="mb-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
                     {isVi ? "Vận hành" : "Operational"}
                   </div>
@@ -346,7 +339,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 </div>
               )}
               {cs.objectives.customer && (
-                <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
                   <div className="mb-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
                     {isVi ? "Khách hàng" : "Customer"}
                   </div>
@@ -367,7 +360,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 </div>
               )}
               {cs.objectives.kpi && (
-                <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5">
                   <div className="mb-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
                     KPI
                   </div>
@@ -421,7 +414,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 {cs.solutions.cards.map((card, idx) => (
                   <div
                     key={idx}
-                    className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5"
+                    className="flex h-full flex-col justify-between space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-5"
                   >
                     <h5 className="flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">
                       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs dark:bg-indigo-900/50">
@@ -538,7 +531,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
           {cs?.systemsAndTools ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {cs.systemsAndTools.systems && (
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+                <div className="flex h-full flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
                   <div className="mb-2 text-xs font-bold tracking-wider text-[var(--muted)] uppercase">
                     {isVi ? "Hệ thống" : "Systems"}
                   </div>
@@ -555,7 +548,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 </div>
               )}
               {cs.systemsAndTools.technologies && (
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+                <div className="flex h-full flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
                   <div className="mb-2 text-xs font-bold tracking-wider text-[var(--muted)] uppercase">
                     {isVi ? "Công nghệ" : "Technology"}
                   </div>
@@ -572,7 +565,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 </div>
               )}
               {cs.systemsAndTools.methods && (
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+                <div className="flex h-full flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
                   <div className="mb-2 text-xs font-bold tracking-wider text-[var(--muted)] uppercase">
                     {isVi ? "Phương pháp" : "Methods"}
                   </div>
@@ -589,7 +582,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 </div>
               )}
               {cs.systemsAndTools.toolsList && (
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+                <div className="flex h-full flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
                   <div className="mb-2 text-xs font-bold tracking-wider text-[var(--muted)] uppercase">
                     {isVi ? "Công cụ" : "Tools"}
                   </div>
@@ -629,7 +622,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                   return (
                     <div
                       key={i}
-                      className="flex flex-col items-center justify-center rounded-xl border border-green-500/20 bg-green-500/10 p-4 text-center"
+                      className="flex flex-col items-center justify-between rounded-xl border border-green-500/20 bg-green-500/10 p-4 text-center"
                     >
                       <div className="mb-1 text-sm font-semibold text-[var(--text-secondary)]">
                         {parts[0]}
@@ -645,7 +638,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
           {cs?.results ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {cs.results.operational && (
-                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
                   <div className="mb-2 flex items-center gap-2 font-bold text-[var(--text-primary)]">
                     <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
                     {isVi ? "Vận hành" : "Operations"}
@@ -667,7 +660,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                 </div>
               )}
               {cs.results.customer && (
-                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
                   <div className="mb-2 flex items-center gap-2 font-bold text-[var(--text-primary)]">
                     <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
                     {isVi ? "Khách hàng" : "Customers"}
@@ -707,7 +700,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
           {cs?.valueAndDevelopment ? (
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
                   <h5 className="mb-2 flex items-center gap-2 font-bold text-[var(--text-primary)]">
                     <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                     {isVi ? "Cho Khách hàng" : "For Customers"}
@@ -716,7 +709,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                     {cs.valueAndDevelopment.customerValue}
                   </p>
                 </div>
-                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
                   <h5 className="mb-2 flex items-center gap-2 font-bold text-[var(--text-primary)]">
                     <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                     {isVi ? "Cho Doanh nghiệp" : "For Business"}
@@ -725,7 +718,7 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
                     {cs.valueAndDevelopment.businessValue}
                   </p>
                 </div>
-                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
+                <div className="flex h-full flex-col justify-between rounded-[16px] border border-[var(--border)] bg-[var(--bg)] p-5">
                   <h5 className="mb-2 flex items-center gap-2 font-bold text-[var(--text-primary)]">
                     <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                     {isVi ? "Cho Tổ chức" : "For Organization"}
@@ -746,114 +739,54 @@ export const ProjectScrollAccordion: React.FC<ProjectScrollAccordionProps> = ({
 
   return (
     <div className="w-full space-y-6 text-left">
-      {/* Top Action Controls: Quick Expand / Collapse All */}
       <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
         <div className="flex items-center gap-2 text-xs font-black tracking-wider text-[var(--muted)] uppercase">
-          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-indigo-500" />
+          <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
           <span>
-            {isVi
-              ? "Hiệu ứng Accordion Xếp Chồng Bài Viết (CodePen ScrollTrigger Style)"
-              : "ScrollTrigger Accordion Stack Effect"}
+            {isVi ? "Cấu trúc Chi Tiết Dự Án" : "Project Detailed Structure"}
           </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={expandAll}
-            className="cursor-pointer rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-600 transition-all hover:bg-indigo-500/20 dark:text-indigo-400"
-          >
-            {isVi ? "Mở tất cả" : "Expand All"}
-          </button>
-          <button
-            type="button"
-            onClick={collapseAll}
-            className="cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-bold text-[var(--muted)] transition-all hover:bg-[var(--glass-xs-bg)] hover:text-[var(--text-primary)]"
-          >
-            {isVi ? "Thu gọn tất cả" : "Collapse All"}
-          </button>
         </div>
       </div>
 
-      {/* ACCORDION CARDS STACK CONTAINER */}
-      <div className="space-y-4">
+      {/* PROJECT DETAILS CARDS GRID */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 auto-rows-fr">
         {sections.map((sec, idx) => {
-          const isOpen = !!openSections[idx];
           const IconComp = sec.icon;
+          // Extract a base color from the gradient string (simplified)
+          const baseColorClass = sec.gradient.split(" ")[0].replace("from-", "bg-");
+          const borderColorClass = sec.gradient.split(" ")[0].replace("from-", "border-");
 
-          // Extract color border or background values dynamically for fine border styling
           return (
-            <motion.div
+            <div
               key={sec.id}
-              layout
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: idx * 0.04 }}
-              className="magic-card overflow-hidden rounded-[15px] border border-[var(--border)] bg-[var(--card)] shadow-md transition-all duration-300 hover:shadow-lg"
+              className={cn(
+                "flex flex-col overflow-hidden rounded-[20px] border-2 bg-[var(--card)] shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1",
+                borderColorClass
+              )}
             >
-              {/* ACCORDION CARD HEADER BUTTON */}
-              <button
-                type="button"
-                onClick={() => toggleSection(idx)}
+              {/* CARD HEADER */}
+              <div className={cn(
+                "flex items-center gap-3.5 p-4 text-white sm:p-5",
+                sec.gradient
+              )}>
+                <div className="shrink-0 rounded-xl bg-white/20 p-2.5 text-white backdrop-blur-md">
+                  <IconComp size={20} className="text-white" />
+                </div>
+                <h4 className="truncate text-sm font-black tracking-wide text-white drop-shadow-xs sm:text-base">
+                  {sec.title}
+                </h4>
+              </div>
+
+              {/* CARD CONTENT */}
+              <div
                 className={cn(
-                  "group flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left select-none sm:p-5",
-                  `bg-gradient-to-r ${sec.gradient} text-white shadow-sm`,
+                  "flex-1 space-y-4 p-5 sm:p-7",
+                  sec.bgLight,
                 )}
               >
-                <div className="flex min-w-0 items-center gap-3.5">
-                  <div className="shrink-0 rounded-xl bg-white/20 p-2.5 text-white backdrop-blur-md">
-                    <IconComp size={20} className="text-white" />
-                  </div>
-                  <h4 className="truncate text-sm font-black tracking-wide text-white drop-shadow-xs sm:text-base">
-                    {sec.title}
-                  </h4>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-3">
-                  <span className="rounded-lg border border-white/30 bg-white/20 px-2.5 py-1 text-[9px] font-black tracking-widest text-white uppercase backdrop-blur-md">
-                    {isOpen
-                      ? isVi
-                        ? "Đang mở"
-                        : "Open"
-                      : isVi
-                        ? "Thu gọn"
-                        : "Collapsed"}
-                  </span>
-
-                  <div
-                    className={cn(
-                      "rounded-full bg-white/20 p-1.5 text-white transition-transform duration-200 backdrop-blur-md",
-                      isOpen ? "rotate-180" : "",
-                    )}
-                  >
-                    <ChevronDown size={16} />
-                  </div>
-                </div>
-              </button>
-
-              {/* ACCORDION CARD CONTENT BODY (Scrubbing / Collapsing Effect) */}
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    key="content"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div
-                      className={cn(
-                        "space-y-4 border-t border-[var(--border)] p-5 sm:p-7",
-                        sec.bgLight,
-                      )}
-                    >
-                      {sec.content}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+                {sec.content}
+              </div>
+            </div>
           );
         })}
       </div>

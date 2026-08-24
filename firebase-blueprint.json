@@ -1,37 +1,50 @@
 {
-  "entities": {
-    "User": {
-      "title": "User",
-      "description": "A user of the application",
-      "type": "object",
-      "properties": {
-        "uid": { "type": "string", "maxLength": 128 },
-        "email": { "type": "string", "maxLength": 256 },
-        "createdAt": { "type": "string" }
-      },
-      "required": ["uid", "email", "createdAt"]
+  "collections": {
+    "website_system_state": {
+      "description": "Stores the current status and summary results of each management module",
+      "fields": {
+        "moduleId": "string",
+        "status": "string (NOT_CHECKED | CHECKED | CONFIRMED | COMPLETED | REVIEW_REQUIRED | ERROR)",
+        "lastCheckedAt": "timestamp",
+        "lastAppliedAt": "timestamp",
+        "summary": "map",
+        "proposedChanges": "array"
+      }
     },
-    "UserPreferences": {
-      "title": "UserPreferences",
-      "description": "User background wallpapers and preferences",
-      "type": "object",
-      "properties": {
-        "customWallpapers": { "type": "string" },
-        "selectedWallpaperId": { "type": "string", "maxLength": 128 },
-        "deletedWallpaperIds": { "type": "string" },
-        "updatedAt": { "type": "string" }
-      },
-      "required": ["updatedAt"]
-    }
-  },
-  "firestore": {
-    "users/{userId}": {
-      "schema": "User",
-      "description": "User profiles"
+    "website_inventory": {
+      "description": "Inventory of all objects recognized on the website",
+      "fields": {
+        "name": "string",
+        "type": "string",
+        "location": "string",
+        "page": "string",
+        "frequency": "number",
+        "parentId": "string",
+        "style": "map",
+        "variant": "string",
+        "status": "string"
+      }
     },
-    "users/{userId}/preferences/{prefId}": {
-      "schema": "UserPreferences",
-      "description": "User preferences and wallpaper storage"
+    "website_settings": {
+      "description": "Global and component-specific configurations",
+      "fields": {
+        "category": "string (GLOBAL | COMPONENT | CUSTOM | EXTERNAL)",
+        "key": "string",
+        "value": "any",
+        "updatedAt": "timestamp"
+      }
+    },
+    "website_history": {
+      "description": "Audit logs for all applied changes",
+      "fields": {
+        "timestamp": "timestamp",
+        "action": "string",
+        "moduleId": "string",
+        "before": "any",
+        "after": "any",
+        "userId": "string",
+        "status": "string"
+      }
     }
   }
 }

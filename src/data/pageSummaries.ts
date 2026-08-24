@@ -68,21 +68,21 @@ export const pageSummariesData: Record<PageId, PageSummaryInfo> = {
     titleVi: "Tổng Kết Trang Giới Thiệu (About Summary)",
     titleEn: "About Page Summary",
     bannerQuoteVi:
-      "“Tận tâm chăm sóc – Vận hành hiệu quả! Sự hài lòng của khách hàng là thước đo giá trị bền vững.”",
+      "“Lắng nghe là nền tảng của mọi mối quan hệ bền vững.”",
     bannerQuoteEn:
-      "“Dedicated care – Efficient operation! Customer satisfaction is the measure of sustainable value.”",
+      "“Listening is the foundation of every sustainable relationship.”",
     qnaList: [
       {
-        qVi: "Triết lý quản trị nổi bật của Hùng Thái là gì?",
-        aVi: "Lắng nghe chân thành, thấu hiểu chiều sâu và giải quyết vấn đề với tinh thần trách nhiệm cao nhất.",
-        qEn: "What is Hung Thai's core management philosophy?",
-        aEn: "Sincere listening, deep understanding, and solving problems with the highest sense of responsibility.",
+        qVi: "Trang Giới Thiệu thể hiện thông tin gì?",
+        aVi: "Tổng quan về lãnh đạo CX Nguyễn Hùng Thái: 22+ năm kinh nghiệm, thông tin cá nhân, 3 trụ cột vận hành cốt lõi và định hướng hợp tác.",
+        qEn: "What does the About page showcase?",
+        aEn: "An executive overview of CX Leader Nguyễn Hùng Thái: 22+ years experience, personal info, 3 core operational pillars, and strategic partnership.",
       },
       {
-        qVi: "Định hướng phát triển sự nghiệp trong tương lai?",
-        aVi: "Trở thành Giám đốc Trải nghiệm Khách hàng (Chief Customer Officer - CCO) dẫn dắt chuyển đổi số CX toàn diện.",
-        qEn: "What is the future career orientation?",
-        aEn: "To become a Chief Customer Officer (CCO) leading comprehensive CX digital transformation.",
+        qVi: "3 Trụ cột vận hành cốt lõi là gì?",
+        aVi: "01. Hiệu quả (SOP, FCR >85%, SLA), 02. Nhân văn (Thấu cảm, lắng nghe), 03. Bền vững (CRM & AI Automation).",
+        qEn: "What are the 3 core operational pillars?",
+        aEn: "01. Efficiency (SOP, FCR >85%, SLA), 02. Human-centric (Empathy, active listening), 03. Sustainability (CRM & AI Automation).",
       },
     ],
   },
@@ -109,49 +109,26 @@ export const pageSummariesData: Record<PageId, PageSummaryInfo> = {
       },
     ],
   },
-  education: {
-    pageId: "education",
-    titleVi: "Tổng Kết Học Vấn & Bằng Cấp (Education Summary)",
-    titleEn: "Education & Certifications Summary",
-    bannerQuoteVi:
-      "“Tri thức là nền tảng vững chắc cho sự cải tiến liên tục và phát triển chuyên môn sâu sắc.”",
-    bannerQuoteEn:
-      "“Knowledge is the firm foundation for continuous improvement and deep professional expertise.”",
-    qnaList: [
-      {
-        qVi: "Trình độ chuyên môn và chứng chỉ quốc tế sở hữu?",
-        aVi: "Cử nhân ĐH Kỹ Thuật Công Nghệ, cùng các chứng chỉ quản lý Contact Center & CX Leadership cao cấp.",
-        qEn: "What are the academic qualifications and certificates?",
-        aEn: "Bachelor Degree from HUTECH, alongside advanced Contact Center & CX Leadership certificates.",
-      },
-      {
-        qVi: "Phương châm học tập và trau dồi tri thức?",
-        aVi: "Học tập liên tục (Lifelong Learning) và cập nhật xu hướng công nghệ AI mới nhất trong quản trị.",
-        qEn: "What is the learning motto?",
-        aEn: "Lifelong Learning and constantly updating the latest AI technology trends in management.",
-      },
-    ],
-  },
   skills: {
     pageId: "skills",
-    titleVi: "Tổng Kết Bản Đồ Kỹ Năng (Skills Summary)",
-    titleEn: "Skills Matrix Summary",
+    titleVi: "Tổng Kết Kỹ Năng & SWOT (Skills & SWOT Summary)",
+    titleEn: "Skills & Personal SWOT Summary",
     bannerQuoteVi:
-      "“Sức mạnh của chuyên môn không nằm ở lý thuyết, mà nằm ở hệ thống vận hành thực chiến tối ưu.”",
+      "“Sự chuẩn bị tốt nhất cho tương lai chính là phát triển bản thân ở hiện tại.”",
     bannerQuoteEn:
-      "“The power of expertise lies not in theory, but in an optimized hands-on operational system.”",
+      "“The best preparation for tomorrow is developing yourself today.”",
     qnaList: [
       {
-        qVi: "Bộ kỹ năng CX/CS cốt lõi gồm những gì?",
-        aVi: "Thiết kế hành trình khách hàng (Journey Mapping), Quản trị KPI CSAT/NPS/FCR, Vận hành CRM Omnichannel.",
-        qEn: "What are the core CX/CS skills?",
-        aEn: "Customer Journey Mapping, CSAT/NPS/FCR KPI Management, and CRM Omnichannel Operations.",
+        qVi: "Bộ kỹ năng quản trị cốt lõi là gì?",
+        aVi: "Quản trị Contact Center, CRM Omnichannel, AI Chatbot/Voicebot, Đào tạo & Phát triển đội ngũ, Phân tích dữ liệu CSKH.",
+        qEn: "What are the core management skills?",
+        aEn: "Contact Center Management, Omnichannel CRM, AI Chatbot/Voicebot, Team Training & Development, CX Data Analytics.",
       },
       {
-        qVi: "Kỹ năng ứng dụng công nghệ và lãnh đạo?",
-        aVi: "Lập kế hoạch chiến lược, đào tạo đội ngũ, triển khai AI Bot & Tự động hóa quy trình (Automation Workflows).",
-        qEn: "What about tech application and leadership skills?",
-        aEn: "Strategic planning, team training, AI Bot deployment & Automation Workflows.",
+        qVi: "Phân tích Personal SWOT thể hiện điều gì?",
+        aVi: "Điểm mạnh chuyên môn 20+ năm, điểm yếu cần cải thiện, cơ hội bứt phá công nghệ AI và thách thức thích ứng thị trường.",
+        qEn: "What does the Personal SWOT analysis reveal?",
+        aEn: "20+ years expertise strengths, areas for improvement, AI technology opportunities, and market adaptation challenges.",
       },
     ],
   },
@@ -201,26 +178,26 @@ export const pageSummariesData: Record<PageId, PageSummaryInfo> = {
       },
     ],
   },
-  systems: {
-    pageId: "systems",
-    titleVi: "Tổng Kết Kiến Trúc Hệ Thống (Systems Architecture Summary)",
-    titleEn: "Systems Architecture Summary",
+  memories: {
+    pageId: "memories",
+    titleVi: "Tổng Kết Trang Kỷ Niệm (Memories Summary)",
+    titleEn: "Memories Page Summary",
     bannerQuoteVi:
-      "“Quy trình chuẩn mực và tự động hóa thông minh là nền tảng bứt phá của doanh nghiệp hiện đại.”",
+      "“Mỗi khoảnh khắc là một dấu ấn trong hành trình 22 năm cống hiến và phát triển chuyên môn.”",
     bannerQuoteEn:
-      "“Standardized workflows and smart automation form the foundation for modern enterprise breakthroughs.”",
+      "“Every moment is a milestone in a 22-year journey of dedication and professional growth.”",
     qnaList: [
       {
-        qVi: "Mô hình kiến trúc hệ thống CRM & Call Center tiêu chuẩn?",
-        aVi: "Tích hợp Omnichannel Call Center, AI Voicebot, Ticketing System & Báo cáo Real-time Dashboard.",
-        qEn: "What is the standard CRM & Call Center architecture model?",
-        aEn: "Integrated Omnichannel Call Center, AI Voicebot, Ticketing System & Real-time Dashboard reporting.",
+        qVi: "Trang Kỷ niệm lưu trữ những gì?",
+        aVi: "Kho lưu trữ hình ảnh về các sự kiện, dấu ấn làm việc tại các tập đoàn lớn như MoMo, Prudential, Mobifone...",
+        qEn: "What does the Memories page store?",
+        aEn: "A gallery of images from events and milestones at major corporations like MoMo, Prudential, Mobifone...",
       },
       {
-        qVi: "Khả năng mở rộng và độ tin cậy của hệ thống?",
-        aVi: "Khả năng mở rộng linh hoạt, uptime 99.99% và đáp ứng quy mô hàng triệu tương tác mỗi tháng.",
-        qEn: "What is the system scalability and reliability?",
-        aEn: "Flexible scalability, 99.99% uptime, serving millions of monthly interactions.",
+        qVi: "Layout của trang Kỷ niệm có gì đặc biệt?",
+        aVi: "Sử dụng bố cục Masonry (Pinterest-style) hiện đại, giúp hiển thị hình ảnh với nhiều kích thước khác nhau một cách thẩm mỹ.",
+        qEn: "What is special about the Memories page layout?",
+        aEn: "Uses a modern Masonry (Pinterest-style) layout, displaying images of varying sizes aesthetically.",
       },
     ],
   },
@@ -247,49 +224,49 @@ export const pageSummariesData: Record<PageId, PageSummaryInfo> = {
       },
     ],
   },
-  astrology: {
-    pageId: "astrology",
-    titleVi: "Tổng Kết Tử Vi & Phong Thủy Nghề Nghiệp (Astrology Summary)",
-    titleEn: "Career Astrology & Feng Shui Summary",
+  education: {
+    pageId: "education",
+    titleVi: "Tổng Kết Học Vấn & Đào Tạo (Education Summary)",
+    titleEn: "Education & Training Summary",
     bannerQuoteVi:
-      "“Lấy cái TÂM làm gốc, lấy sự ĐIỀM TĨNH làm sức mạnh để dẫn dắt con người và hệ thống.”",
+      "“Hành trình học tập suốt đời là nền tảng vững chắc cho mọi sự đổi mới và bứt phá trong sự nghiệp chuyên môn.”",
     bannerQuoteEn:
-      "“Mindfulness as the root, composure as the strength to guide people and systems.”",
+      "“A lifelong learning journey is the solid foundation for every innovation and breakthrough in professional career.”",
     qnaList: [
       {
-        qVi: "Khám phá chỉ số phong thủy và tử vi nghề nghiệp?",
-        aVi: "Sự kết hợp giữa mệnh phong thủy và tính cách lãnh đạo: Điềm tĩnh, kiên trì, sâu sắc và lấy tâm làm gốc.",
-        qEn: "What does the career astrology insight reveal?",
-        aEn: "A harmony of Feng Shui elements and leadership traits: Composed, persistent, deep, and mindful.",
+        qVi: "Nền tảng học vấn chính quy của Hùng Thái là gì?",
+        aVi: "Hùng Thái là Cử nhân Công nghệ thông tin (STU), tốt nghiệp năm 2007, đây là nền tảng quan trọng giúp kết hợp giữa Quản trị và Công nghệ.",
+        qEn: "What is Hung Thai's formal educational background?",
+        aEn: "Hung Thai is a Bachelor of Information Technology (STU), graduated in 2007, which is a key foundation for bridging Management and Technology.",
       },
       {
-        qVi: "Ý nghĩa trong công việc và quan hệ đồng nghiệp?",
-        aVi: "Lắng nghe chân thành, tạo dựng niềm tin và truyền cảm hứng tích cực cho đội ngũ nhân sự.",
-        qEn: "What is the significance in teamwork and culture?",
-        aEn: "Sincere listening, building trust, and inspiring positive energy across teams.",
+        qVi: "Hùng Thái có những chứng chỉ chuyên môn nào?",
+        aVi: "Hùng Thái sở hữu nhiều chứng chỉ quốc tế và chuyên sâu như CCNA, MCSA, Quản trị rủi ro, Quản trị dự án và Quản lý cấp cao từ Dale Carnegie.",
+        qEn: "What professional certifications does Hung Thai hold?",
+        aEn: "Hung Thai holds several international and advanced certifications such as CCNA, MCSA, Risk Management, Project Management, and Executive Management from Dale Carnegie.",
       },
     ],
   },
-  memories: {
-    pageId: "memories",
-    titleVi: "Tổng Kết Kỷ Niệm & Hoạt Động (Memories Summary)",
-    titleEn: "Memories & Highlights Summary",
+  systems: {
+    pageId: "systems",
+    titleVi: "Tổng Kết Hệ Thống Năng Lực (Systems Summary)",
+    titleEn: "Capability Systems Summary",
     bannerQuoteVi:
-      "“Những khoảnh khắc đáng nhớ cùng đội ngũ là minh chứng cho tinh thần đoàn kết và khát vọng vươn lên.”",
+      "“Kiến trúc năng lực đa chiều là nền tảng vững chắc cho mọi thành công trong quản trị và vận hành.”",
     bannerQuoteEn:
-      "“Memorable team moments demonstrate unity and relentless ambition for excellence.”",
+      "“Multidimensional competency architecture is the solid foundation for all management and operational success.”",
     qnaList: [
       {
-        qVi: "Bộ sưu tập hình ảnh lưu giữ những khoảnh khắc nào?",
-        aVi: "Các sự kiện teambuilding, lễ trao giải cống hiến, hoạt động đào tạo và kỷ niệm đồng hành cùng các đội ngũ.",
-        qEn: "What moments does the photo collection capture?",
-        aEn: "Teambuilding events, dedication awards, training programs, and memorable team milestones.",
+        qVi: "Hệ thống năng lực của Hùng Thái được chia như thế nào?",
+        aVi: "Bao gồm 5 trụ cột chính: Chuyên môn CRM & Dữ liệu, Đổi mới & Số hóa, Lãnh đạo & Quản trị, Hợp tác & CX, và Ngôn ngữ toàn cầu.",
+        qEn: "How are Hung Thai's capability systems categorized?",
+        aEn: "Includes 5 main pillars: CRM & Data Expertise, Innovation & Digitalization, Leadership & Management, Collaboration & CX, and Global Languages.",
       },
       {
-        qVi: "Văn hóa doanh nghiệp được thể hiện ra sao?",
-        aVi: "Tinh thần đoàn kết, gắn kết bền chặt và môi trường làm việc sáng tạo, chuyên nghiệp.",
-        qEn: "How is corporate culture reflected?",
-        aEn: "Solidarity, strong engagement, and a creative, professional work environment.",
+        qVi: "Điểm nổi bật nhất trong biểu đồ năng lực radar là gì?",
+        aVi: "Sự cân bằng cao giữa năng lực công nghệ (AI/CRM) và quản trị lãnh đạo quy mô lớn với điểm trung bình ấn tượng.",
+        qEn: "What is the most highlight in the radar competency chart?",
+        aEn: "High balance between technology capabilities (AI/CRM) and large-scale leadership management with an impressive average score.",
       },
     ],
   },
@@ -336,6 +313,52 @@ export const pageSummariesData: Record<PageId, PageSummaryInfo> = {
         aVi: "Hệ thống tự động đồng bộ chế độ Sáng/Tối và màu nhấn chủ đạo tương thích với sắc thái của từng hình nền.",
         qEn: "Do wallpapers adapt to the UI theme automatically?",
         aEn: "The system automatically synchronizes Light/Dark modes and accent colors to match the mood of each wallpaper.",
+      },
+    ],
+  },
+  templateTest: {
+    pageId: "templateTest",
+    titleVi: "Tổng Kết Trang Mẫu Kiểm Thử (Template Test Summary)",
+    titleEn: "Template Test Showcase Summary",
+    bannerQuoteVi:
+      "“Mẫu dữ liệu chuẩn hóa giúp kiểm thử toàn diện giao diện, hiệu ứng ánh sáng pháp thuật và công cụ X-Ray.”",
+    bannerQuoteEn:
+      "“Standardized template data enables comprehensive testing of UI components, magical lighting, and X-Ray.”",
+    qnaList: [
+      {
+        qVi: "Trang mẫu kiểm thử có chức năng gì?",
+        aVi: "Cung cấp các widget tương tác, biểu mẫu test, bảng dữ liệu mẫu và hiển thị hiệu ứng ánh sáng pháp thuật chuột.",
+        qEn: "What is the purpose of the template test page?",
+        aEn: "Provides interactive widgets, sample form inputs, data tables, and magical cursor lighting effects.",
+      },
+      {
+        qVi: "Có thể chỉnh sửa trang này bằng X-Ray không?",
+        aVi: "Hoàn toàn có thể. Mọi phần tử trên trang mẫu này đều tương thích đầy đủ với trình biên tập X-Ray Prompt.",
+        qEn: "Can this page be inspected with X-Ray?",
+        aEn: "Yes, every element on this template page is fully compatible with the X-Ray Prompt Editor.",
+      },
+    ],
+  },
+  websiteManagement: {
+    pageId: "websiteManagement",
+    titleVi: "Hệ Thống Quản Trị Website (Website System)",
+    titleEn: "Website Management System",
+    bannerQuoteVi:
+      "“Kiểm soát tập trung, cấu trúc đồng bộ và quy trình xác thực độc lập là chìa khóa của một hệ thống bền vững.”",
+    bannerQuoteEn:
+      "“Centralized control, synchronized structure, and independent validation are keys to a sustainable system.”",
+    qnaList: [
+      {
+        qVi: "Hệ thống quản trị cung cấp những module nào?",
+        aVi: "Bao gồm 24 module độc lập từ Quét Website, Kho đối tượng, Hệ thống Component đến Tùy chỉnh mã nguồn (Custom Code).",
+        qEn: "What modules does the management system provide?",
+        aEn: "Includes 24 independent modules from Website Scan, Object Inventory, Component System to Custom Code integration.",
+      },
+      {
+        qVi: "Quy trình thực hiện thay đổi diễn ra như thế nào?",
+        aVi: "Hệ thống tuân thủ nguyên tắc: Kiểm tra → Preview → Người dùng xác nhận → Thực hiện. Tuyệt đối không tự động thay đổi dữ liệu.",
+        qEn: "How does the change process work?",
+        aEn: "The system follows: Check → Preview → User Confirm → Apply. It never automatically modifies data without approval.",
       },
     ],
   },

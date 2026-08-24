@@ -28,6 +28,63 @@ export function getBrowserInfo(): BrowserInfo {
  * - Microsoft Edge: Defaults to Giọng Nam Minh (Microsoft NamMinh Online Natural / Nam Minh)
  * - Google Chrome: Defaults to Google Tiếng Việt 3 (Natural) / Google Tiếng Việt
  */
+export function getVietnameseVoices(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice[] {
+  if (!voices) return [];
+  const viVoices = voices.filter(
+    (v) =>
+      v.lang.toLowerCase().includes("vi") ||
+      v.name.toLowerCase().includes("tiếng việt") ||
+      v.name.toLowerCase().includes("vietnamese") ||
+      v.name.toLowerCase().includes("multilingual"),
+  );
+
+  return viVoices.sort((a, b) => {
+    const aName = a.name.toLowerCase();
+    const bName = b.name.toLowerCase();
+    let aScore = 0;
+    let bScore = 0;
+
+    if (aName.includes("natural")) aScore += 100;
+    if (aName.includes("multilingual")) aScore += 80;
+    if (aName.includes("google") && (aName.includes("3") || aName.includes("tiếng việt"))) aScore += 90;
+    if (aName.includes("hoài my") || aName.includes("namminh")) aScore += 50;
+
+    if (bName.includes("natural")) bScore += 100;
+    if (bName.includes("multilingual")) bScore += 80;
+    if (bName.includes("google") && (bName.includes("3") || bName.includes("tiếng việt"))) bScore += 90;
+    if (bName.includes("hoài my") || bName.includes("namminh")) bScore += 50;
+
+    return bScore - aScore;
+  });
+}
+
+export function getEnglishVoices(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice[] {
+  if (!voices) return [];
+  const enVoices = voices.filter(
+    (v) => 
+      v.lang.toLowerCase().includes("en") || 
+      v.name.toLowerCase().includes("english") ||
+      v.name.toLowerCase().includes("multilingual")
+  );
+
+  return enVoices.sort((a, b) => {
+    const aName = a.name.toLowerCase();
+    const bName = b.name.toLowerCase();
+    let aScore = 0;
+    let bScore = 0;
+
+    if (aName.includes("natural")) aScore += 100;
+    if (aName.includes("multilingual")) aScore += 80;
+    if (aName.includes("google")) aScore += 50;
+
+    if (bName.includes("natural")) bScore += 100;
+    if (bName.includes("multilingual")) bScore += 80;
+    if (bName.includes("google")) bScore += 50;
+
+    return bScore - aScore;
+  });
+}
+
 export function getDefaultVietnameseVoice(
   voices: SpeechSynthesisVoice[],
 ): SpeechSynthesisVoice | undefined {

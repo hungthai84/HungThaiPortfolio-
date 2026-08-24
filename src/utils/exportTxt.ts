@@ -28,8 +28,8 @@ export const generateAndDownloadTxt = () => {
   coreValuesData?.forEach((c: any) => text += `- ${c.titleVi}: ${c.descVi}\n`);
   text += "\n";
 
-  // 3. Giới thiệu (About)
-  text += "=== 3. GIỚI THIỆU (ABOUT) ===\n";
+  // 3. Thông tin cá nhân (Personal Profile)
+  text += "=== 3. THÔNG TIN CÁ NHÂN (PERSONAL PROFILE) ===\n";
   text += "Thông tin cá nhân:\n";
   data.personalInfo?.forEach((info: any) => {
     text += `- ${info.label}: ${info.value}\n`;
@@ -54,21 +54,8 @@ export const generateAndDownloadTxt = () => {
     text += "\n";
   });
 
-  // 5. Học vấn (Education)
-  text += "=== 5. HỌC VẤN (EDUCATION) ===\n";
-  if (data.education) {
-    data.education.forEach((edu: any) => {
-      text += `* ${edu.degree} - ${edu.school}\n`;
-      text += `  - Thời gian: ${edu.year}\n`;
-      if (edu.desc) text += `  - Mô tả: ${edu.desc}\n`;
-    });
-  } else {
-    text += "Dữ liệu đang cập nhật...\n";
-  }
-  text += "\n";
-
-  // 6. Kỹ năng (Skills)
-  text += "=== 6. KỸ NĂNG (SKILLS) ===\n";
+  // 5. Kỹ năng (Skills)
+  text += "=== 5. KỸ NĂNG (SKILLS) ===\n";
   if (data.skills) {
     data.skills.forEach((skillGroup: any) => {
       text += `* ${skillGroup.category}:\n`;
@@ -79,8 +66,8 @@ export const generateAndDownloadTxt = () => {
   }
   text += "\n";
 
-  // 7. Lĩnh vực (Domains)
-  text += "=== 7. LĨNH VỰC (DOMAINS/SERVICES) ===\n";
+  // 6. Lĩnh vực (Domains)
+  text += "=== 6. LĨNH VỰC (DOMAINS/SERVICES) ===\n";
   if (data.domains) {
     data.domains.forEach((d: any) => {
       text += `* ${d.title}\n`;
@@ -91,8 +78,8 @@ export const generateAndDownloadTxt = () => {
   }
   text += "\n";
 
-  // 8. Dự án (Projects)
-  text += "=== 8. DỰ ÁN (PROJECTS) ===\n";
+  // 7. Dự án (Projects)
+  text += "=== 7. DỰ ÁN (PROJECTS) ===\n";
   projectsData?.forEach((p: any) => {
     text += `* Dự án: ${p.title}\n`;
     text += `  - Nhóm: ${p.group}\n`;
@@ -101,8 +88,8 @@ export const generateAndDownloadTxt = () => {
     text += `  - Mô tả: ${p.desc}\n\n`;
   });
 
-  // 9. Phỏng vấn (Interview)
-  text += "=== 9. PHỎNG VẤN (INTERVIEW/CASE STUDIES) ===\n";
+  // 8. Phỏng vấn (Interview)
+  text += "=== 8. PHỎNG VẤN (INTERVIEW/CASE STUDIES) ===\n";
   Object.values(caseStudiesMap || {})?.forEach((c: any) => {
     text += `* Câu hỏi/Tình huống: ${c.titleVi}\n`;
     text += `  - Bối cảnh: ${c.situationVi}\n`;
@@ -110,36 +97,19 @@ export const generateAndDownloadTxt = () => {
     text += `  - Kết quả: ${c.resultVi}\n\n`;
   });
 
-  // 10. Tử vi (Astrology)
-  text += "=== 10. TỬ VI (ASTROLOGY) ===\n";
-  if (data.astrology) {
-    text += `* Bản mệnh: ${data.astrology.element || ""}\n`;
-    text += `* Mô tả: ${data.astrology.description || ""}\n`;
-  } else {
-    text += "Dữ liệu đang cập nhật...\n";
-  }
-  text += "\n";
 
-  // 11. Kỷ niệm (Memories)
-  text += "=== 11. KỶ NIỆM (MEMORIES) ===\n";
-  if (data.memories) {
-    data.memories.forEach((m: any) => {
-      text += `* ${m.title} (${m.year})\n  - ${m.desc}\n`;
-    });
-  } else {
-    text += "Dữ liệu đang cập nhật...\n";
-  }
-  text += "\n";
 
-  // 12. Trợ lý AI (AI Assistant)
-  text += "=== 12. TRỢ LÝ AI (AI KNOWLEDGE BASE) ===\n";
+
+
+  // 11. Trợ lý AI (AI Assistant)
+  text += "=== 11. TRỢ LÝ AI (AI KNOWLEDGE BASE) ===\n";
   Object.entries(PREDEFINED_ANSWERS || {}).forEach(([q, a]) => {
     text += `* Q: ${q}\n`;
     text += `  A: ${a}\n\n`;
   });
 
-  // 13. Hệ thống (System)
-  text += "=== 13. HỆ THỐNG (SYSTEM SETTINGS/CONFIG) ===\n";
+  // 12. Hệ thống (System)
+  text += "=== 12. HỆ THỐNG (SYSTEM SETTINGS/CONFIG) ===\n";
   text += "Dữ liệu cấu hình hệ thống hiện tại đang được nạp từ các module React.\n";
   text += "\n";
   text += "========================================================================\n";

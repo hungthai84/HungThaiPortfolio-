@@ -52,6 +52,7 @@ import {
   Languages,
   HelpCircle,
   Search,
+MoreHorizontal,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -264,280 +265,135 @@ export function GlassAnimatedWeatherIcon({
   const isCloudy = code === 2 || code === 3;
   const isRain = (code >= 51 && code <= 67) || (code >= 80 && code <= 82);
   const isThunder = code >= 95;
-  const isFog = code >= 45 && code <= 48;
   const isSnow = (code >= 71 && code <= 77) || code === 85 || code === 86;
 
-  const renderIconContent = () => {
-    if (!isDay && (isClear || isCloudy || isFog)) {
-      // SCENE 1: Night cloudy / crescent moon
-      return (
-        <g filter="url(#dropShadow)">
-          {/* Glowing Crescent Moon */}
-          <path
-            d="M52 22 C52 22 30 26 30 48 C30 66 45 76 64 73 C48 78 36 64 36 48 C36 33 46 25 52 22 Z"
-            fill="url(#moonGrad)"
-            stroke="#FFB300"
-            strokeWidth="1.2"
-            filter="url(#glow)"
-            className="animate-[pulse_3s_ease-in-out_infinite]"
-          />
-          {/* Frosted Glass Cloud with high visibility */}
-          <path
-            d="M25 60 C25 51.7 31.7 45 40 45 C41.2 45 42.4 45.1 43.5 45.4 C47.5 39.5 54.3 35.6 62 35.6 C72.5 35.6 81.3 42.6 83.7 52.1 C84.7 51.8 85.8 51.6 87 51.6 C94.2 51.6 100 57.4 100 64.6 C100 71.8 94.2 77.6 87 77.6 L40 77.6 C31.7 77.6 25 70.9 25 62.6 Z"
-            fill="url(#glassGrad)"
-            stroke="url(#glassBorder)"
-            strokeWidth="2.5"
-            className="backdrop-blur-[4px] animate-[pulse_4s_ease-in-out_infinite]"
-          />
-        </g>
-      );
-    }
-
-    if (isThunder) {
-      // SCENE 2: Thunderstorm with lightning
-      return (
-        <g filter="url(#dropShadow)">
-          {/* Glowing Lightning Bolt */}
-          <path
-            d="M48 45 L62 45 L48 68 L62 68 L36 94 L48 70 L36 70 Z"
-            fill="url(#lightningGrad)"
-            stroke="#FFE500"
-            strokeWidth="1"
-            filter="url(#glow)"
-            className="animate-pulse"
-          />
-          {/* Dark Glass Cloud */}
-          <path
-            d="M20 52 C20 43.7 26.7 37 35 37 C36.2 37 37.4 37.1 38.5 37.4 C42.5 31.5 49.3 27.6 57 27.6 C67.5 27.6 76.3 34.6 78.7 44.1 C79.7 43.8 80.8 43.6 82 43.6 C89.2 43.6 95 49.4 95 56.6 C95 63.8 89.2 69.6 82 69.6 L35 69.6 C26.7 69.6 20 62.9 20 54.6 Z"
-            fill="url(#thunderCloudGrad)"
-            stroke="url(#glassBorder)"
-            strokeWidth="2.5"
-            className="backdrop-blur-[4px]"
-          />
-        </g>
-      );
-    }
-
-    if (isDay && (isClear || isCloudy || isFog)) {
-      // SCENE 3: Day partly cloudy / sunny
-      return (
-        <g filter="url(#dropShadow)">
-          {/* Glowing Sun with Sunrays */}
-          <g className="animate-[spin_40s_linear_infinite]" transform="translate(60, 36)">
-            <circle cx="0" cy="0" r="18" fill="url(#sunGrad)" filter="url(#glow)" stroke="#FF8F00" strokeWidth="1.5" />
-            {/* Sun Rays */}
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-              <line
-                key={angle}
-                x1="0"
-                y1="-22"
-                x2="0"
-                y2="-29"
-                stroke="#FF8F00"
-                strokeWidth="4"
-                strokeLinecap="round"
-                transform={`rotate(${angle})`}
-              />
-            ))}
-          </g>
-          {/* Frosted Glass Cloud with High Clarity */}
-          <path
-            d="M18 58 C18 49.7 24.7 43 33 43 C34.2 43 35.4 43.1 36.5 43.4 C40.5 37.5 47.3 33.6 55 33.6 C65.5 33.6 74.3 40.6 76.7 50.1 C77.7 49.8 78.8 49.6 80 49.6 C87.2 49.6 93 55.4 93 62.6 C93 69.8 87.2 75.6 80 75.6 L33 75.6 C24.7 75.6 18 68.9 18 60.6 Z"
-            fill="url(#glassGrad)"
-            stroke="url(#glassBorder)"
-            strokeWidth="2.5"
-            className="backdrop-blur-[4px] animate-[pulse_5s_ease-in-out_infinite]"
-          />
-        </g>
-      );
-    }
-
-    if (isRain && code >= 60) {
-      // SCENE 4: Heavy Rain with glowing cyan/purple rain streaks
-      return (
-        <g filter="url(#dropShadow)">
-          {/* Glowing rain streaks */}
-          {[
-            { x1: 34, y1: 65, x2: 28, y2: 84 },
-            { x1: 48, y1: 68, x2: 42, y2: 87 },
-            { x1: 62, y1: 65, x2: 56, y2: 84 },
-            { x1: 76, y1: 68, x2: 70, y2: 87 }
-          ].map((line, idx) => (
-            <line
-              key={idx}
-              x1={line.x1}
-              y1={line.y1}
-              x2={line.x2}
-              y2={line.y2}
-              stroke="#00E5FF"
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              filter="url(#glow)"
-              className="animate-pulse"
-              style={{ animationDelay: `${idx * 0.25}s` }}
-            />
-          ))}
-          {/* Frosted Glass Cloud */}
-          <path
-            d="M20 54 C20 45.7 26.7 39 35 39 C36.2 39 37.4 39.1 38.5 39.4 C42.5 33.5 49.3 29.6 57 29.6 C67.5 29.6 76.3 36.6 78.7 46.1 C79.7 45.8 80.8 45.6 82 45.6 C89.2 45.6 95 51.4 95 58.6 C95 65.8 89.2 71.6 82 71.6 L35 71.6 C26.7 71.6 20 64.9 20 56.6 Z"
-            fill="url(#glassGrad)"
-            stroke="url(#glassBorder)"
-            strokeWidth="2.5"
-            className="backdrop-blur-[4px]"
-          />
-        </g>
-      );
-    }
-
-    if (isRain) {
-      // SCENE 5: Standard Rain - Glossy blue raindrop
-      return (
-        <g filter="url(#dropShadow)">
-          {/* Big Glossy blue raindrop */}
-          <path
-            d="M50 42 C50 42 64 62 64 74 C64 82 58 88 50 88 C42 88 36 82 36 74 C36 62 50 42 50 42 Z"
-            fill="url(#rainGrad)"
-            stroke="#0284C7"
-            strokeWidth="1.5"
-            filter="url(#glow)"
-            className="animate-bounce"
-          />
-          {/* Frosted Glass Cloud */}
-          <path
-            d="M20 48 C20 39.7 26.7 33 35 33 C36.2 33 37.4 33.1 38.5 33.4 C42.5 27.5 49.3 23.6 57 23.6 C67.5 23.6 76.3 30.6 78.7 40.1 C79.7 39.8 80.8 39.6 82 39.6 C89.2 39.6 95 45.4 95 52.6 C95 59.8 89.2 65.6 82 65.6 L35 65.6 C26.7 65.6 20 58.9 20 50.6 Z"
-            fill="url(#glassGrad)"
-            stroke="url(#glassBorder)"
-            strokeWidth="2.5"
-            className="backdrop-blur-[4px]"
-          />
-        </g>
-      );
-    }
-
-    if (isSnow) {
-      // SCENE 6: Snow / Snowflake
-      return (
-        <g filter="url(#dropShadow)">
-          {/* Rotating Glowing Snowflake */}
-          <g className="animate-[spin_20s_linear_infinite]" transform="translate(50, 72)">
-            {[0, 60, 120, 180, 240, 300].map((angle) => (
-              <g key={angle} transform={`rotate(${angle})`}>
-                <line x1="0" y1="0" x2="0" y2="-14" stroke="url(#snowGrad)" strokeWidth="3" filter="url(#glow)" />
-                <path d="M-4 -8 L0 -12 L4 -8" fill="none" stroke="url(#snowGrad)" strokeWidth="2.5" />
-              </g>
-            ))}
-          </g>
-          {/* Frosted Glass Cloud */}
-          <path
-            d="M20 44 C20 35.7 26.7 29 35 29 C36.2 29 37.4 29.1 38.5 29.4 C42.5 23.5 49.3 19.6 57 19.6 C67.5 19.6 76.3 26.6 78.7 36.1 C79.7 35.8 80.8 35.6 82 35.6 C89.2 35.6 95 41.4 95 48.6 C95 55.8 89.2 61.6 82 61.6 L35 61.6 C26.7 61.6 20 54.9 20 46.6 Z"
-            fill="url(#glassGrad)"
-            stroke="url(#glassBorder)"
-            strokeWidth="2.5"
-            className="backdrop-blur-[4px]"
-          />
-        </g>
-      );
-    }
-
-    // Default Fallback: Classic Cloudy scene
-    return (
-      <g filter="url(#dropShadow)">
-        {/* Secondary back cloud */}
-        <path
-          d="M38 52 C38 45.4 43.4 40 50 40 C51 40 51.9 40.1 52.8 40.4 C56 35.7 61.4 32.5 67.5 32.5 C75.9 32.5 82.9 38.1 84.8 45.7 C85.6 45.5 86.5 45.3 87.4 45.3 C93.2 45.3 97.9 50 97.9 55.8 C97.9 61.6 93.2 66.3 87.4 66.3 L50 66.3 C43.4 66.3 38 60.9 38 54.3 Z"
-          fill="rgba(148, 163, 184, 0.7)"
-          className="animate-[pulse_6s_ease-in-out_infinite]"
-        />
-        {/* Main Frosted Glass Cloud */}
-        <path
-          d="M18 58 C18 49.7 24.7 43 33 43 C34.2 43 35.4 43.1 36.5 43.4 C40.5 37.5 47.3 33.6 55 33.6 C65.5 33.6 74.3 40.6 76.7 50.1 C77.7 49.8 78.8 49.6 80 49.6 C87.2 49.6 93 55.4 93 62.6 C93 69.8 87.2 75.6 80 75.6 L33 75.6 C24.7 75.6 18 68.9 18 60.6 Z"
-          fill="url(#glassGrad)"
-          stroke="url(#glassBorder)"
-          strokeWidth="2.5"
-          className="backdrop-blur-[4px] animate-[pulse_4s_ease-in-out_infinite]"
-        />
-      </g>
-    );
-  };
+  // Determine which of the 4 scenes to render
+  let scene = 'cloudy'; // Default
+  if (isRain) scene = 'rain';
+  if (isThunder) scene = 'thunder';
+  if (isSnow) scene = 'snow';
 
   return (
     <div
       className="group/weather-icon relative flex items-center justify-center select-none transition-all duration-300 group-hover/weather:scale-110"
       style={{ width: size, height: size }}
     >
-      {/* Background aura badge for high contrast */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-sky-400/20 via-indigo-500/10 to-amber-400/20 opacity-80 blur-[2px] transition-all group-hover/weather:opacity-100" />
-
-      {/* SVG Canvas representing high fidelity glassmorphism vectors */}
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 120 120"
-        fill="none"
+      <svg 
+        width="100%" 
+        height="100%" 
+        viewBox="0 0 128 128" 
+        fill="none" 
         xmlns="http://www.w3.org/2000/svg"
-        className="relative z-10 filter drop-shadow-lg"
+        className="relative z-10 overflow-visible drop-shadow-xl"
       >
         <defs>
-          {/* Intense glow blur filter */}
-          <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          {/* Frost Blur Filter for the glassmorphism bleed */}
+          <filter id="frost" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="7" />
           </filter>
 
-          {/* High contrast drop shadow filter */}
-          <filter id="dropShadow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#0f172a" floodOpacity="0.4" />
-          </filter>
+          {/* Cloud Path: Perfect puffy cloud shape */}
+          <path id="cloud-path" d="M 38,92 c -13.25,0 -24,-10.75 -24,-24 c 0,-12.92 10.22,-23.45 23,-23.95 c 4.18,-15.7 18.52,-27.05 35,-27.05 c 15.65,0 29.35,10.15 34.2,24.52 c 11.58,1.72 20.8,11.5 20.8,23.48 c 0,13.25 -10.75,24 -24,24 z" />
+          
+          {/* Cloud Clip Path (for masking the blurred objects and inner bevels) */}
+          <clipPath id="cloud-clip">
+            <use href="#cloud-path" />
+          </clipPath>
 
-          {/* High Contrast Color Gradients */}
-          <linearGradient id="sunGrad" x1="42" y1="22" x2="74" y2="54" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFF176" />
-            <stop offset="50%" stopColor="#FFB300" />
-            <stop offset="100%" stopColor="#FF6D00" />
+          {/* Gradients matching the image exactly */}
+          <linearGradient id="sun-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#FFE100" />
+            <stop offset="100%" stopColor="#FF7B00" />
           </linearGradient>
 
-          <linearGradient id="moonGrad" x1="30" y1="22" x2="64" y2="73" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFF59D" />
-            <stop offset="50%" stopColor="#FFC107" />
-            <stop offset="100%" stopColor="#FF8F00" />
+          <linearGradient id="moon-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#E2E8F0" />
+            <stop offset="100%" stopColor="#94A3B8" />
           </linearGradient>
 
-          <linearGradient id="lightningGrad" x1="40" y1="45" x2="55" y2="85" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFF59D" />
-            <stop offset="50%" stopColor="#FFEE58" />
-            <stop offset="100%" stopColor="#F57F17" />
+          <linearGradient id="blue-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#00D2FF" />
+            <stop offset="100%" stopColor="#0066FF" />
           </linearGradient>
 
-          <linearGradient id="rainGrad" x1="36" y1="42" x2="64" y2="88" gradientUnits="userSpaceOnUse">
+          <linearGradient id="rain-grad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#38BDF8" />
-            <stop offset="100%" stopColor="#0284C7" />
+            <stop offset="100%" stopColor="#3B82F6" />
           </linearGradient>
 
-          <linearGradient id="snowGrad" x1="40" y1="58" x2="60" y2="86" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#E0F7FA" />
-            <stop offset="100%" stopColor="#38BDF8" />
-          </linearGradient>
-
-          {/* Vibrant high-contrast frosted glass cloud gradient */}
-          <linearGradient id="glassGrad" x1="20" y1="30" x2="100" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
-            <stop offset="45%" stopColor="#F0F9FF" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#BAE6FD" stopOpacity="0.75" />
-          </linearGradient>
-
-          <linearGradient id="thunderCloudGrad" x1="20" y1="30" x2="100" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#64748B" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#1E293B" stopOpacity="0.8" />
-          </linearGradient>
-
-          <linearGradient id="glassBorder" x1="20" y1="30" x2="100" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.9" />
-            <stop offset="50%" stopColor="#FFFFFF" stopOpacity="1" />
-            <stop offset="100%" stopColor="#0284C7" stopOpacity="0.8" />
-          </linearGradient>
+          <g id="snowflake">
+            <line x1="0" y1="-10" x2="0" y2="10" stroke="url(#blue-grad)" strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="-8.66" y1="-5" x2="8.66" y2="5" stroke="url(#blue-grad)" strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="-8.66" y1="5" x2="8.66" y2="-5" stroke="url(#blue-grad)" strokeWidth="3.5" strokeLinecap="round" />
+          </g>
         </defs>
 
-        {renderIconContent()}
+        <g transform="translate(0, 10)">
+          
+          {/* BACKGROUND OBJECTS (Crisp, behind the cloud) */}
+          {scene === 'cloudy' && isDay && (
+            <circle cx="86" cy="38" r="21" fill="url(#sun-grad)" className="animate-[pulse_4s_ease-in-out_infinite]" />
+          )}
+          {scene === 'cloudy' && !isDay && (
+            <circle cx="86" cy="38" r="21" fill="url(#moon-grad)" className="animate-[pulse_4s_ease-in-out_infinite]" />
+          )}
+          
+          {scene === 'rain' && (
+            <g className="animate-[bounce_3s_ease-in-out_infinite]">
+              <line x1="36" y1="85" x2="36" y2="100" stroke="url(#rain-grad)" strokeWidth="6" strokeLinecap="round" />
+              <line x1="50" y1="92" x2="50" y2="115" stroke="url(#rain-grad)" strokeWidth="6" strokeLinecap="round" />
+              <line x1="64" y1="82" x2="64" y2="108" stroke="url(#rain-grad)" strokeWidth="6" strokeLinecap="round" />
+              <line x1="78" y1="95" x2="78" y2="110" stroke="url(#rain-grad)" strokeWidth="6" strokeLinecap="round" />
+              <line x1="92" y1="85" x2="92" y2="100" stroke="url(#rain-grad)" strokeWidth="6" strokeLinecap="round" />
+            </g>
+          )}
+
+          {scene === 'thunder' && (
+            <path 
+              d="M 69,70 L 49,105 H 64 L 54,130 L 84,95 H 69 Z" 
+              fill="url(#blue-grad)" 
+              className="animate-[pulse_1.5s_ease-in-out_infinite]"
+            />
+          )}
+
+          {scene === 'snow' && (
+            <g className="animate-[pulse_3s_ease-in-out_infinite]">
+              <use href="#snowflake" transform="translate(56, 105) scale(0.9)" />
+              <use href="#snowflake" transform="translate(80, 120) scale(0.7)" />
+              <use href="#snowflake" transform="translate(95, 100) scale(0.5)" />
+            </g>
+          )}
+
+          {/* CLOUD BASE */}
+          {/* Soft white matte base */}
+          <use href="#cloud-path" fill="#F8FAFC" opacity="0.95" />
+
+          {/* FROSTED GLASS EFFECTS (Objects blurred inside the cloud for 3D translucency) */}
+          <g clipPath="url(#cloud-clip)">
+            
+            {/* Cloudy sun/moon frosted bleed */}
+            {scene === 'cloudy' && isDay && (
+              <circle cx="86" cy="38" r="21" fill="url(#sun-grad)" filter="url(#frost)" opacity="0.85" />
+            )}
+            {scene === 'cloudy' && !isDay && (
+              <circle cx="86" cy="38" r="21" fill="url(#moon-grad)" filter="url(#frost)" opacity="0.85" />
+            )}
+
+            {/* Rain/Thunder/Snow blue inner frosted glow */}
+            {(scene === 'rain' || scene === 'thunder' || scene === 'snow') && (
+              <circle cx="64" cy="75" r="32" fill="url(#blue-grad)" filter="url(#frost)" opacity="0.45" />
+            )}
+
+            {/* 3D BEVELS */}
+            {/* Top inner highlight */}
+            <use href="#cloud-path" fill="none" stroke="#FFFFFF" strokeWidth="12" transform="translate(0, 6)" opacity="0.9" />
+            {/* Bottom inner shadow */}
+            <use href="#cloud-path" fill="none" stroke="#94A3B8" strokeWidth="10" transform="translate(0, -5)" opacity="0.2" />
+            {/* Overall soft inner volumetric shadow */}
+            <use href="#cloud-path" fill="none" stroke="#CBD5E1" strokeWidth="20" filter="url(#frost)" opacity="0.3" transform="translate(0, -6)" />
+          </g>
+          
+        </g>
       </svg>
     </div>
   );
@@ -561,7 +417,16 @@ export function RightSidebar({
     temp: number;
     code: number;
     isDay: number;
+    details?: {
+      maxTemp: number;
+      minTemp: number;
+      precipProb: number;
+      uvIndex: number;
+      windSpeed: number;
+      humidity: number;
+    };
   } | null>(null);
+  const [showWeatherModal, setShowWeatherModal] = useState(false);
 
   // Page curl / wallpaper background modal state
   const [isDraggingCurl, setIsDraggingCurl] = useState(false);
@@ -1247,8 +1112,6 @@ export function RightSidebar({
     return saved ? parseFloat(saved) : 1.0;
   });
   
-  // ABOUT PAGE LAYOUT STATE
-  
   const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(() => {
     return localStorage.getItem("app_video_playing") !== "false";
   });
@@ -1510,19 +1373,27 @@ export function RightSidebar({
     const fetchWeather = async () => {
       try {
         const response = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=10.8231&longitude=106.6297&current_weather=true",
+          "https://api.open-meteo.com/v1/forecast?latitude=10.8231&longitude=106.6297&current=temperature_2m,relative_humidity_2m,weather_code,is_day,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&timezone=Asia%2FHo_Chi_Minh",
         );
         if (!response.ok) throw new Error(`HTTP error ${response.status}`);
         const data = await response.json();
-        if (data && data.current_weather) {
+        if (data && data.current) {
           setWeather({
-            temp: Math.round(data.current_weather.temperature),
-            code: data.current_weather.weathercode,
-            isDay: data.current_weather.is_day,
+            temp: Math.round(data.current.temperature_2m),
+            code: data.current.weather_code,
+            isDay: data.current.is_day,
+            details: data.daily ? {
+              maxTemp: Math.round(data.daily.temperature_2m_max[0]),
+              minTemp: Math.round(data.daily.temperature_2m_min[0]),
+              precipProb: data.daily.precipitation_probability_max[0],
+              uvIndex: data.daily.uv_index_max[0],
+              windSpeed: Math.round(data.current.wind_speed_10m),
+              humidity: data.current.relative_humidity_2m,
+            } : undefined,
           });
           return;
         }
-      } catch {
+      } catch (e) {
         // Fallback to default pleasant weather if network/API is unavailable
         setWeather({
           temp: 30,
@@ -1537,6 +1408,15 @@ export function RightSidebar({
     const interval = setInterval(fetchWeather, 30 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+    const getWeatherColorClass = (code: number, isDay: number) => {
+    if (code === 0 || code === 1) return isDay ? "text-amber-500" : "text-amber-400";
+    if (code === 2 || code === 3) return "text-sky-500";
+    if (code >= 51 && code <= 67) return "text-blue-500";
+    if (code >= 71 && code <= 77) return "text-sky-300";
+    if (code >= 80) return "text-indigo-500";
+    return "text-slate-700 dark:text-slate-200";
+  };
 
   const getSmartWeatherAdvice = (code: number, temp: number, lang: string) => {
     if (lang === "vi") {
@@ -1687,79 +1567,176 @@ export function RightSidebar({
 
             <div className="h-px w-4/5 bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
 
-            {/* 3. Icon thời tiết Glass, Nhiệt độ & Địa điểm (Font Google Play) */}
+            {/* 3. New Vertical Weather Card Replacement */}
             <div
-              className="group/weather relative z-[999] flex w-full cursor-pointer flex-col items-center gap-1 py-1 overflow-visible"
-              style={{ fontFamily: "'Play', sans-serif" }}
+              className={cn(
+                "duration-300 font-mono text-white group cursor-pointer relative overflow-hidden bg-[#DCDFE4] dark:bg-[#22272B] rounded-[10px] p-[5px] m-[5px] h-[90px] w-auto hover:bg-blue-200 hover:dark:bg-[#0C66E4] flex flex-col items-center justify-center transition-all shadow-lg border-0",
+              )}
+              onClick={() => setShowWeatherModal(true)}
             >
-              {/* Icon thời tiết Glass - Nâng cấp phong cách Glassmorphism động */}
-              <GlassAnimatedWeatherIcon
-                code={weather?.code ?? 0}
-                isDay={time.getHours() >= 6 && time.getHours() < 18}
-                size={60}
-              />
-
-              {/* 4. Nhiệt độ - Font Google Play */}
-              <div
-                className="flex items-baseline gap-0.5"
-                style={{ fontFamily: "'Play', sans-serif" }}
-              >
-                <span
-                  className="text-2xl font-black tracking-tight text-[var(--text-primary)]"
-                  style={{ fontFamily: "'Play', sans-serif" }}
+              <h3 className="text-lg text-center font-black mb-1 text-slate-800 dark:text-white">Today</h3>
+              <div className="gap-2 relative flex flex-col items-center">
+                <svg
+                  viewBox="0 0 64 64"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={cn("transition-all duration-300", isExpanded ? "w-20" : "w-16")}
                 >
-                  {weather ? weather.temp : 29}
-                </span>
-                <span
-                  className="text-xs font-bold text-sky-600 dark:text-sky-400"
-                  style={{ fontFamily: "'Play', sans-serif" }}
+                  <defs>
+                    <linearGradient
+                      gradientUnits="userSpaceOnUse"
+                      y2="28.33"
+                      y1="19.67"
+                      x2="21.5"
+                      x1="16.5"
+                      id="weather_b"
+                    >
+                      <stop stopColor="#fbbf24" offset="0"></stop>
+                      <stop stopColor="#fbbf24" offset=".45"></stop>
+                      <stop stopColor="#f59e0b" offset="1"></stop>
+                    </linearGradient>
+                    <linearGradient
+                      gradientUnits="userSpaceOnUse"
+                      y2="50.8"
+                      y1="21.96"
+                      x2="39.2"
+                      x1="22.56"
+                      id="weather_c"
+                    >
+                      <stop stopColor="#f3f7fe" offset="0"></stop>
+                      <stop stopColor="#f3f7fe" offset=".45"></stop>
+                      <stop stopColor="#deeafb" offset="1"></stop>
+                    </linearGradient>
+                    <linearGradient
+                      gradientUnits="userSpaceOnUse"
+                      y2="48.05"
+                      y1="42.95"
+                      x2="25.47"
+                      x1="22.53"
+                      id="weather_a"
+                    >
+                      <stop stopColor="#4286ee" offset="0"></stop>
+                      <stop stopColor="#4286ee" offset=".45"></stop>
+                      <stop stopColor="#0950bc" offset="1"></stop>
+                    </linearGradient>
+                    <linearGradient
+                      xlinkHref="#weather_a"
+                      y2="48.05"
+                      y1="42.95"
+                      x2="32.47"
+                      x1="29.53"
+                      id="weather_d"
+                    ></linearGradient>
+                    <linearGradient
+                      xlinkHref="#weather_a"
+                      y2="48.05"
+                      y1="42.95"
+                      x2="39.47"
+                      x1="36.53"
+                      id="weather_e"
+                    ></linearGradient>
+                  </defs>
+                  <circle
+                    strokeWidth=".5"
+                    strokeMiterlimit="10"
+                    stroke="#f8af18"
+                    fill="url(#weather_b)"
+                    r="5"
+                    cy="24"
+                    cx="19"
+                  ></circle>
+                  <path
+                    d="M19 15.67V12.5m0 23v-3.17m5.89-14.22l2.24-2.24M10.87 32.13l2.24-2.24m0-11.78l-2.24-2.24m16.26 16.26l-2.24-2.24M7.5 24h3.17m19.83 0h-3.17"
+                    strokeWidth="2"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    stroke="#fbbf24"
+                    fill="none"
+                  >
+                    <animateTransform
+                      values="0 19 24; 360 19 24"
+                      type="rotate"
+                      repeatCount="indefinite"
+                      dur="45s"
+                      attributeName="transform"
+                    ></animateTransform>
+                  </path>
+                  <path
+                    d="M46.5 31.5h-.32a10.49 10.49 0 00-19.11-8 7 7 0 00-10.57 6 7.21 7.21 0 00.1 1.14A7.5 7.5 0 0018 45.5a4.19 4.19 0 00.5 0v0h28a7 7 0 000-14z"
+                    strokeWidth=".5"
+                    strokeMiterlimit="10"
+                    stroke="#e6effc"
+                    fill="url(#weather_c)"
+                  ></path>
+                  <path
+                    d="M24.39 43.03l-.78 4.94"
+                    strokeWidth="2"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    stroke="url(#weather_a)"
+                    fill="none"
+                  >
+                    <animateTransform
+                      values="1 -5; -2 10"
+                      type="translate"
+                      repeatCount="indefinite"
+                      dur="0.7s"
+                      attributeName="transform"
+                    ></animateTransform>
+                  </path>
+                  <path
+                    d="M31.39 43.03l-.78 4.94"
+                    strokeWidth="2"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    stroke="url(#weather_d)"
+                    fill="none"
+                  >
+                    <animateTransform
+                      values="1 -5; -2 10"
+                      type="translate"
+                      repeatCount="indefinite"
+                      dur="0.7s"
+                      begin="-0.4s"
+                      attributeName="transform"
+                    ></animateTransform>
+                  </path>
+                  <path
+                    d="M38.39 43.03l-.78 4.94"
+                    strokeWidth="2"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    stroke="url(#weather_e)"
+                    fill="none"
+                  >
+                    <animateTransform
+                      values="1 -5; -2 10"
+                      type="translate"
+                      repeatCount="indefinite"
+                      dur="0.7s"
+                      begin="-0.2s"
+                      attributeName="transform"
+                    ></animateTransform>
+                  </path>
+                </svg>
+                <h4
+                  className={cn(
+                    "font-sans duration-300 absolute left-1/2 -translate-x-1/2 text-center group-hover:translate-x-8 group-hover:-translate-y-12 group-hover:scale-125 font-black text-slate-800 dark:text-white",
+                    isExpanded ? "text-4xl" : "text-2xl"
+                  )}
                 >
-                  °C
-                </span>
+                  {weather ? weather.temp : 29}°
+                </h4>
               </div>
-
-              {/* 5. Địa điểm dưới nhiệt độ */}
-              <div
-                className="mt-0.5 flex items-center justify-center gap-1 text-[11px] font-bold text-violet-600 dark:text-violet-300"
-                style={{ fontFamily: "'Play', sans-serif" }}
-              >
-                <MapPin
-                  size={11}
-                  className="shrink-0 animate-bounce text-rose-500"
-                />
-                <span className="truncate">TP. Hồ Chí Minh</span>
-              </div>
-
-              {/* 6. Ghi chú thời tiết khi rê chuột vào (Hover Tooltip Note) */}
-              <div className="pointer-events-none absolute top-full left-1/2 z-[9999] mt-2 w-48 -translate-x-1/2 translate-y-1 transform opacity-0 transition-all duration-300 group-hover/weather:pointer-events-auto group-hover/weather:translate-y-0 group-hover/weather:opacity-100">
-                <div
-                  className="relative space-y-2 rounded-2xl border border-sky-400/30 bg-[var(--glass-lg-bg)] p-3 text-center text-xs shadow-2xl backdrop-blur-xl"
-                  style={{ fontFamily: "'Play', sans-serif" }}
-                >
-                  <div className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-t border-l border-sky-400/30 bg-[var(--glass-lg-bg)]" />
-
-                  <div className="relative z-10 flex items-center justify-center gap-1.5 font-black text-sky-700 dark:text-sky-300">
-                    <Sparkles
-                      size={12}
-                      className="shrink-0 animate-spin text-amber-500"
-                    />
-                    <span className="leading-tight">
-                      {getSmartWeatherAdvice(
-                        weather?.code ?? 0,
-                        weather?.temp ?? 29,
-                        language,
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="relative z-10 flex items-center justify-center gap-1 border-t border-[var(--border)] pt-1.5 text-[10px] font-bold text-[var(--text-secondary)]">
-                    <MapPin
-                      size={10}
-                      className="shrink-0 animate-bounce text-rose-500"
-                    />
-                    <span>TP. Hồ Chí Minh • Việt Nam</span>
-                  </div>
-                </div>
+              <div className="hidden absolute duration-300 -left-40 mt-2 group-hover:left-4 transition-all opacity-0 group-hover:opacity-100 flex flex-col items-start px-2">
+                <p className="text-[10px] font-bold text-slate-800 dark:text-white leading-tight">
+                  {getSmartWeatherAdvice(
+                    weather?.code ?? 0,
+                    weather?.temp ?? 29,
+                    language,
+                  )}
+                </p>
+                <p className="text-[9px] opacity-70 text-slate-700 dark:text-slate-200">50% humidity</p>
               </div>
             </div>
           </div>
@@ -1809,6 +1786,35 @@ export function RightSidebar({
             />
           </motion.button>
 
+          {/* Chat Zalo (0909097882) Button */}
+          <motion.button
+            id="chat-zalo-btn"
+            data-name="Nút mở liên kết chat Zalo Nguyễn Hùng Thái (Zalo Chat Button)"
+            onClick={() => {
+              playUiSound("click");
+              window.open("https://zalo.me/0909097882", "_blank");
+            }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            className={cn(
+              "right-sidebar-item group relative flex h-10 cursor-pointer items-center rounded-xl text-sky-500 transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
+              isExpanded
+                ? "w-full justify-end gap-2.5 px-3"
+                : "mx-auto w-10 justify-center",
+            )}
+          >
+            {isExpanded && (
+              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-sky-500 dark:text-sky-400">
+                Chat Zalo
+              </span>
+            )}
+            <MessageCircle
+              size={22}
+              className="shrink-0 text-sky-500 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-sky-400"
+            />
+            <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-[var(--bg)] bg-sky-500" />
+          </motion.button>
+
           {/* AI Assistant Button */}
           <motion.button
             id="ai-chat-btn"
@@ -1845,74 +1851,48 @@ export function RightSidebar({
             )}
           </motion.button>
 
-          {/* Systems Button (Hệ thống) */}
+          {/* Trang Phong Cách (Style Showcase) Button */}
           <motion.button
-            id="systems-btn"
-            data-name="Nút chuyển sang trang Kiến trúc & Hệ thống (Systems Button)"
+            id="template-test-btn"
+            data-name="Nút mở Trang Phong Cách (Style Showcase Button)"
             onClick={() => {
-              playUiSound("pageSwitch");
-              if (onNavigate) onNavigate("systems");
+              playUiSound("click");
+              if (onNavigate) onNavigate("templateTest");
             }}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
-            data-active={activePage === "systems"}
+            data-active={activePage === "templateTest"}
             className={cn(
               "right-sidebar-item group relative flex h-10 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
               isExpanded
                 ? "w-full justify-end gap-2.5 px-3"
                 : "mx-auto w-10 justify-center",
-              activePage === "systems"
-                ? "bg-[var(--glass-xs-bg)] text-violet-600 dark:text-violet-400"
-                : "text-violet-600 dark:text-violet-400",
+              activePage === "templateTest"
+                ? "bg-[var(--glass-xs-bg)] text-fuchsia-600 dark:text-fuchsia-400"
+                : "text-fuchsia-600 dark:text-fuchsia-400",
             )}
-            title={language === "vi" ? "Hệ thống" : "Systems"}
+            title={language === "vi" ? "Trang Phong Cách" : "Style Showcase"}
           >
             {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-violet-600 dark:text-violet-400">
-                {language === "vi" ? "Hệ thống" : "Systems"}
+              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-fuchsia-600 dark:text-fuchsia-400">
+                {language === "vi" ? "Trang Phong Cách" : "Style Showcase"}
               </span>
             )}
-            <Server
+            <Sparkles
               size={22}
-              className="shrink-0 text-violet-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-violet-400"
+              className="shrink-0 text-fuchsia-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-fuchsia-400"
             />
-            {activePage === "systems" && (
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 animate-ping rounded-full border-2 border-[var(--bg)] bg-emerald-400" />
+            {activePage === "templateTest" && (
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 animate-ping rounded-full border-2 border-[var(--bg)] bg-fuchsia-400" />
             )}
           </motion.button>
+
+
 
           
           
 
-          {/* Chat Zalo (0909097882) Button */}
 
-          <motion.button
-            id="chat-zalo-btn"
-            data-name="Nút mở liên kết chat Zalo Nguyễn Hùng Thái (Zalo Chat Button)"
-            onClick={() => {
-              playUiSound("click");
-              window.open("https://zalo.me/0909097882", "_blank");
-            }}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              "right-sidebar-item group relative flex h-10 cursor-pointer items-center rounded-xl text-sky-500 transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
-              isExpanded
-                ? "w-full justify-end gap-2.5 px-3"
-                : "mx-auto w-10 justify-center",
-            )}
-          >
-            {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-sky-500 dark:text-sky-400">
-                Chat Zalo
-              </span>
-            )}
-            <MessageCircle
-              size={22}
-              className="shrink-0 text-sky-500 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-sky-400"
-            />
-            <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-[var(--bg)] bg-sky-500" />
-          </motion.button>
 
           {/* Hide/Show Wallpaper Background Toggle Button */}
           <motion.button
@@ -2101,39 +2081,7 @@ export function RightSidebar({
                   : "Expand Sidebar"
             }
           >
-            {isExpanded ? (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="shrink-0 transition-transform group-hover:translate-x-0.5"
-              >
-                <line x1="20" y1="4" x2="20" y2="20" />
-                <line x1="5" y1="12" x2="16" y2="12" />
-                <polyline points="10 6 16 12 10 18" />
-              </svg>
-            ) : (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="shrink-0 transition-transform group-hover:-translate-x-0.5"
-              >
-                <line x1="20" y1="4" x2="20" y2="20" />
-                <line x1="16" y1="12" x2="5" y2="12" />
-                <polyline points="10 6 4 12 10 18" />
-              </svg>
-            )}
+            <MoreHorizontal size={20} className="shrink-0 transition-transform group-hover:scale-110" />
           </motion.button>
         </div>
       </motion.aside>
@@ -2196,6 +2144,75 @@ export function RightSidebar({
           )}
         </motion.button>
       </nav>
+
+      <AnimatePresence>
+        {showWeatherModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowWeatherModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/20 bg-slate-900/80 p-6 text-white shadow-2xl backdrop-blur-xl"
+              style={{ fontFamily: "'Play', sans-serif" }}
+            >
+              <button
+                onClick={() => setShowWeatherModal(false)}
+                className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-slate-300 transition-colors hover:bg-white/20 hover:text-white"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+
+              <div className="flex flex-col items-center gap-2">
+                <GlassAnimatedWeatherIcon code={weather?.code || 0} isDay={weather?.isDay === 1} size={80} />
+                <h3 className="text-xl font-bold tracking-tight text-slate-100">TP. Hồ Chí Minh</h3>
+                <div className={`text-5xl font-black ${getWeatherColorClass(weather?.code || 0, weather?.isDay ?? 1)}`}>
+                  {weather?.temp || 29}°C
+                </div>
+                <p className="text-sm font-medium text-slate-300">
+                  {getSmartWeatherAdvice(weather?.code || 0, weather?.temp || 29, language)}
+                </p>
+              </div>
+
+              {weather?.details && (
+                <div className="mt-8 grid grid-cols-2 gap-4">
+                  <div className="flex flex-col items-center rounded-2xl bg-white/5 p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400">Cao nhất / Thấp nhất</span>
+                    <span className="mt-1 text-base font-bold text-slate-200">
+                      {weather.details.maxTemp}° / {weather.details.minTemp}°
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center rounded-2xl bg-white/5 p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400">Khả năng mưa</span>
+                    <span className="mt-1 text-base font-bold text-sky-400">
+                      {weather.details.precipProb}%
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center rounded-2xl bg-white/5 p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400">Gió</span>
+                    <span className="mt-1 text-base font-bold text-slate-200">
+                      {weather.details.windSpeed} km/h
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center rounded-2xl bg-white/5 p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400">Độ ẩm</span>
+                    <span className="mt-1 text-base font-bold text-slate-200">
+                      {weather.details.humidity}%
+                    </span>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
+

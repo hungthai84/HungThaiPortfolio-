@@ -1,13 +1,16 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
+  Layers,
+  Settings,
+  Activity,
+  Heart,
+  BarChart,
   User,
-  Mail,
-  Phone,
-  Globe,
-  MapPin,
-  Users,
   Cake,
-  Copy,
+  Users,
+  HeartHandshake,
+  MapPin,
   Play,
   Pause,
   Volume2,
@@ -16,41 +19,82 @@ import {
   CheckCircle2,
   Sparkles,
   ShieldCheck,
-  HeartHandshake,
   Target,
   Send,
-  Quote,
   Award,
   TrendingUp,
   Cpu,
-  Layers,
-  Headphones,
-  Check,
-  ArrowUpRight,
   Briefcase,
-  Activity,
-  Star,
+  FileText,
+  X,
+  ExternalLink,
+  Sparkle,
 } from "lucide-react";
-import { cn } from "../lib/utils";
 import { PageLayout } from "../components/PageLayout";
-import { motion, AnimatePresence } from "motion/react";
-import { playUiSound } from "../lib/sound";
 import { useLanguage } from "../context/LanguageContext";
+import { cn } from "../lib/utils";
+import { playGlassSound } from "../lib/sound";
 
-export function About() {
+interface AboutProps {
+  onNavigate?: (pageId: string) => void;
+}
+
+// Tactical haptic sound feedback
+const playTactileSound = (type: "click" | "toast" | "sparkle" = "click") => {
+  try {
+    const isEnabled = localStorage.getItem("app_ui_sounds_enabled") !== "false";
+    if (!isEnabled) return;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+
+    if (type === "click") {
+      osc.frequency.setValueAtTime(820, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(420, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+    } else if (type === "toast") {
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+    } else if (type === "sparkle") {
+      osc.frequency.setValueAtTime(700, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    }
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
+  } catch {
+    playGlassSound("tap");
+  }
+};
+
+export function About({ onNavigate }: AboutProps) {
   const { language } = useLanguage();
   const isVi = language === "vi";
-  const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [isIntroPlaying, setIsIntroPlaying] = useState(false);
-  const [isVideoAudioOn, setIsVideoAudioOn] = useState(false);
+
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [isIntroPlaying, setIsIntroPlaying] = useState<boolean>(false);
+  const [isVideoAudioOn, setIsVideoAudioOn] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [activeModal, setActiveModal] = useState<"cv" | "projects" | null>(null);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const videoSets = [
     {
       idle: "https://cdn.scena.ai/project/8606/e48a67884f3a52e8a68cf06b97979f3b22835ec92bf466a058c0d78da97c83b0.mp4",
-      intro:
-        "https://cdn.scena.ai/project/8606/5f84521bf5c51ff234fb0f4029fb9fba29e7e386f13912a56bc7ee25aebcbc10.mp4",
+      intro: "https://cdn.scena.ai/project/8606/5f84521bf5c51ff234fb0f4029fb9fba29e7e386f13912a56bc7ee25aebcbc10.mp4",
     },
   ];
 
@@ -71,48 +115,41 @@ export function About() {
       }
     };
 
-    video?.addEventListener("ended", handleIntroEnded);
+    video.addEventListener("ended", handleIntroEnded);
     return () => {
-      video?.removeEventListener("ended", handleIntroEnded);
+      video.removeEventListener("ended", handleIntroEnded);
     };
   }, [isIntroPlaying]);
 
   const toggleIntro = () => {
-    playUiSound("click");
+    playTactileSound("click");
     const video = videoRef.current;
     if (!video) return;
 
     if (isIntroPlaying) {
       setIsIntroPlaying(false);
-      if (video) {
-        video.src = videoSets[0].idle;
-        video.loop = true;
-        video.muted = true;
-        video.load();
-        video.play().catch(() => {});
-      }
+      video.src = videoSets[0].idle;
+      video.loop = true;
+      video.muted = true;
+      video.load();
+      video.play().catch(() => {});
     } else {
       setIsIntroPlaying(true);
       setIsVideoAudioOn(true);
-      if (video) {
-        video.src = videoSets[0].intro;
-        video.loop = false;
-        video.muted = false;
-        video.load();
-        video.play().catch(() => {});
-      }
+      video.src = videoSets[0].intro;
+      video.loop = false;
+      video.muted = false;
+      video.load();
+      video.play().catch(() => {});
     }
   };
 
-  const copyToClipboard = (text: string, label: string) => {
-    playUiSound("click");
-    navigator.clipboard.writeText(text);
-    setCopiedField(label);
-    setToastMessage(isVi ? `Đã sao chép ${label}` : `Copied ${label}`);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    playTactileSound("toast");
     setTimeout(() => {
-      setCopiedField(null);
       setToastMessage(null);
-    }, 2000);
+    }, 3000);
   };
 
   const personalInfo = [
@@ -153,33 +190,6 @@ export function About() {
     },
   ];
 
-  const contactDetails = [
-    {
-      label: isVi ? "Điện thoại" : "Phone",
-      value: "090 909 7882",
-      href: "tel:0909097882",
-      icon: Phone,
-      color: "text-rose-600 dark:text-rose-400",
-      bg: "bg-rose-500/10",
-    },
-    {
-      label: "Email",
-      value: "trinhan.virtual@gmail.com",
-      href: "mailto:trinhan.virtual@gmail.com",
-      icon: Mail,
-      color: "text-cyan-600 dark:text-cyan-400",
-      bg: "bg-cyan-500/10",
-    },
-    {
-      label: "Website",
-      value: "nguyenhungthai.info",
-      href: "https://nguyenhungthai.info",
-      icon: Globe,
-      color: "text-indigo-600 dark:text-indigo-400",
-      bg: "bg-indigo-500/10",
-    },
-  ];
-
   const quickMetrics = [
     {
       num: "22+",
@@ -215,412 +225,553 @@ export function About() {
     },
   ];
 
+  const filterOptions = [
+    { id: "all", labelVi: "Tổng Quan", labelEn: "Overview" },
+    { id: "philosophy", labelVi: "Triết Lý CX", labelEn: "Philosophy" },
+    { id: "mission", labelVi: "Sứ Mệnh", labelEn: "Mission" },
+  ];
+
+  const strategicPillars = [
+    {
+      title: isVi ? "QUY TRÌNH" : "PROCESS",
+      desc: isVi ? "tạo nền tảng." : "creating foundation.",
+      icon: Layers,
+      bg: "bg-[#673ab7]",
+      shadowColor: "#2196f3",
+    },
+    {
+      title: isVi ? "CON NGƯỜI" : "PEOPLE",
+      desc: isVi ? "tạo giá trị." : "creating value.",
+      icon: Users,
+      bg: "bg-[rgb(41,49,79)]",
+      shadowColor: "rgb(244,67,54)",
+    },
+    {
+      title: isVi ? "CÔNG NGHỆ" : "TECHNOLOGY",
+      desc: isVi ? "tạo đòn bẩy." : "creating leverage.",
+      icon: Cpu,
+      bg: "bg-[#2196f3]",
+      shadowColor: "#ffeb3b",
+    },
+    {
+      title: isVi ? "HIỆU QUẢ" : "EFFICIENCY",
+      desc: isVi ? "Tối ưu & đo lường." : "Optimize & Measure.",
+      icon: BarChart,
+      bg: "bg-[#4caf50]",
+      shadowColor: "#673ab7",
+    },
+    {
+      title: isVi ? "NHÂN VĂN" : "HUMANITY",
+      desc: isVi ? "Thấu hiểu & đồng cảm." : "Empathy & Understanding.",
+      icon: Heart,
+      bg: "bg-[#e91e63]",
+      shadowColor: "#00bcd4",
+    },
+    {
+      title: isVi ? "BỀN VỮNG" : "SUSTAINABILITY",
+      desc: isVi ? "Gắn kết & đồng hành." : "Bonding & Companionship.",
+      icon: ShieldCheck,
+      bg: "bg-[#009688]",
+      shadowColor: "#ff9800",
+    },
+  ];
+
   return (
     <PageLayout
       id="about-main-card"
       pageId="about"
-      pageName="About & Profile Overview"
-      title={isVi ? "Giới Thiệu" : "About Me"}
+      pageName="About Main Card"
+      title={isVi ? "Giới thiệu" : "About Me"}
       subtitle={
         isVi
-          ? "Hồ sơ cá nhân Bento Grid: tiểu sử, triết lý phục vụ, 3 trụ cột vận hành và kênh liên hệ."
-          : "Bento Grid Portfolio Profile: biography, customer experience philosophy, operational pillars and contact channels."
+          ? "“Lắng nghe là nền tảng của mọi mối quan hệ bền vững.”"
+          : "“Listening is the foundation of every sustainable relationship.”"
       }
       icon={User}
+      filterOptions={filterOptions}
+      activeFilter={activeTab}
+      onFilterChange={(tabId) => {
+        playTactileSound("click");
+        setActiveTab(tabId);
+      }}
+      rootClassName="w-full max-w-full relative flex flex-1 flex-col transition-all duration-300 !rounded-[20px]"
+      headerClassName="!py-2 sm:!py-3 !mb-0 transition-all duration-300"
+      className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto border-slate-200/80 dark:border-slate-800 border"
     >
-      <div
-        className="relative mx-auto w-full max-w-7xl h-auto min-h-fit flex-1 px-0 pb-0 transition-all duration-300 ease-in-out"
-        id="about-profile-container"
-        style={{ paddingLeft: '0px', paddingRight: '0px', paddingBottom: '0px' }}
-      >
-        
-        {/* =========================================================================
-            BENTO PORTFOLIO GRID (HỒ SƠ CÁ NHÂN)
-            Structured Responsive Layout Reflow with Fluid Auto-Scaling Below Desktop
-           ========================================================================= */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 sm:gap-5 md:gap-6 auto-rows-auto min-h-fit w-full">
-          
-          {/* -------------------------------------------------------------
-              BENTO CARD 1: HERO PORTRAIT & INTERACTIVE AI VIDEO (Col 1-4)
-              Fluid scaling: Full width on Mobile, 5/12 on Tablet, 4/12 on Desktop
-             ------------------------------------------------------------- */}
-          <div className="md:col-span-5 lg:col-span-4 rounded-2xl border border-[var(--border)] bg-gradient-to-b from-white/90 via-white/70 to-white/90 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-slate-900/90 p-4 sm:p-5 md:p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-md hover:border-blue-500/30 flex flex-col justify-between h-auto min-h-fit relative overflow-hidden group">
-            
-            {/* Ambient Background Glow */}
-            <div className="pointer-events-none absolute -top-24 -left-24 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl group-hover:bg-blue-500/20 transition-all duration-500" />
-            
-            <div className="relative z-10">
-              {/* Header Badge */}
-              <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-bold text-blue-600 dark:text-blue-400">
-                  <Play size={12} className="fill-current" />
-                  <span>{isVi ? "Lời Chào Trực Quan" : "Visual Greeting"}</span>
-                </span>
-                <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-mono font-bold text-[var(--muted)]">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  AI Live
-                </span>
-              </div>
-
-              {/* Video Player Box */}
-              <div className="relative aspect-[6/19] w-full max-h-[380px] sm:max-h-[460px] overflow-hidden rounded-xl bg-slate-950 flex items-center justify-center shadow-inner border border-black/10 dark:border-white/10 my-1">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="video h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                  crossOrigin="anonymous"
-                  src="https://cdn.scena.ai/project/8606/e48a67884f3a52e8a68cf06b97979f3b22835ec92bf466a058c0d78da97c83b0.mp4"
-                />
-                
-                {/* Floating Bottom Control Bar */}
-                <div className="absolute inset-x-0 bottom-0 flex justify-center items-center bg-gradient-to-t from-black/95 via-black/60 to-transparent p-3 pt-8">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.95 }}
-                    type="button"
-                    onClick={toggleIntro}
-                    className="flex w-full max-w-[260px] h-[48px] cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-indigo-400/80 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_0_25px_rgba(99,102,241,0.6)] backdrop-blur-md transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white"
-                  >
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-md">
-                      {isIntroPlaying ? <Pause size={13} className="fill-indigo-600" /> : <Play size={13} className="translate-x-0.5 fill-indigo-600" />}
-                    </div>
-                    <span className="truncate px-1">
-                      {isIntroPlaying ? (isVi ? "Tạm dừng" : "Pause") : (isVi ? "Phát Intro" : "Play Intro")}
-                    </span>
-                    {!isIntroPlaying && (
-                      <Sparkles size={13} className="shrink-0 animate-bounce text-amber-300" />
-                    )}
-
-                    {/* Integrated Divider and Audio Button */}
-                    <div className="mx-1 h-4 w-px shrink-0 bg-white/20" />
-
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        playUiSound("click");
-                        const video = videoRef.current;
-                        if (video) {
-                          video.muted = !video.muted;
-                          setIsVideoAudioOn(!video.muted);
-                        }
-                      }}
-                      className={cn(
-                        "flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full border text-white shadow-md transition-all hover:scale-105 active:scale-95",
-                        isVideoAudioOn ? "border-white/30 bg-white/20 hover:bg-white/30" : "border-rose-500/40 bg-rose-600/90 hover:bg-rose-600"
-                      )}
-                      title={isVideoAudioOn ? (isVi ? "Tắt tiếng" : "Mute") : (isVi ? "Bật tiếng" : "Unmute")}
-                    >
-                      {isVideoAudioOn ? <Volume2 size={12} className="animate-pulse text-white" /> : <VolumeX size={12} className="text-white" />}
-                    </div>
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* -------------------------------------------------------------
-              BENTO CARD 2: PHILOSOPHY & OPERATIONAL HUB (Col 5-12)
-              Fluid scaling: Full width on Mobile, 7/12 on Tablet, 8/12 on Desktop
-             ------------------------------------------------------------- */}
-          <div className="md:col-span-7 lg:col-span-8 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-white/95 via-cyan-500/[0.03] to-white/90 dark:from-slate-900/95 dark:via-cyan-500/[0.05] dark:to-slate-900/90 p-4 sm:p-6 md:p-7 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-md hover:border-cyan-500/40 flex flex-col justify-between h-auto min-h-fit relative overflow-hidden group">
-            
-            {/* Large Watermark Ambient Icon */}
-            <Zap
-              className="absolute -bottom-6 -right-6 text-cyan-500/[0.06] dark:text-cyan-400/[0.06] pointer-events-none transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6"
-              size={150}
-              strokeWidth={1}
-            />
-
-            <div className="relative z-10 space-y-3.5 sm:space-y-4">
-              {/* Header Badges */}
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] sm:text-xs font-black tracking-wide text-cyan-700 dark:text-cyan-300">
-                  <Zap size={13} />
-                  <span>{isVi ? "Triết Lý & Tầm Nhìn CX" : "Philosophy & CX Vision"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-md border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-mono font-bold text-cyan-600 dark:text-cyan-400">
-                    22+ Năm Thực Chiến
-                  </span>
-                </div>
-              </div>
-
-              {/* Main Headline */}
-              <h2 className="text-base sm:text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">
-                {isVi ? "Tận Tâm & Đồng Hành Cùng Trải Nghiệm Khách Hàng" : "Dedication & Partnership in Customer Experience"}
-              </h2>
-
-              {/* Narrative Content */}
-              <div className="text-xs sm:text-[13px] leading-relaxed text-[var(--text-secondary)] space-y-2 sm:space-y-2.5">
-                <p>
-                  Một chuyên gia dịch vụ khách hàng với hơn <strong className="text-cyan-600 dark:text-cyan-400 font-bold">22 năm kinh nghiệm thực chiến</strong>. Với tôi, Chăm Sóc Khách Hàng không chỉ đơn thuần là giải quyết sự vụ, mà là <strong className="text-[var(--text-primary)] font-bold">sự đồng hành và thấu cảm sâu sắc</strong>.
-                </p>
-                <p>
-                  Mỗi cuộc trò chuyện, mỗi điểm chạm — dù là nhỏ nhất — đều là cơ hội quý giá: để lắng nghe, để thấu hiểu, và để kiến tạo những trải nghiệm vượt trên mong đợi.
-                </p>
-                <p>
-                  Tôi tin rằng sự hài lòng bền vững không đến từ sự hoàn hảo tuyệt đối, mà bắt nguồn từ <strong className="text-amber-600 dark:text-amber-400 font-bold">sự tận tâm kịp thời, tính minh bạch và sự đồng cảm chân thành</strong>.
-                </p>
-              </div>
-            </div>
-
-            {/* 3 OPERATIONAL PILLARS MINI CARDS */}
-            <div className="relative z-10 mt-4 sm:mt-5 pt-3.5 sm:pt-4 border-t border-[var(--border)]">
-              <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 mb-2.5 sm:mb-3">
-                <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
-                  <Sparkles size={14} className="text-amber-500" />
-                  {isVi ? "3 Trụ Cột Vận Hành Cốt Lõi" : "3 Core Operational Pillars"}
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                  Hiệu quả – Nhân văn – Bền vững
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
-                {/* Pillar 1 */}
-                <div className="p-3 sm:p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] dark:bg-amber-500/[0.08] hover:border-amber-500/40 transition-all">
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-amber-600 dark:text-amber-400 font-black text-xs mb-1">
-                    <ShieldCheck size={15} />
-                    <span>01. {isVi ? "Hiệu quả" : "Efficiency"}</span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-[var(--text-secondary)]">
-                    {isVi ? "Chuẩn hóa SOP, tối ưu FCR (>85%), rút ngắn SLA và chi phí xử lý." : "SOP standardization, high FCR (>85%), SLA optimization."}
-                  </p>
-                </div>
-
-                {/* Pillar 2 */}
-                <div className="p-3 sm:p-3.5 rounded-xl border border-rose-500/20 bg-rose-500/[0.04] dark:bg-rose-500/[0.08] hover:border-rose-500/40 transition-all">
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-rose-600 dark:text-rose-400 font-black text-xs mb-1">
-                    <HeartHandshake size={15} />
-                    <span>02. {isVi ? "Nhân văn" : "Human-centric"}</span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-[var(--text-secondary)]">
-                    {isVi ? "Lắng nghe chân thành, kết nối cảm xúc và đào tạo đội ngũ tận tâm." : "Empathetic engagement, customer trust & dedicated team growth."}
-                  </p>
-                </div>
-
-                {/* Pillar 3 */}
-                <div className="p-3 sm:p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] dark:bg-emerald-500/[0.08] hover:border-emerald-500/40 transition-all sm:col-span-2 lg:col-span-1">
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-emerald-600 dark:text-emerald-400 font-black text-xs mb-1">
-                    <Target size={15} />
-                    <span>03. {isVi ? "Bền vững" : "Sustainability"}</span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-[var(--text-secondary)]">
-                    {isVi ? "Ứng dụng CRM, AI Automation tạo giá trị dài hạn cho tổ chức." : "CRM & AI automation driving lasting organizational growth."}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* -------------------------------------------------------------
-              BENTO CARD 4: VALUE MISSION EMOTIONAL SPOTLIGHT (Col 1-7)
-              Fluid 12 cols on Tablet, 7 cols on Desktop
-             ------------------------------------------------------------- */}
-          <div className="md:col-span-12 lg:col-span-7 rounded-2xl border border-rose-500/25 bg-gradient-to-br from-white/95 via-rose-500/[0.04] to-amber-500/[0.03] dark:from-slate-900/95 dark:via-rose-500/[0.08] dark:to-amber-500/[0.05] p-4 sm:p-6 md:p-7 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-md hover:border-rose-500/40 flex flex-col justify-between h-auto min-h-fit relative overflow-hidden group">
-            
-            {/* Background Decorative Quote */}
-            <Quote
-              size={120}
-              className="absolute -right-4 -bottom-6 text-rose-500/10 dark:text-rose-400/10 pointer-events-none rotate-180 transition-transform duration-700 group-hover:scale-110"
-              strokeWidth={1}
-            />
-
-            <div className="relative z-10 space-y-3 sm:space-y-4 my-auto">
-              
-              {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-rose-500/30 bg-rose-500/15 px-3 py-1 text-[11px] sm:text-xs font-black uppercase tracking-wider text-rose-600 dark:text-rose-300 shadow-xs">
-                <Sparkles size={13} className="text-rose-500 animate-pulse" />
-                <span>{isVi ? "Tuyên Ngôn Sứ Mệnh" : "Value Mission Statement"}</span>
-              </div>
-
-              {/* Narrative */}
-              <p className="text-xs sm:text-sm font-medium text-[var(--text-secondary)] leading-relaxed">
-                {isVi
-                  ? "Nỗ lực không ngừng để kiến tạo dịch vụ chuẩn mực, tối ưu hóa chi phí vận hành. Và trên hết, để mỗi khách hàng luôn cảm nhận được một chân lý giản dị nhưng cốt lõi:"
-                  : "Relentlessly striving to deliver benchmark service quality with optimal operating cost. And above all, ensuring every single customer experiences:"}
-              </p>
-
-              {/* Emotional Quote Pill */}
-              <div className="relative my-1.5 sm:my-2 inline-block w-full">
-                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 opacity-20 blur-md group-hover:opacity-30 transition-opacity" />
-                <div className="relative rounded-2xl border-2 border-rose-500/30 bg-white/90 dark:bg-slate-900/90 px-4 sm:px-6 md:px-8 py-3 sm:py-4 shadow-lg backdrop-blur-md text-center">
-                  <span className="bg-gradient-to-r from-rose-600 via-pink-600 to-amber-600 dark:from-rose-400 dark:via-pink-300 dark:to-amber-300 bg-clip-text text-base sm:text-xl md:text-2xl font-black tracking-tight text-transparent">
-                    {isVi ? "“ Họ luôn luôn được lắng nghe. ”" : "“ They are always genuinely heard. ”"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Bottom Assurance */}
-              <div className="flex items-center gap-2 text-xs font-bold text-rose-700 dark:text-rose-300 pt-0.5">
-                <HeartHandshake size={15} className="text-rose-500 shrink-0" />
-                <span className="text-[11px] sm:text-xs">{isVi ? "Cam kết thấu cảm trọn vẹn trong mọi điểm chạm dịch vụ" : "Dedicated to deep empathy across every single touchpoint"}</span>
-              </div>
-
-            </div>
-          </div>
-
-          {/* -------------------------------------------------------------
-              BENTO CARD 5: COMPACT PROFILE & CONTACT HUBS (Col 8-12)
-              Fluid 12 cols on Tablet, 5 cols on Desktop
-             ------------------------------------------------------------- */}
-          <div className="md:col-span-12 lg:col-span-5 rounded-2xl border border-[var(--border)] bg-gradient-to-b from-white/90 to-white/70 dark:from-slate-900/90 dark:to-slate-900/70 p-4 sm:p-5 md:p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-md hover:border-purple-500/30 flex flex-col justify-between h-auto min-h-fit space-y-3.5 sm:space-y-4">
-            
-            {/* TOP SUB-SECTION: THÔNG TIN CÁ NHÂN */}
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-2 sm:mb-2.5">
-                <span className="text-[11px] sm:text-xs font-bold text-purple-600 dark:text-purple-400 px-2.5 py-0.5 rounded-full border border-purple-500/20 bg-purple-500/10 inline-flex items-center gap-1.5">
-                  <User size={12} />
-                  {isVi ? "Hồ Sơ Cá Nhân" : "Personal Profile"}
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-mono text-[var(--muted)] font-bold">Bio Data</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1.5">
-                {personalInfo.map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between gap-2 p-2 rounded-xl border border-[var(--border)] bg-[var(--bg)]/40 hover:bg-[var(--bg)]/80 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg", item.bg, item.color)}>
-                          <Icon size={13} />
+      <div className="w-full max-w-6xl mx-auto pb-8">
+        {/* MASONRY WALL LAYOUT */}
+        <div className="flex flex-col md:flex-row gap-6">
+          {[0, 1, 2].map((colIndex) => (
+            <div key={colIndex} className={cn(
+              "flex-1 flex flex-col gap-6",
+              colIndex === 1 ? "hidden md:flex" : "",
+              colIndex === 2 ? "hidden lg:flex" : ""
+            )}>
+              {(() => {
+                // Define all possible cards
+                const allCards = [
+                  // 1. VISUAL GREETING
+                  {
+                    id: "visual-greeting",
+                    tabs: ["all", "philosophy"],
+                    content: (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="rounded-full px-3 py-1 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 inline-flex items-center gap-1.5 backdrop-blur-sm">
+                            <Play size={12} className="fill-current" />
+                            <span>{isVi ? "Lời Chào Trực Quan" : "Visual Greeting"}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400">
+                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            AI Live
+                          </span>
                         </div>
-                        <span className="text-xs font-medium text-[var(--muted)] truncate">
-                          {item.label}
-                        </span>
+                        <div className="relative aspect-[4/5] w-full max-h-[400px] overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center shadow-inner border border-black/10 dark:border-white/10 group/vid">
+                          <video
+                            ref={videoRef}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover/vid:scale-105"
+                            crossOrigin="anonymous"
+                            src="https://cdn.scena.ai/project/8606/e48a67884f3a52e8a68cf06b97979f3b22835ec92bf466a058c0d78da97c83b0.mp4"
+                          />
+                          <div className="absolute inset-x-0 bottom-3 flex justify-center items-center px-3 z-20">
+                            <div className="rounded-full p-1.5 flex items-center gap-2 w-full max-w-[270px] bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/60 dark:border-white/20 shadow-2xl">
+                              <button
+                                type="button"
+                                onClick={toggleIntro}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+                              >
+                                {isIntroPlaying ? (
+                                  <Pause size={13} className="fill-current" />
+                                ) : (
+                                  <Play size={13} className="fill-current" />
+                                )}
+                                <span>{isIntroPlaying ? (isVi ? "Tạm dừng" : "Pause") : (isVi ? "Phát Intro" : "Play Intro")}</span>
+                              </button>
+                              <div className="h-4 w-px bg-slate-400/30 dark:bg-white/20" />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  playTactileSound("click");
+                                  const video = videoRef.current;
+                                  if (video) {
+                                    video.muted = !video.muted;
+                                    setIsVideoAudioOn(!video.muted);
+                                  }
+                                }}
+                                className={cn(
+                                  "p-2 rounded-full transition-all text-white shadow-xs cursor-pointer",
+                                  isVideoAudioOn ? "bg-emerald-600 hover:bg-emerald-500" : "bg-rose-600 hover:bg-rose-500"
+                                )}
+                              >
+                                {isVideoAudioOn ? <Volume2 size={13} /> : <VolumeX size={13} />}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <span className="text-xs font-bold text-[var(--text-primary)] text-right truncate">
-                        {item.value}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* ARTISTIC DIVIDER */}
-            <div className="relative flex items-center justify-center py-0.5">
-              <div className="w-full border-t border-[var(--border)]" />
-              <div className="absolute px-3 rounded-full border border-[var(--border)] bg-[var(--card)] text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <Send size={10} />
-                <span>{isVi ? "Kênh Kết Nối" : "Contact Channels"}</span>
-              </div>
-            </div>
-
-            {/* BOTTOM SUB-SECTION: KÊNH KẾT NỐI & COPY BUTTONS */}
-            <div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1.5">
-                {contactDetails.map((contact, idx) => {
-                  const Icon = contact.icon;
-                  const isCopied = copiedField === contact.label;
-                  return (
-                    <div
-                      key={idx}
-                      className="group/item flex items-center justify-between gap-2 p-2 rounded-xl border border-[var(--border)] bg-[var(--bg)]/40 hover:bg-[var(--bg)]/80 transition-all hover:border-[var(--border-hover)]"
-                    >
-                      <a
-                        href={contact.href}
-                        target={contact.label === "Website" ? "_blank" : undefined}
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
-                      >
-                        <div className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg", contact.bg, contact.color)}>
-                          <Icon size={13} />
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-[9px] font-bold text-[var(--muted)] uppercase tracking-wider">
-                            {contact.label}
-                          </span>
-                          <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover/item:text-purple-600 dark:group-hover/item:text-purple-400 transition-colors">
-                            {contact.value}
+                    ),
+                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-[10px] shadow-sm backdrop-blur-md"
+                  },
+                  // 2. PERSONAL PROFILE
+                  {
+                    id: "personal-profile",
+                    tabs: ["all", "philosophy"],
+                    content: (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400 px-2.5 py-0.5 rounded-full border border-purple-500/20 bg-purple-500/10 inline-flex items-center gap-1.5">
+                            <User size={12} />
+                            {isVi ? "Hồ Sơ Cá Nhân" : "Personal Profile"}
                           </span>
                         </div>
-                      </a>
+                        <div className="grid grid-cols-1 gap-1.5">
+                          {personalInfo.map((item, idx) => {
+                            const ItemIcon = item.icon;
+                            return (
+                              <div key={idx} className="flex items-center justify-between gap-2 p-2.5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-800/40 transition-colors">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-xl", item.bg, item.color)}>
+                                    <ItemIcon size={14} />
+                                  </div>
+                                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400 truncate">{item.label}</span>
+                                </div>
+                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 text-right truncate">{item.value}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ),
+                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm backdrop-blur-md"
+                  },
+                  // 3. CX PHILOSOPHY
+                  {
+                    id: "cx-philosophy",
+                    tabs: ["all", "philosophy"],
+                    content: (
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="rounded-full px-3.5 py-1 text-xs font-black tracking-wide text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 border border-cyan-500/20 inline-flex items-center gap-1.5">
+                            <Zap size={13} />
+                            <span>{isVi ? "Triết Lý & Tầm Nhìn CX" : "Philosophy & CX Vision"}</span>
+                          </div>
+                        </div>
+                        <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                          {isVi ? "Tận Tâm & Đồng Hành Cùng Trải Nghiệm Khách Hàng" : "Dedication & Partnership in CX"}
+                        </h2>
+                        <div className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-300 space-y-3">
+                          <p>
+                            {isVi ? (
+                              <>Chuyên gia CX với <strong className="text-cyan-600 dark:text-cyan-400">22 năm thực chiến</strong>. Với tôi, CSKH là <strong className="text-slate-900 dark:text-white">sự đồng hành và thấu cảm sâu sắc</strong>.</>
+                            ) : (
+                              <>CX specialist with <strong className="text-cyan-600 dark:text-cyan-400">22 years experience</strong>. To me, Customer Care is <strong className="text-slate-900 dark:text-white">deep empathy</strong>.</>
+                            )}
+                          </p>
+                          <p>{isVi ? "Mỗi cuộc trò chuyện là cơ hội để lắng nghe và kiến tạo trải nghiệm vượt mong đợi." : "Every talk is a chance to listen and exceed expectations."}</p>
+                        </div>
+                      </div>
+                    ),
+                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-6 shadow-sm backdrop-blur-md"
+                  },
+                  // 4. MISSION STATEMENT
+                  {
+                    id: "mission-statement",
+                    tabs: ["all", "mission"],
+                    content: (
+                      <div className="flex flex-col items-center text-center space-y-4">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-1 text-xs font-black uppercase tracking-wider text-rose-700 dark:text-rose-300">
+                          <Sparkles size={14} className="text-rose-500" />
+                          <span>{isVi ? "Tuyên Ngôn Sứ Mệnh" : "Mission Statement"}</span>
+                        </div>
+                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 leading-relaxed">
+                          {isVi ? "Nỗ lực kiến tạo dịch vụ chuẩn mực và tối ưu vận hành." : "Striving for benchmark service and optimized operations."}
+                        </p>
+                        <div onClick={() => { playTactileSound("sparkle"); showToast(isVi ? "✨ Cam kết thấu cảm!" : "✨ Empathy commitment!"); }} className="relative cursor-pointer group w-full">
+                          <div className="relative rounded-2xl border-2 border-rose-500/40 bg-gradient-to-r from-rose-500/10 to-amber-500/10 px-4 py-4 shadow-lg">
+                            <span className="bg-gradient-to-r from-rose-600 to-amber-600 bg-clip-text text-lg font-black tracking-tight text-transparent">
+                              {isVi ? "“ Họ luôn được lắng nghe. ”" : "“ They are always heard. ”"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ),
+                    className: "rounded-3xl border border-rose-500/30 bg-white/90 dark:bg-slate-900/90 p-5 shadow-md backdrop-blur-md"
+                  },
+                  // 5. IMPACT METRICS
+                  {
+                    id: "impact-metrics",
+                    tabs: ["all", "philosophy"],
+                    content: (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <Award size={14} className="text-blue-500" />
+                            {isVi ? "Chỉ Số Vận Hành" : "Ops Metrics"}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          {quickMetrics.map((metric, idx) => (
+                            <div key={idx} className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40 p-3 flex flex-col justify-center">
+                              <div className={cn("text-lg font-black bg-gradient-to-r bg-clip-text text-transparent", metric.color)}>{metric.num}</div>
+                              <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">{metric.unit}</div>
+                              <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 leading-tight mt-1">{metric.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ),
+                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm backdrop-blur-md"
+                  },
+                  // 6. STRATEGIC PILLARS
+                  {
+                    id: "strategic-pillars",
+                    tabs: ["all", "philosophy"],
+                    content: (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <Sparkles size={14} className="text-amber-500" />
+                            {isVi ? "Hệ Giá Trị Cốt Lõi" : "Core Value Pillars"}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          {strategicPillars.map((pillar, idx) => {
+                            const PillarIcon = pillar.icon;
+                            return (
+                              <div
+                                key={idx}
+                                className={cn("group w-full rounded-xl p-4 transition-all relative duration-300 cursor-pointer border-none overflow-hidden hover:translate-x-1", pillar.bg)}
+                                onMouseEnter={() => playTactileSound("click")}
+                              >
+                                <div className="relative z-10">
+                                  <p className="text-white text-lg font-black tracking-tight">{pillar.title}</p>
+                                  <p className="text-white/80 text-[11px] font-bold">{pillar.desc}</p>
+                                </div>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-20 text-white">
+                                  <PillarIcon size={24} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ),
+                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm backdrop-blur-md"
+                  }
+                ];
 
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(contact.value, contact.label)}
-                        className={cn(
-                          "cursor-pointer p-1.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center gap-1",
-                          isCopied
-                            ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                            : "text-[var(--muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/10"
-                        )}
-                        title={isVi ? "Sao chép" : "Copy"}
-                      >
-                        {isCopied ? <Check size={13} /> : <Copy size={13} />}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+                // Filter cards based on active tab
+                const filteredCards = allCards.filter(card => card.tabs.includes(activeTab));
+
+                // Determine column count (dynamic based on viewport)
+                // In server-side, we assume 3 columns for desktop
+                const numCols = 3;
+                const columns: any[][] = Array.from({ length: numCols }, () => []);
+
+                // Simplified Masonry: Distribute items round-robin (simulates joining shortest column)
+                filteredCards.forEach((card, index) => {
+                  columns[index % numCols].push(card);
+                });
+
+                // Get current column's cards
+                const columnCards = columns[colIndex];
+                
+                return columnCards.map(card => (
+                  <motion.div
+                    key={card.id}
+                    layout
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={card.className}
+                  >
+                    {card.content}
+                  </motion.div>
+                ));
+              })()}
             </div>
-
-          </div>
-
-          {/* -------------------------------------------------------------
-              BENTO CARD 3: 4 REAL-WORLD KEY METRICS (Col 1-12)
-              Positions horizontally in 1 row below Personal Profile & Mission
-             ------------------------------------------------------------- */}
-          <div className="md:col-span-12 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 md:gap-4 w-full">
-            {quickMetrics.map((metric, idx) => {
-              const Icon = metric.icon;
-              return (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-[var(--border)] bg-gradient-to-b from-white/90 to-white/70 dark:from-slate-900/90 dark:to-slate-900/70 p-3.5 sm:p-4 md:p-5 shadow-xs backdrop-blur-xl transition-all duration-300 hover:shadow-md hover:border-blue-500/30 flex flex-col justify-between group"
-                >
-                  <div className="flex items-center justify-between gap-1.5 mb-1.5 sm:mb-2">
-                    <div className={cn("p-1.5 sm:p-2 rounded-xl bg-black/5 dark:bg-white/5", metric.accent)}>
-                      <Icon size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    </div>
-                    <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--muted)]">
-                      {metric.unit}
-                    </span>
-                  </div>
-                  <div>
-                    <div className={cn("bg-gradient-to-r bg-clip-text text-xl sm:text-2xl md:text-3xl font-black text-transparent tracking-tight", metric.color)}>
-                      {metric.num}
-                    </div>
-                    <div className="text-[11px] sm:text-xs font-bold text-[var(--text-primary)] mt-0.5 sm:mt-1 leading-snug">
-                      {metric.label}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
+          ))}
         </div>
 
-        {/* TOAST NOTIFICATION */}
-        <AnimatePresence>
-          {toastMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="fixed bottom-8 left-1/2 z-[999999] flex -translate-x-1/2 items-center gap-2.5 rounded-[10px] border border-white/20 bg-slate-900/90 px-4 py-2.5 text-xs font-black text-white shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-white/90 dark:text-slate-900"
+
+        {/* CALL TO ACTION FLOATING BAR */}
+        <motion.div
+          layout
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-6 shadow-md flex flex-col lg:flex-row items-center justify-between gap-6 backdrop-blur-md"
+        >
+          <div className="flex items-center gap-4 w-full lg:w-auto">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              <Send size={22} className="translate-x-0.5" />
+            </div>
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                {isVi
+                  ? "CÙNG TẠO RA TRẢI NGHIỆM KHÁCH HÀNG TỐT HƠN"
+                  : "CREATE BETTER CUSTOMER EXPERIENCES TOGETHER"}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                {isVi
+                  ? "Tôi luôn sẵn sàng kết nối để cùng doanh nghiệp xây dựng hệ thống Customer Experience hiệu quả, nhân văn và bền vững."
+                  : "I am always ready to connect to help businesses build effective, human-centric, and sustainable Customer Experience systems."}
+              </p>
+            </div>
+          </div>
+
+          {/* Action Capsule Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full lg:w-auto shrink-0">
+            <a
+              href="mailto:trinhan.virtual@gmail.com?subject=Liên%20hệ%20hợp%20tác%20Nguyễn%20Hùng%20Thái"
+              onClick={() => playTactileSound("click")}
+              className="group flex items-center gap-3 p-3.5 rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-slate-800 dark:text-white transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 font-black text-xs cursor-pointer"
             >
-              <CheckCircle2
-                size={16}
-                className="shrink-0 text-emerald-400 dark:text-emerald-600"
-              />
-              <span>{toastMessage}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white shadow-xs group-hover:bg-white group-hover:text-blue-600 transition-colors">
+                <Send size={15} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-black uppercase tracking-wider">
+                  {isVi ? "KẾT NỐI VỚI TÔI" : "CONNECT"}
+                </span>
+                <span className="text-[10px] opacity-75 font-normal">
+                  {isVi ? "Trao đổi hợp tác" : "Collaborate"}
+                </span>
+              </div>
+            </a>
+
+            <button
+              type="button"
+              onClick={() => {
+                playTactileSound("click");
+                setActiveModal("cv");
+              }}
+              className="group flex items-center gap-3 p-3.5 rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 text-slate-800 dark:text-white transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 font-black text-xs cursor-pointer"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-600 text-white shadow-xs group-hover:bg-white group-hover:text-purple-600 transition-colors">
+                <FileText size={15} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-black uppercase tracking-wider">
+                  {isVi ? "XEM CV" : "VIEW CV"}
+                </span>
+                <span className="text-[10px] opacity-75 font-normal">
+                  {isVi ? "Tải xuống CV" : "Download CV"}
+                </span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                playTactileSound("click");
+                if (onNavigate) {
+                  onNavigate("projects");
+                } else {
+                  setActiveModal("projects");
+                }
+              }}
+              className="group flex items-center gap-3 p-3.5 rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-amber-600 hover:text-white dark:hover:bg-amber-600 text-slate-800 dark:text-white transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 font-black text-xs cursor-pointer"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white shadow-xs group-hover:bg-white group-hover:text-amber-600 transition-colors">
+                <Briefcase size={15} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-black uppercase tracking-wider">
+                  {isVi ? "XEM DỰ ÁN" : "PROJECTS"}
+                </span>
+                <span className="text-[10px] opacity-75 font-normal">
+                  {isVi ? "Dự án nổi bật" : "Featured Work"}
+                </span>
+              </div>
+            </button>
+          </div>
+        </motion.div>
       </div>
+
+      {/* LIQUID GLASS MODAL POPOVERS */}
+      <AnimatePresence>
+        {activeModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="rounded-3xl p-6 sm:p-8 max-w-lg w-full bg-white dark:bg-slate-900 shadow-2xl relative border border-slate-200 dark:border-slate-700"
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  playTactileSound("click");
+                  setActiveModal(null);
+                }}
+                className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+
+              {activeModal === "cv" ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-purple-600 dark:text-purple-400">
+                    <FileText size={24} />
+                    <h3 className="text-lg font-black">
+                      {isVi
+                        ? "Hồ Sơ Năng Lực (CV Chi Tiết)"
+                        : "Executive CV Resume"}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {isVi
+                      ? "Hồ sơ trình bày chi tiết hành trình 22+ năm lãnh đạo vận hành CX, CSAT >99%, tối ưu SOP, xây dựng hệ thống AI CRM tại các tập đoàn lớn."
+                      : "Executive resume detailing 22+ years of CX operational leadership, SOP optimization, and AI CRM implementations."}
+                  </p>
+                  <div className="pt-2 flex items-center gap-3">
+                    <a
+                      href="mailto:trinhan.virtual@gmail.com?subject=Yêu%20cầu%20CV%20Nguyễn%20Hùng%20Thái"
+                      onClick={() => {
+                        playTactileSound("toast");
+                        showToast(
+                          isVi
+                            ? "Đang mở trình gửi email yêu cầu CV..."
+                            : "Opening email client to request CV..."
+                        );
+                      }}
+                      className="flex-1 py-3 px-4 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs text-center shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <Send size={14} />
+                      <span>{isVi ? "Gửi Yêu Cầu Tải CV" : "Request Full CV"}</span>
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
+                    <Briefcase size={24} />
+                    <h3 className="text-lg font-black">
+                      {isVi ? "Dự Án & Thành Tựu Nổi Bật" : "Featured Key Projects"}
+                    </h3>
+                  </div>
+                  <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-400">
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
+                      <span className="font-bold text-slate-900 dark:text-white block">
+                        1. AI CRM & Omnichannel Service Integration
+                      </span>
+                      <span className="text-[11px] opacity-80">
+                        {isVi
+                          ? "Tự động hóa 24/7, nâng chỉ số FCR trên 85% và rút ngắn thời gian xử lý khiếu nại."
+                          : "24/7 automation, boosting FCR above 85% and shortening resolution cycle times."}
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
+                      <span className="font-bold text-slate-900 dark:text-white block">
+                        2. Chuẩn Hóa Khung SOP Chăm Sóc Khách Hàng Quy Mô Lớn
+                      </span>
+                      <span className="text-[11px] opacity-80">
+                        {isVi
+                          ? "Thiết lập quy trình chuẩn cho hơn 8 tập đoàn lớn, duy trì CSAT > 99%."
+                          : "Standardized frameworks across 8+ major corporations with sustained CSAT > 99%."}
+                      </span>
+                    </div>
+                  </div>
+                  {onNavigate && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveModal(null);
+                        onNavigate("projects");
+                      }}
+                      className="w-full py-2.5 rounded-full bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <span>{isVi ? "Đi đến trang Dự án" : "Go to Projects page"}</span>
+                      <ExternalLink size={13} />
+                    </button>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* TOAST NOTIFICATION */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 20, x: "-50%" }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-full px-5 py-2.5 text-xs font-black text-slate-900 dark:text-white bg-white/90 dark:bg-slate-900/90 shadow-2xl flex items-center gap-2 border border-slate-200 dark:border-slate-700 backdrop-blur-xl"
+          >
+            <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PageLayout>
   );
 }
-

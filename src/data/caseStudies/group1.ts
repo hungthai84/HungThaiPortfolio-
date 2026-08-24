@@ -2,48 +2,151 @@ import { CaseStudy } from "../projectsData";
 
 export const group1CaseStudies: Record<string, CaseStudy> = {
   "1.1 · Xây dựng và vận hành Phòng Dịch vụ Khách hàng": {
-    summary: "",
+    summary:
+      "Chuyển đổi phòng CSKH từ một trung tâm chi phí thụ động (Cost Center) thành bệ phóng trải nghiệm và trung tâm giá trị (Value Center). Thiết lập bộ máy vận hành hoàn chỉnh từ Tầm nhìn, Sơ đồ tổ chức 6 khối chuyên trách, Luồng xử lý 3 tuyến, Khung năng lực tuyển dụng đến Văn hóa Customer-Centric.",
     context: {
-      currentStatus: "",
-      cause: "",
-      needForChange: ""
+      currentStatus:
+        "Doanh nghiệp chưa có bộ máy CSKH chuyên trách bài bản, các phản hồi của khách hàng bị đùn đẩy và phản hồi chậm trễ, dẫn đến tỷ lệ rời bỏ cao.",
+      cause:
+        "Thiếu sơ đồ tổ chức phân cấp, thiếu bộ quy trình chuẩn SOP, hạ tầng CRM rời rạc và nhân sự tuyến đầu chưa được chuẩn hóa năng lực.",
+      needForChange:
+        "Thiết lập phòng CSKH toàn diện từ số 0 để xây dựng bệ phóng trải nghiệm khách hàng, chuẩn hóa SLA/SOP và tối ưu giữ chân khách hàng.",
     },
-    problems: [],
+    problems: [
+      {
+        problem: "Chưa có bộ máy vận hành CSKH chuyên trách",
+        cause: "Xử lý đùn đẩy giữa các phòng ban, thiếu quy trình chuẩn hóa SOP & SLA.",
+        impact: "Thời gian phản hồi trễ 45 phút, CSAT chỉ đạt 72%, tỷ lệ rời bỏ dịch vụ 8.5%.",
+      },
+      {
+        problem: "Hạ tầng CRM và công nghệ tiếp nhận phân tán",
+        cause: "Khách hàng nhắn tin qua nhiều kênh lẻ tẻ không được quản lý hội tụ.",
+        impact: "Ticket bị thất lạc, thông tin phản hồi không đồng bộ, chi phí xử lý cao ($4.50/ticket).",
+      },
+    ],
     objectives: {
-      strategic: [],
-      operational: [],
-      customer: [],
-      development: [],
-      kpi: []
+      strategic: [
+        "Định vị CSKH là Trung tâm Giá trị (Value Center) bệ phóng trải nghiệm khách hàng.",
+        "Thiết lập Tầm nhìn đối tác tin cậy và bộ 6 Giá trị cốt lõi (Tận tâm, Lắng nghe, Đồng cảm, Chủ động, Chính trực, Trao quyền).",
+      ],
+      operational: [
+        "100% Phủ Kênh CSKH Omnichannel (Hotline, Chat, Zalo, Mail, Social).",
+        "Cam kết thời gian phản hồi SLA < 15 phút, FCR >= 85%.",
+        "Thiết lập bộ chuẩn SOP và quy trình phối hợp xử lý 3 Tuyến.",
+      ],
+      customer: [
+        "Nâng chỉ số CSAT từ 72% lên >= 95%.",
+        "Tăng điểm số NPS lên mức xuất sắc (> 50).",
+      ],
+      development: [
+        "Chuẩn hóa Khung năng lực 3 cấp (Agent, Team Leader, CS Manager) & Quy trình tuyển dụng 5 bước.",
+      ],
+      kpi: [
+        "FRT < 3 phút (thực tế đạt 2.8 phút).",
+        "FCR đạt 88.2%.",
+        "Tỷ lệ tuân thủ SLA phản hồi đạt 98.5%.",
+        "Tiết kiệm 40% chi phí xử lý / Ticket (xuống $2.70).",
+        "Giảm Churn Rate xuống 2.1%.",
+      ],
     },
     solutions: {
-      modelOverview: "",
-      imageUrl: "",
-      cards: []
+      modelOverview:
+        "Bản đồ thực thi 4 Trụ cột giải pháp: Tầm nhìn & Sứ mệnh, Sơ đồ tổ chức 6 khối chuyên trách & 3 tuyến, Khung năng lực tuyển dụng 5 bước, Văn hóa Customer-Centric.",
+      imageUrl: "https://i.ibb.co/ymvZmbMM/1-1-X-y-d-ng-Ph-ng-D-ch-v-Kh-ch-h-ng.png",
+      cards: [
+        {
+          name: "01 · TẦM NHÌN & SỨ MỆNH",
+          purpose: "Định hình rõ vai trò và đóng góp chiến lược của phòng CSKH trong bức tranh chung của doanh nghiệp.",
+          implementation: "Xây dựng tuyên ngôn Tầm nhìn đối tác tin cậy; 4 định hướng Sứ mệnh và bộ 6 Giá trị cốt lõi.",
+          value: "Thống nhất tư duy và kim chỉ nam hành động cho toàn bộ đội ngũ.",
+        },
+        {
+          name: "02 · THIẾT KẾ SƠ ĐỒ TỔ CHỨC 6 KHỐI",
+          purpose: "Tối ưu hóa hiệu suất vận hành nhờ tính chuyên trách và luồng phối hợp 3 tuyến nhịp nhàng.",
+          implementation: "Thiết lập sơ đồ cây 3 tầng đứng đầu bởi Giám Đốc CSKH, quản lý 6 khối chuyên biệt: Inbound, Outbound, Escalation, QA, Data & Social.",
+          value: "Phân định rõ trách nhiệm, xử lý đúng tuyến và dễ dàng mở rộng quy mô.",
+        },
+        {
+          name: "03 · KHUNG NĂNG LỰC & TUYỂN DỤNG",
+          purpose: "Đảm bảo tuyển dụng đúng người, đúng năng lực và giảm thiểu tỷ lệ tiêu hao nhân sự.",
+          implementation: "Chuẩn hóa Khung năng lực cho 3 cấp (Nhân viên, Trưởng nhóm, Quản lý) và ban hành Quy trình tuyển dụng 5 bước nghiêm ngặt.",
+          value: "Xây dựng lực lượng nhân sự chất lượng cao, giỏi chuyên môn và vững tư duy dịch vụ.",
+        },
+        {
+          name: "04 · VĂN HÓA CUSTOMER-CENTRIC",
+          purpose: "Đưa khách hàng vào trung tâm của mọi quyết định nội bộ.",
+          implementation: "Triển khai 4 trụ cột (Lắng nghe, Đồng cảm, Trao quyền, Ghi nhận) thông qua các chương trình đào tạo định hướng.",
+          value: "Biến tinh thần phục vụ thành DNA của bộ phận, tạo ra các tương tác vượt kỳ vọng.",
+        },
+      ],
     },
-    implementation: [],
+    implementation: [
+      "Bước 1: Khảo sát & Đánh giá hiện trạng vận hành CSKH.",
+      "Bước 2: Khuôn mẫu & Thiết kế ban hành Tầm nhìn & Sơ đồ 6 khối.",
+      "Bước 3: Tuyển dụng Onboarding theo quy trình 5 bước HR.",
+      "Bước 4: Đào tạo chuẩn hóa kỹ năng & quy trình SOP.",
+      "Bước 5: Vận hành thử, chấm điểm QA & Báo cáo KPI.",
+      "Bước 6: Tối ưu & Mở rộng sẵn sàng tích hợp CRM/AI.",
+    ],
     roleAndContribution: {
-      role: "",
-      responsibilities: []
+      role: "Senior Project Architect / CX Strategist",
+      responsibilities: [
+        "Nghiên cứu và hoạch định toàn bộ mô hình tổ chức CSKH.",
+        "Thiết kế khung năng lực, tiêu chuẩn tuyển dụng và văn hóa vận hành.",
+        "Chủ trì quy định phối hợp 3 tuyến giữa 6 khối chuyên trách.",
+        "Áp dụng nguyên tắc Trao quyền cho nhân sự tuyến đầu bồi thường nhanh.",
+        "Thiết lập bộ chỉ số đo lường trải nghiệm CSAT & NPS realtime.",
+      ],
     },
     systemsAndTools: {
-      methods: [],
-      toolsList: []
+      methods: ["Model 6 Khối Chuyên Trách", "Phân Cấp 3 Tuyến (Tier 1, 2, 3)", "Văn Hóa 4 Trụ Cột Customer-Centric"],
+      toolsList: [
+        "Công cụ tính Định biên Headcount",
+        "Bảng chấm điểm QA Đàm thoại",
+        "Đo lường CSAT & NPS Realtime Calculator",
+        "Helpdesk Omnichannel Ticket System",
+      ],
     },
     results: {
-      operational: [],
-      customer: [],
-      hr: [],
-      business: [],
-      kpiBeforeAfter: []
+      operational: [
+        "Thời gian phản hồi ban đầu (FRT) giảm từ 45 phút xuống 2.8 phút (Nhanh hơn 93.7%).",
+        "Tỷ lệ giải quyết lần đầu (FCR) tăng từ 52.0% lên 88.2%.",
+        "Tỷ lệ tuân thủ SLA phản hồi đạt 98.5%.",
+      ],
+      customer: [
+        "Chỉ số hài lòng khách hàng (CSAT) tăng từ 72.0% lên 96.8%.",
+        "Điểm số NPS đạt +62 (Mức Xuất Sắc).",
+        "Giảm tỷ lệ rời bỏ dịch vụ Churn Rate từ 8.5% xuống 2.1%.",
+      ],
+      hr: [
+        "Xây dựng xong bộ Khung năng lực 3 cấp độ và Quy trình tuyển dụng 5 bước HR chuẩn hóa.",
+      ],
+      business: [
+        "Chi phí xử lý trung bình / Ticket giảm 40% từ $4.50 xuống $2.70.",
+        "Đạt chỉ số ROI 210%, chuyển đổi CSKH từ Cost Center thành Value Center.",
+      ],
+      kpiBeforeAfter: [
+        "FRT: 45 Phút -> 2.8 Phút (Nhanh hơn 93.7%)",
+        "FCR: 52.0% -> 88.2% (Tăng +36.2%)",
+        "CSAT: 72.0% -> 96.8% (Tăng +24.8%)",
+        "SLA: 68.5% -> 98.5% (Tăng +30.0%)",
+        "Cost/Ticket: $4.50 -> $2.70 (Tiết kiệm 40.0%)",
+        "Churn Rate: 8.5% -> 2.1% (Giảm 6.4%)",
+      ],
     },
     valueAndDevelopment: {
-      customerValue: "",
-      businessValue: "",
-      organizationValue: "",
-      lessons: [],
-      nextSteps: []
-    }
+      customerValue: "Nhận được sự hỗ trợ nhanh chóng, tận tâm và được tôn trọng giải quyết tận gốc vấn đề.",
+      businessValue: "Tiết kiệm 40% chi phí vận hành, gia tăng LTV và tạo bảo chứng tài chính ROI 210%.",
+      organizationValue: "Sở hữu bộ máy CSKH 6 khối chuyên trách bài bản, sẵn sàng mở rộng quy mô.",
+      lessons: [
+        "Trao quyền cho nhân viên tuyến đầu giúp giải tỏa ức chế của khách hàng ngay lập tức.",
+        "Đo lường dữ liệu Realtime giúp phát hiện sớm các điểm nghẽn vận hành.",
+      ],
+      nextSteps: [
+        "Tích hợp AI Bot trợ lý ảo để tự động hóa trả lời các yêu cầu Tuyến 1.",
+        "Mở rộng mô hình Omnichannel kết hợp Voicebot đàm thoại tự động.",
+      ],
+    },
   },
 
   "1.2 · Thiết lập mục tiêu và chỉ tiêu hoạt động": {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import {
   Info,
   Globe,
@@ -277,14 +276,14 @@ export const CSKHProjectDetails: React.FC = () => {
         <div className="relative z-10 mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div
             onClick={() => highlightPillar("pillar-1")}
-            className="group cursor-pointer rounded-2xl border border-sky-500/30 bg-white/50 p-3.5 transition duration-300 hover:-translate-y-1 hover:bg-sky-500/10 dark:bg-slate-950/50"
+            className="group cursor-pointer rounded-2xl border border-sky-500/30 bg-white/50 p-3.5 hover:bg-sky-500/10 dark:bg-slate-950/50"
           >
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1 rounded-md bg-gradient-to-r from-sky-500 to-blue-600 px-2 py-0.5 text-[10px] font-black text-white shadow-sm">
                 <Compass size={10} className="text-amber-300" /> TRỤ CỘT 01
               </span>
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-500/20 text-sky-500">
-                <Compass size={16} className="transition-transform duration-300 group-hover:rotate-45" />
+                <Compass size={16} />
               </div>
             </div>
             <div className="mt-2 text-xs font-black text-slate-900 dark:text-white">Tầm Nhìn & Sứ Mệnh</div>
@@ -293,14 +292,14 @@ export const CSKHProjectDetails: React.FC = () => {
 
           <div
             onClick={() => highlightPillar("pillar-2")}
-            className="group cursor-pointer rounded-2xl border border-purple-500/30 bg-white/50 p-3.5 transition duration-300 hover:-translate-y-1 hover:bg-purple-500/10 dark:bg-slate-950/50"
+            className="group cursor-pointer rounded-2xl border border-purple-500/30 bg-white/50 p-3.5 hover:bg-purple-500/10 dark:bg-slate-950/50"
           >
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1 rounded-md bg-gradient-to-r from-purple-600 to-pink-600 px-2 py-0.5 text-[10px] font-black text-white shadow-sm">
                 <Network size={10} className="text-pink-300" /> TRỤ CỘT 02
               </span>
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/20 text-purple-500">
-                <Network size={16} className="transition-transform duration-300 group-hover:scale-110" />
+                <Network size={16} />
               </div>
             </div>
             <div className="mt-2 text-xs font-black text-slate-900 dark:text-white">Sơ Đồ 6 Khối CSKH</div>
@@ -309,14 +308,14 @@ export const CSKHProjectDetails: React.FC = () => {
 
           <div
             onClick={() => highlightPillar("pillar-3")}
-            className="group cursor-pointer rounded-2xl border border-emerald-500/30 bg-white/50 p-3.5 transition duration-300 hover:-translate-y-1 hover:bg-emerald-500/10 dark:bg-slate-950/50"
+            className="group cursor-pointer rounded-2xl border border-emerald-500/30 bg-white/50 p-3.5 hover:bg-emerald-500/10 dark:bg-slate-950/50"
           >
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1 rounded-md bg-gradient-to-r from-emerald-600 to-teal-600 px-2 py-0.5 text-[10px] font-black text-white shadow-sm">
                 <Users size={10} className="text-emerald-200" /> TRỤ CỘT 03
               </span>
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-500">
-                <Users size={16} className="transition-transform duration-300 group-hover:scale-110" />
+                <Users size={16} />
               </div>
             </div>
             <div className="mt-2 text-xs font-black text-slate-900 dark:text-white">Định Biên & Tuyển Dụng</div>
@@ -325,14 +324,14 @@ export const CSKHProjectDetails: React.FC = () => {
 
           <div
             onClick={() => highlightPillar("pillar-4")}
-            className="group cursor-pointer rounded-2xl border border-orange-500/30 bg-white/50 p-3.5 transition duration-300 hover:-translate-y-1 hover:bg-orange-500/10 dark:bg-slate-950/50"
+            className="group cursor-pointer rounded-2xl border border-orange-500/30 bg-white/50 p-3.5 hover:bg-orange-500/10 dark:bg-slate-950/50"
           >
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1 rounded-md bg-gradient-to-r from-orange-600 to-amber-500 px-2 py-0.5 text-[10px] font-black text-white shadow-sm">
                 <Heart size={10} className="text-rose-200" /> TRỤ CỘT 04
               </span>
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500/20 text-orange-500">
-                <Heart size={16} className="transition-transform duration-300 group-hover:scale-110" />
+                <Heart size={16} />
               </div>
             </div>
             <div className="mt-2 text-xs font-black text-slate-900 dark:text-white">Văn Hóa Customer-Centric</div>
@@ -365,10 +364,10 @@ export const CSKHProjectDetails: React.FC = () => {
                 <stop offset="100%" stopColor="#ea580c" stopOpacity="0.4" />
               </linearGradient>
             </defs>
-            <path d={paths[0]} stroke="url(#grad-sky)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4] animate-[flowDash_30s_linear_infinite]" />
-            <path d={paths[1]} stroke="url(#grad-purple)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4] animate-[flowDash_30s_linear_infinite]" />
-            <path d={paths[2]} stroke="url(#grad-emerald)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4] animate-[flowDash_30s_linear_infinite]" />
-            <path d={paths[3]} stroke="url(#grad-orange)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4] animate-[flowDash_30s_linear_infinite]" />
+            <path d={paths[0]} stroke="url(#grad-sky)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4]" />
+            <path d={paths[1]} stroke="url(#grad-purple)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4]" />
+            <path d={paths[2]} stroke="url(#grad-emerald)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4]" />
+            <path d={paths[3]} stroke="url(#grad-orange)" strokeWidth="3" fill="none" className="stroke-dasharray-[8_4]" />
           </svg>
 
           {/* Mindmap Tree Grid */}
@@ -378,7 +377,7 @@ export const CSKHProjectDetails: React.FC = () => {
               <div
                 ref={p1Ref}
                 onClick={() => highlightPillar("pillar-1")}
-                className="group cursor-pointer rounded-2xl border-2 border-sky-500/50 bg-white/80 p-4 shadow-md transition duration-300 hover:-translate-y-1 hover:border-sky-400 dark:bg-slate-900/80"
+                className="group cursor-pointer rounded-2xl border-2 border-sky-500/50 bg-white/80 p-4 shadow-md dark:bg-slate-900/80"
               >
                 <div className="flex items-center space-x-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500 text-white shadow-lg shadow-sky-500/30">
@@ -390,7 +389,7 @@ export const CSKHProjectDetails: React.FC = () => {
                   </div>
                 </div>
                 <div className="relative mt-3 h-20 overflow-hidden rounded-xl border border-white/20">
-                  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=400&auto=format&fit=crop" alt="Tầm nhìn CSKH" className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=400&auto=format&fit=crop" alt="Tầm nhìn CSKH" className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-slate-950/40 flex items-end p-2">
                     <p className="text-[11px] font-semibold text-white">Tuyên ngôn đối tác tin cậy & 6 Giá trị cốt lõi</p>
                   </div>
@@ -405,7 +404,7 @@ export const CSKHProjectDetails: React.FC = () => {
               <div
                 ref={p3Ref}
                 onClick={() => highlightPillar("pillar-3")}
-                className="group cursor-pointer rounded-2xl border-2 border-emerald-500/50 bg-white/80 p-4 shadow-md transition duration-300 hover:-translate-y-1 hover:border-emerald-400 dark:bg-slate-900/80"
+                className="group cursor-pointer rounded-2xl border-2 border-emerald-500/50 bg-white/80 p-4 shadow-md dark:bg-slate-900/80"
               >
                 <div className="flex items-center space-x-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-500/30">
@@ -417,7 +416,7 @@ export const CSKHProjectDetails: React.FC = () => {
                   </div>
                 </div>
                 <div className="relative mt-3 h-20 overflow-hidden rounded-xl border border-white/20">
-                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop" alt="Tuyển dụng CSKH" className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop" alt="Tuyển dụng CSKH" className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-slate-950/40 flex items-end p-2">
                     <p className="text-[11px] font-semibold text-white">Khung năng lực 3 cấp & 5 Bước HR</p>
                   </div>
@@ -434,10 +433,9 @@ export const CSKHProjectDetails: React.FC = () => {
             <div className="flex justify-center py-4 md:col-span-4">
               <div
                 ref={centerRef}
-                className="group relative flex h-64 w-64 cursor-pointer flex-col items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-sky-600 via-indigo-600 to-purple-700 p-6 text-center text-white shadow-2xl transition duration-300 hover:scale-105 dark:border-slate-700 sm:h-72 sm:w-72 ring-8 ring-sky-400/20"
+                className="group relative flex h-64 w-64 cursor-pointer flex-col items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-sky-600 via-indigo-600 to-purple-700 p-6 text-center text-white shadow-2xl dark:border-slate-700 sm:h-72 sm:w-72 ring-8 ring-sky-400/20"
               >
-                <div className="absolute inset-0 animate-ping rounded-full border-2 border-sky-300/40 pointer-events-none" />
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md transition group-hover:bg-white/30">
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md">
                   <Monitor size={28} className="text-amber-300" />
                 </div>
                 <h3 className="text-sm font-black uppercase leading-snug sm:text-base">
@@ -457,7 +455,7 @@ export const CSKHProjectDetails: React.FC = () => {
               <div
                 ref={p2Ref}
                 onClick={() => highlightPillar("pillar-2")}
-                className="group cursor-pointer rounded-2xl border-2 border-purple-500/50 bg-white/80 p-4 shadow-md transition duration-300 hover:-translate-y-1 hover:border-purple-400 dark:bg-slate-900/80"
+                className="group cursor-pointer rounded-2xl border-2 border-purple-500/50 bg-white/80 p-4 shadow-md hover:border-purple-400 dark:bg-slate-900/80"
               >
                 <div className="flex items-center space-x-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/30">
@@ -469,7 +467,7 @@ export const CSKHProjectDetails: React.FC = () => {
                   </div>
                 </div>
                 <div className="relative mt-3 h-20 overflow-hidden rounded-xl border border-white/20">
-                  <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=400&auto=format&fit=crop" alt="Cấu trúc tổ chức CSKH" className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                  <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=400&auto=format&fit=crop" alt="Cấu trúc tổ chức CSKH" className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-slate-950/40 flex items-end p-2">
                     <p className="text-[11px] font-semibold text-white">6 Khối chuyên trách & Phân cấp 3 Tuyến</p>
                   </div>
@@ -484,7 +482,7 @@ export const CSKHProjectDetails: React.FC = () => {
               <div
                 ref={p4Ref}
                 onClick={() => highlightPillar("pillar-4")}
-                className="group cursor-pointer rounded-2xl border-2 border-orange-500/50 bg-white/80 p-4 shadow-md transition duration-300 hover:-translate-y-1 hover:border-orange-400 dark:bg-slate-900/80"
+                className="group cursor-pointer rounded-2xl border-2 border-orange-500/50 bg-white/80 p-4 shadow-md hover:border-orange-400 dark:bg-slate-900/80"
               >
                 <div className="flex items-center space-x-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-600 text-white shadow-lg shadow-orange-500/30">
@@ -496,7 +494,7 @@ export const CSKHProjectDetails: React.FC = () => {
                   </div>
                 </div>
                 <div className="relative mt-3 h-20 overflow-hidden rounded-xl border border-white/20">
-                  <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=400&auto=format&fit=crop" alt="Văn hóa Customer Centric" className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                  <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=400&auto=format&fit=crop" alt="Văn hóa Customer Centric" className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-slate-950/40 flex items-end p-2">
                     <p className="text-[11px] font-semibold text-white">Trao quyền tuyến đầu & CRM hội tụ</p>
                   </div>
@@ -516,33 +514,16 @@ export const CSKHProjectDetails: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b border-slate-200/60 pb-3 dark:border-slate-700/60">
           <div className="flex items-center gap-2 text-xs font-black tracking-wider text-slate-500 uppercase">
-            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-indigo-500" />
-            <span>Xếp Chồng Bài Viết (CodePen ScrollTrigger Style)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={expandAll}
-              className="cursor-pointer rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-600 transition hover:bg-indigo-500/20 dark:text-indigo-400"
-            >
-              Mở tất cả
-            </button>
-            <button
-              onClick={collapseAll}
-              className="cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-500 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-            >
-              Thu gọn tất cả
-            </button>
+            <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
+            <span>Cấu trúc Chi Tiết Dự Án</span>
           </div>
         </div>
 
-        {/* Dynamic Accordion list */}
-        <div className="space-y-4">
+        {/* Dynamic Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-fr">
           {/* SECTION 00 */}
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("00")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-indigo-600 via-indigo-500 to-sky-400 p-4 text-left text-white"
-            >
+          <div className="flex flex-col overflow-hidden rounded-[20px] border-2 border-indigo-600 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-indigo-600 via-indigo-500 to-sky-400 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Layers size={18} />
@@ -551,79 +532,68 @@ export const CSKHProjectDetails: React.FC = () => {
                   00 · YÊU CẦU ĐẶT RA CỦA DỰ ÁN
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["00"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["00"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["00"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-indigo-500/5 space-y-4">
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  Xác định rõ ràng các mục tiêu bài toán, bài học vận hành và tiêu chuẩn chất lượng trọng tâm mà phòng Chăm sóc Khách hàng cần giải quyết ngay từ giai đoạn khởi tạo nhằm tạo nền tảng vững chắc cho sự phát triển lâu dài của doanh nghiệp.
-                </p>
+            </div>
+            <div className="flex-1 p-5 bg-indigo-500/5 space-y-4">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                Xác định rõ ràng các mục tiêu bài toán, bài học vận hành và tiêu chuẩn chất lượng trọng tâm mà phòng Chăm sóc Khách hàng cần giải quyết ngay từ giai đoạn khởi tạo nhằm tạo nền tảng vững chắc cho sự phát triển lâu dài của doanh nghiệp.
+              </p>
 
-                {/* Metric Grid */}
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
-                    <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">100%</div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-white">Phủ Kênh CSKH</div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Tích hợp đa kênh Omnichannel</p>
-                  </div>
-                  <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
-                    <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">&lt; 15p</div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-white">Thời Gian Phản Hồi</div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Cam kết SLA chuẩn hóa</p>
-                  </div>
-                  <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
-                    <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">&ge; 95%</div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-white">Chỉ Số CSAT Target</div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Đo lường độ hài lòng khách hàng</p>
-                  </div>
-                  <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
-                    <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">01</div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-white">Bộ Chuẩn SOP</div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Quy trình vận hành đồng bộ</p>
-                  </div>
+              {/* Metric Grid */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
+                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">100%</div>
+                  <div className="text-xs font-bold text-slate-900 dark:text-white">Phủ Kênh CSKH</div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Tích hợp đa kênh Omnichannel</p>
                 </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-5 space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-800 dark:text-indigo-300">
-                      <Layers size={14} className="text-indigo-500" /> XÂY DỰNG TỪ SỐ 0
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      Thiết lập toàn bộ sơ đồ tổ chức, chức năng nhiệm vụ, mô hình phân cấp và định biên nhân sự phù hợp với quy mô phát triển doanh nghiệp.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-5 space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-800 dark:text-indigo-300">
-                      <CheckCircle size={14} className="text-indigo-500" /> CHUẨN HÓA QUY TRÌNH SOP & SLA
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      Xây dựng cẩm nang vận hành, quy trình xử lý khiếu nại, kịch bản giao tiếp và cam kết thời gian phản hồi minh bạch cho từng kênh dịch vụ.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-5 space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-800 dark:text-indigo-300">
-                      <Sliders size={14} className="text-indigo-500" /> ỨNG DỤNG CÔNG NGHỆ CRM
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      Triển khai hạ tầng Helpdesk/Ticket, đài tổng đài IP đàm thoại và Omnichannel hội tụ (Hotline, Chat, Zalo, Mail, Social) đồng bộ.
-                    </p>
-                  </div>
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
+                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">&lt; 15p</div>
+                  <div className="text-xs font-bold text-slate-900 dark:text-white">Thời Gian Phản Hồi</div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Cam kết SLA chuẩn hóa</p>
+                </div>
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
+                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">&ge; 95%</div>
+                  <div className="text-xs font-bold text-slate-900 dark:text-white">Chỉ Số CSAT Target</div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Đo lường độ hài lòng khách hàng</p>
+                </div>
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4 text-center">
+                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">01</div>
+                  <div className="text-xs font-bold text-slate-900 dark:text-white">Bộ Chuẩn SOP</div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Quy trình vận hành đồng bộ</p>
                 </div>
               </div>
-            )}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-5 space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-800 dark:text-indigo-300">
+                    <Layers size={14} className="text-indigo-500" /> XÂY DỰNG TỪ SỐ 0
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Thiết lập toàn bộ sơ đồ tổ chức, chức năng nhiệm vụ, mô hình phân cấp và định biên nhân sự phù hợp với quy mô phát triển doanh nghiệp.
+                  </p>
+                </div>
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-5 space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-800 dark:text-indigo-300">
+                    <CheckCircle size={14} className="text-indigo-500" /> CHUẨN HÓA QUY TRÌNH SOP & SLA
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Xây dựng cẩm nang vận hành, quy trình xử lý khiếu nại, kịch bản giao tiếp và cam kết thời gian phản hồi minh bạch cho từng kênh dịch vụ.
+                  </p>
+                </div>
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-5 space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-800 dark:text-indigo-300">
+                    <Sliders size={14} className="text-indigo-500" /> ỨNG DỤNG CÔNG NGHỆ CRM
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Triển khai hạ tầng Helpdesk/Ticket, đài tổng đài IP đàm thoại và Omnichannel hội tụ (Hotline, Chat, Zalo, Mail, Social) đồng bộ.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* SECTION 01 */}
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("01")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-sky-500 via-indigo-500 to-cyan-400 p-4 text-left text-white"
-            >
+          <div className="flex flex-col overflow-hidden rounded-[20px] border-2 border-sky-500 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-sky-500 via-indigo-500 to-cyan-400 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Info size={18} />
@@ -632,15 +602,8 @@ export const CSKHProjectDetails: React.FC = () => {
                   01 · TỔNG QUAN DỰ ÁN & TẦM NHÌN
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["01"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["01"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["01"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-sky-500/5 space-y-4">
+            </div>
+            <div className="flex-1 p-5 bg-sky-500/5 space-y-4">
                 <div className="overflow-x-auto rounded-xl border border-slate-200/60 dark:border-slate-700/60">
                   <table className="w-full text-left border-collapse">
                     <tbody className="divide-y divide-slate-200/60 dark:divide-slate-700/60 text-slate-700 dark:text-slate-200">
@@ -680,7 +643,7 @@ export const CSKHProjectDetails: React.FC = () => {
 
                 {/* Vision / Mission grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-sky-500/10 border border-sky-500/20 space-y-2">
+                  <div className="flex h-full flex-col justify-between p-4 rounded-xl bg-sky-500/10 border border-sky-500/20 space-y-2">
                     <div className="flex items-center space-x-1.5 text-sky-700 dark:text-sky-300 font-bold text-xs">
                       <Eye size={16} />
                       <span>TẦM NHÌN (VISION)</span>
@@ -689,7 +652,7 @@ export const CSKHProjectDetails: React.FC = () => {
                       &quot;Trở thành đối tác tin cậy, dẫn đầu về trải nghiệm khách hàng trong ngành.&quot;
                     </p>
                   </div>
-                  <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 space-y-2">
+                  <div className="flex h-full flex-col justify-between p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 space-y-2">
                     <div className="flex items-center space-x-1.5 text-purple-700 dark:text-purple-300 font-bold text-xs">
                       <Rocket size={16} />
                       <span>SỰ MỆNH (MISSION)</span>
@@ -701,16 +664,12 @@ export const CSKHProjectDetails: React.FC = () => {
                     </ul>
                   </div>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 02 */}
-          <div id="pillar-2" className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("02")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-500 p-4 text-left text-white"
-            >
+          <div id="pillar-2" className="flex flex-col overflow-hidden rounded-[20px] border-2 border-purple-600 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-500 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Network size={18} />
@@ -719,15 +678,8 @@ export const CSKHProjectDetails: React.FC = () => {
                   02 · THIẾT KẾ CƠ CẤU TỔ CHỨC & MÔ HÌNH VẬN HÀNH
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["02"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["02"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["02"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-purple-500/5 space-y-6">
+            </div>
+            <div className="flex-1 p-5 bg-purple-500/5 space-y-6">
                 <div className="text-center space-y-1">
                   <h5 className="text-sm font-black text-slate-900 dark:text-white uppercase">Sơ đồ cơ cấu tổ chức 6 Khối</h5>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Phân cấp tinh gọn từ Quản lý đến Agent chuyên biệt</p>
@@ -741,41 +693,37 @@ export const CSKHProjectDetails: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="rounded-xl border border-sky-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-sky-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-sky-600">Khối 01: Inbound & Voice</span>
                     <p className="text-[11px] text-slate-500 mt-1">Tiếp nhận cuộc gọi nóng, giải đáp thông tin tức thời và xử lý Ticket cơ bản.</p>
                   </div>
-                  <div className="rounded-xl border border-emerald-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-emerald-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-emerald-600">Khối 02: Omnichannel Chat</span>
                     <p className="text-[11px] text-slate-500 mt-1">Hỗ trợ Livechat Website, Fanpage, Zalo OA và hộp thư Email hội tụ.</p>
                   </div>
-                  <div className="rounded-xl border border-purple-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-purple-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-purple-600">Khối 03: Outbound Care</span>
                     <p className="text-[11px] text-slate-500 mt-1">Gọi thăm hỏi chủ động, chăm sóc tập khách VIP và đo lường CSAT/NPS định kỳ.</p>
                   </div>
-                  <div className="rounded-xl border border-red-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-red-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-red-600">Khối 04: Escalation (Khiếu Nại)</span>
                     <p className="text-[11px] text-slate-500 mt-1">Giải quyết khiếu nại sâu, sự cố nhạy cảm và khủng hoảng truyền thông.</p>
                   </div>
-                  <div className="rounded-xl border border-amber-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-amber-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-amber-600">Khối 05: QA & Training</span>
                     <p className="text-[11px] text-slate-500 mt-1">Chấm điểm chất lượng đàm thoại, đào tạo chuyên môn Onboarding 14 ngày.</p>
                   </div>
-                  <div className="rounded-xl border border-indigo-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-indigo-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-indigo-600">Khối 06: Data & CRM System</span>
                     <p className="text-[11px] text-slate-500 mt-1">Xây dựng báo cáo realtime, phân tích Voice of Customer & bảo trì CRM.</p>
                   </div>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 03 */}
-          <div id="pillar-3" className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("03")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 p-4 text-left text-white"
-            >
+          <div id="pillar-3" className="flex flex-col overflow-hidden rounded-[20px] border-2 border-emerald-600 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Users size={18} />
@@ -784,15 +732,8 @@ export const CSKHProjectDetails: React.FC = () => {
                   03 · ĐỊNH BIÊN NHÂN SỰ & KHUNG NĂNG LỰC
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["03"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["03"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["03"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-emerald-500/5 space-y-4">
+            </div>
+            <div className="flex-1 p-5 bg-emerald-500/5 space-y-4">
                 <div className="overflow-x-auto rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-950">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -821,16 +762,12 @@ export const CSKHProjectDetails: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 04 */}
-          <div id="pillar-4" className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("04")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-orange-600 via-amber-500 to-rose-400 p-4 text-left text-white"
-            >
+          <div id="pillar-4" className="flex flex-col overflow-hidden rounded-[20px] border-2 border-orange-500 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-orange-500 via-amber-500 to-rose-400 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Heart size={18} />
@@ -839,43 +776,32 @@ export const CSKHProjectDetails: React.FC = () => {
                   04 · VĂN HÓA CUSTOMER-CENTRIC & HỆ THỐNG CRM
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["04"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["04"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["04"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-orange-500/5 space-y-4">
+            </div>
+            <div className="flex-1 p-5 bg-orange-500/5 space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-orange-600 uppercase">LẮNG NGHE</span>
                     <p className="text-[11px] text-slate-500 mt-1">Nắm bắt chính xác phản hồi từ khách hàng và thu thập lỗi phần mềm.</p>
                   </div>
-                  <div className="rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-orange-600 uppercase">ĐỒNG CẢM</span>
                     <p className="text-[11px] text-slate-500 mt-1">Luôn đứng ở góc nhìn khách hàng để giải quyết mâu thuẫn một cách êm đẹp.</p>
                   </div>
-                  <div className="rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-orange-600 uppercase">TRAO QUYỀN</span>
                     <p className="text-[11px] text-slate-500 mt-1">Cho phép nhân viên bồi thường trực tiếp trong khung hạn mức bồi thường SOP.</p>
                   </div>
-                  <div className="rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-orange-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
                     <span className="font-extrabold text-xs text-orange-600 uppercase">GHI NHẬN</span>
                     <p className="text-[11px] text-slate-500 mt-1">Biểu dương xuất sắc các ca hỗ trợ vượt kỳ vọng của khách hàng hàng tuần.</p>
                   </div>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 05 */}
-          <div id="pillar-1" className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("05")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-sky-600 via-indigo-600 to-blue-400 p-4 text-left text-white"
-            >
+          <div id="pillar-1" className="flex flex-col overflow-hidden rounded-[20px] border-2 border-sky-600 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-sky-600 via-indigo-600 to-blue-400 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Target size={18} />
@@ -884,17 +810,10 @@ export const CSKHProjectDetails: React.FC = () => {
                   05 · MÔ HÌNH & GIẢI PHÁP CHIẾN LƯỢC
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["05"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["05"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["05"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-sky-500/5 space-y-4">
+            </div>
+            <div className="flex-1 p-5 bg-sky-500/5 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div id="pillar-1" className="rounded-xl border border-sky-300 bg-white p-5 dark:border-slate-800 dark:bg-slate-950 space-y-2">
+                  <div id="pillar-1" className="flex h-full flex-col justify-between rounded-xl border border-sky-300 bg-white p-5 dark:border-slate-800 dark:bg-slate-950 space-y-2">
                     <div className="relative h-24 overflow-hidden rounded-lg">
                       <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600&auto=format&fit=crop" alt="Tầm nhìn" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
@@ -906,7 +825,7 @@ export const CSKHProjectDetails: React.FC = () => {
                     </p>
                   </div>
 
-                  <div id="pillar-2" className="rounded-xl border border-purple-300 bg-white p-5 dark:border-slate-800 dark:bg-slate-950 space-y-2">
+                  <div id="pillar-2" className="flex h-full flex-col justify-between rounded-xl border border-purple-300 bg-white p-5 dark:border-slate-800 dark:bg-slate-950 space-y-2">
                     <div className="relative h-24 overflow-hidden rounded-lg">
                       <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=600&auto=format&fit=crop" alt="Sơ đồ" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
@@ -918,16 +837,12 @@ export const CSKHProjectDetails: React.FC = () => {
                     </p>
                   </div>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 06 */}
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("06")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-amber-500 to-orange-600 p-4 text-left text-white"
-            >
+          <div className="flex flex-col overflow-hidden rounded-[20px] border-2 border-amber-500 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-amber-500 to-orange-600 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Clock size={18} />
@@ -936,51 +851,40 @@ export const CSKHProjectDetails: React.FC = () => {
                   06 · TRIỂN KHAI & VẬN HÀNH
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["06"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["06"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["06"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-orange-500/5 space-y-4">
+            </div>
+            <div className="flex-1 p-5 bg-orange-500/5 space-y-4">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 text-center font-bold">
-                  <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
+                  <div className="flex h-full flex-col items-center justify-between p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs">1</div>
                     <div className="text-[10px] text-slate-800 dark:text-slate-200 uppercase">Khảo sát & Đánh giá</div>
                   </div>
-                  <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
+                  <div className="flex h-full flex-col items-center justify-between p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs">2</div>
                     <div className="text-[10px] text-slate-800 dark:text-slate-200 uppercase">Thiết kế Sơ đồ</div>
                   </div>
-                  <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
+                  <div className="flex h-full flex-col items-center justify-between p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs">3</div>
                     <div className="text-[10px] text-slate-800 dark:text-slate-200 uppercase">Tuyển dụng 5 Bước</div>
                   </div>
-                  <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
+                  <div className="flex h-full flex-col items-center justify-between p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs">4</div>
                     <div className="text-[10px] text-slate-800 dark:text-slate-200 uppercase">Đào tạo Onboarding</div>
                   </div>
-                  <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
+                  <div className="flex h-full flex-col items-center justify-between p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 space-y-1">
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-white text-xs">5</div>
                     <div className="text-[10px] text-slate-800 dark:text-slate-200 uppercase">Vận hành Thử</div>
                   </div>
-                  <div className="p-3 rounded-xl bg-amber-600 text-white space-y-1 shadow">
+                  <div className="flex h-full flex-col items-center justify-between p-3 rounded-xl bg-amber-600 text-white space-y-1 shadow">
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-white text-amber-600 text-xs font-black">6</div>
                     <div className="text-[10px] uppercase">Bàn giao & Tối ưu</div>
                   </div>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 07 */}
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("07")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-teal-600 to-emerald-500 p-4 text-left text-white"
-            >
+          <div className="flex flex-col overflow-hidden rounded-[20px] border-2 border-teal-600 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-teal-600 to-emerald-500 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <UserCheck size={18} />
@@ -989,17 +893,10 @@ export const CSKHProjectDetails: React.FC = () => {
                   07 · VAI TRÒ & ĐÓNG GÓP CỦA DỰ ÁN
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["07"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["07"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["07"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-emerald-500/5 space-y-4">
+            </div>
+            <div className="flex-1 p-5 bg-emerald-500/5 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="rounded-xl border border-teal-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950 space-y-2">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-teal-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950 space-y-2">
                     <span className="font-extrabold text-xs text-teal-700 dark:text-teal-400 uppercase">Trách nhiệm chính:</span>
                     <ul className="list-disc pl-4 text-xs text-slate-600 dark:text-slate-400 space-y-1 leading-relaxed">
                       <li>Nghiên cứu thị trường và quy hoạch toàn bộ cơ cấu vận hành phòng CSKH.</li>
@@ -1007,7 +904,7 @@ export const CSKHProjectDetails: React.FC = () => {
                       <li>Giám sát ca trực Hotline và bảo vệ tỷ lệ tuân thủ SLA phản hồi.</li>
                     </ul>
                   </div>
-                  <div className="rounded-xl border border-teal-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950 space-y-2">
+                  <div className="flex h-full flex-col justify-between rounded-xl border border-teal-200 bg-white p-4.5 shadow-xs dark:border-slate-800 dark:bg-slate-950 space-y-2">
                     <span className="font-extrabold text-xs text-teal-700 dark:text-teal-400 uppercase">Quyết định then chốt:</span>
                     <ul className="list-disc pl-4 text-xs text-slate-600 dark:text-slate-400 space-y-1 leading-relaxed">
                       <li>Áp dụng chính sách &quot;Ủy quyền bồi thường ngay tuyến đầu&quot; cho Agent có năng lực tốt.</li>
@@ -1016,16 +913,12 @@ export const CSKHProjectDetails: React.FC = () => {
                     </ul>
                   </div>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 08 (INTERACTIVE TOOLS) */}
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("08")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-400 p-4 text-left text-white"
-            >
+          <div className="flex flex-col overflow-hidden rounded-[20px] border-2 border-blue-600 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-400 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <SlidersHorizontal size={18} />
@@ -1034,26 +927,19 @@ export const CSKHProjectDetails: React.FC = () => {
                   08 · HỆ THỐNG & CÔNG CỤ INTERACTIVE
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["08"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["08"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["08"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-blue-500/5 space-y-6">
-                <div className="flex flex-wrap gap-2 border-b border-slate-200/80 pb-3 dark:border-slate-700/80">
+            </div>
+            <div className="flex-1 p-5 bg-blue-500/5 space-y-6">
+                <div className="inline-flex flex-wrap items-center gap-2.5 p-1 bg-transparent mx-2.5 my-2.5">
                   <button
                     onClick={() => {
                       playUiSound("click");
                       setActiveToolTab("calc");
                     }}
                     className={cn(
-                      "px-3.5 py-2 rounded-xl font-extrabold text-xs transition flex items-center gap-1.5",
+                      "px-3.5 py-2 m-2 rounded-xl font-extrabold text-xs transition flex items-center gap-1.5 cursor-pointer",
                       activeToolTab === "calc"
-                        ? "bg-indigo-600 text-white shadow-md"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+                        ? "bg-indigo-600 text-white shadow-xs"
+                        : "border border-slate-200/80 bg-white/80 text-slate-700 hover:bg-white dark:border-slate-700/80 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-800"
                     )}
                   >
                     <Sliders size={14} /> 1. Định Biên Headcount
@@ -1064,10 +950,10 @@ export const CSKHProjectDetails: React.FC = () => {
                       setActiveToolTab("qa");
                     }}
                     className={cn(
-                      "px-3.5 py-2 rounded-xl font-extrabold text-xs transition flex items-center gap-1.5",
+                      "px-3.5 py-2 m-2 rounded-xl font-extrabold text-xs transition flex items-center gap-1.5 cursor-pointer",
                       activeToolTab === "qa"
-                        ? "bg-indigo-600 text-white shadow-md"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+                        ? "bg-indigo-600 text-white shadow-xs"
+                        : "border border-slate-200/80 bg-white/80 text-slate-700 hover:bg-white dark:border-slate-700/80 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-800"
                     )}
                   >
                     <CheckSquare size={14} /> 2. Chấm Điểm QA
@@ -1078,10 +964,10 @@ export const CSKHProjectDetails: React.FC = () => {
                       setActiveToolTab("csat");
                     }}
                     className={cn(
-                      "px-3.5 py-2 rounded-xl font-extrabold text-xs transition flex items-center gap-1.5",
+                      "px-3.5 py-2 m-2 rounded-xl font-extrabold text-xs transition flex items-center gap-1.5 cursor-pointer",
                       activeToolTab === "csat"
-                        ? "bg-indigo-600 text-white shadow-md"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+                        ? "bg-indigo-600 text-white shadow-xs"
+                        : "border border-slate-200/80 bg-white/80 text-slate-700 hover:bg-white dark:border-slate-700/80 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-800"
                     )}
                   >
                     <Heart size={14} /> 3. Đo Lường CSAT / NPS
@@ -1266,7 +1152,7 @@ export const CSKHProjectDetails: React.FC = () => {
                 {/* TAB 3: CSAT & NPS */}
                 {activeToolTab === "csat" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/10 space-y-4">
+                    <div className="flex h-full flex-col justify-between p-5 rounded-2xl border border-amber-500/20 bg-amber-500/10 space-y-4">
                       <div className="flex items-center space-x-1.5 font-extrabold text-amber-900 dark:text-amber-200 text-xs border-b border-amber-500/20 pb-2">
                         <Star size={16} />
                         <span>CHỈ SỐ HÀI LÒNG KHÁCH HÀNG (CSAT)</span>
@@ -1278,7 +1164,7 @@ export const CSKHProjectDetails: React.FC = () => {
                             type="number"
                             value={csatGood}
                             onChange={(e) => setCsatGood(Math.max(0, parseInt(e.target.value) || 0))}
-                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white"
                           />
                         </div>
                         <div>
@@ -1287,7 +1173,7 @@ export const CSKHProjectDetails: React.FC = () => {
                             type="number"
                             value={csatTotal}
                             onChange={(e) => setCsatTotal(Math.max(1, parseInt(e.target.value) || 0))}
-                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white"
                           />
                         </div>
                         <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-800/80 text-center">
@@ -1298,7 +1184,7 @@ export const CSKHProjectDetails: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="p-5 rounded-2xl border border-indigo-500/20 bg-indigo-500/10 space-y-4">
+                    <div className="flex h-full flex-col justify-between p-5 rounded-2xl border border-indigo-500/20 bg-indigo-500/10 space-y-4">
                       <div className="flex items-center space-x-1.5 font-extrabold text-indigo-900 dark:text-indigo-200 text-xs border-b border-indigo-500/20 pb-2">
                         <Heart size={16} />
                         <span>NET PROMOTER SCORE (NPS)</span>
@@ -1311,7 +1197,7 @@ export const CSKHProjectDetails: React.FC = () => {
                               type="number"
                               value={npsPromoters}
                               onChange={(e) => setNpsPromoters(Math.max(0, parseInt(e.target.value) || 0))}
-                              className="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                              className="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white"
                             />
                           </div>
                           <div>
@@ -1320,7 +1206,7 @@ export const CSKHProjectDetails: React.FC = () => {
                               type="number"
                               value={npsPassives}
                               onChange={(e) => setNpsPassives(Math.max(0, parseInt(e.target.value) || 0))}
-                              className="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                              className="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white"
                             />
                           </div>
                           <div>
@@ -1329,7 +1215,7 @@ export const CSKHProjectDetails: React.FC = () => {
                               type="number"
                               value={npsDetractors}
                               onChange={(e) => setNpsDetractors(Math.max(0, parseInt(e.target.value) || 0))}
-                              className="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                              className="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white"
                             />
                           </div>
                         </div>
@@ -1342,16 +1228,12 @@ export const CSKHProjectDetails: React.FC = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            )}
+            </div>
           </div>
 
           {/* SECTION 09 */}
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900">
-            <button
-              onClick={() => toggleSection("09")}
-              className="flex w-full cursor-pointer items-center justify-between bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 p-4 text-left text-white"
-            >
+          <div className="flex flex-col overflow-hidden rounded-[20px] border-2 border-emerald-600 bg-white shadow-md dark:bg-slate-900 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="flex w-full items-center justify-between bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 p-4 text-left text-white">
               <div className="flex items-center space-x-3">
                 <div className="rounded-xl bg-white/20 p-2 text-white">
                   <Trophy size={18} />
@@ -1360,15 +1242,8 @@ export const CSKHProjectDetails: React.FC = () => {
                   09 · KẾT QUẢ ĐẠT ĐƯỢC CỦA DỰ ÁN
                 </h4>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded-lg bg-white/20 px-2.5 py-0.5 text-[9px] font-black uppercase">
-                  {openSections["09"] ? "Đang mở" : "Thu gọn"}
-                </span>
-                <ChevronDown size={16} className={cn("transition-transform duration-200", openSections["09"] && "rotate-180")} />
-              </div>
-            </button>
-            {openSections["09"] && (
-              <div className="border-t border-slate-100 p-5 dark:border-slate-800 bg-emerald-500/5 space-y-4">
+            </div>
+            <div className="flex-1 p-5 bg-emerald-500/5 space-y-4">
                 <div className="overflow-x-auto rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-950">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -1425,8 +1300,7 @@ export const CSKHProjectDetails: React.FC = () => {
                     In Báo Cáo Kết Quả
                   </button>
                 </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -1452,7 +1326,7 @@ export const CSKHProjectDetails: React.FC = () => {
                 playUiSound("click");
                 setIsSimOpen(true);
               }}
-              className="cursor-pointer px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-extrabold shadow-lg transition transform hover:scale-105 active:scale-95 flex items-center space-x-2 text-xs"
+              className="cursor-pointer px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-extrabold shadow-lg flex items-center space-x-2 text-xs"
             >
               <Bot size={16} />
               <span>Thử Nghiệm Mô Phỏng CSKH</span>
@@ -1462,136 +1336,128 @@ export const CSKHProjectDetails: React.FC = () => {
       </section>
 
       {/* CSKH SIMULATION MODAL */}
-      <AnimatePresence>
-        {isSimOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsSimOpen(false)}
-              className="absolute inset-0 bg-slate-950/70 backdrop-blur-md"
-            />
+      {isSimOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            onClick={() => setIsSimOpen(false)}
+            className="absolute inset-0 bg-slate-950/70 backdrop-blur-md"
+          />
 
-            {/* Modal Box */}
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/40 bg-white/90 p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900/90 backdrop-blur-xl max-h-[90vh] overflow-y-auto space-y-6"
-            >
-              <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 dark:border-slate-700/60">
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white shadow">
-                    <Bot size={22} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Mô Phỏng Xử Lý Tình Huống CSKH</h3>
-                    <p className="text-xs text-slate-500">Kiểm tra ứng xử Customer-Centric &amp; Khung năng lực tuyến đầu</p>
-                  </div>
+          {/* Modal Box */}
+          <div
+            className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/40 bg-white/90 p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900/90 backdrop-blur-xl max-h-[90vh] overflow-y-auto space-y-6"
+          >
+            <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 dark:border-slate-700/60">
+              <div className="flex items-center space-x-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white shadow">
+                  <Bot size={22} />
                 </div>
-                <button
-                  onClick={() => setIsSimOpen(false)}
-                  className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
-                >
-                  <X size={20} />
-                </button>
+                <div className="text-left">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Mô Phỏng Xử Lý Tình Huống CSKH</h3>
+                  <p className="text-xs text-slate-500">Kiểm tra ứng xử Customer-Centric &amp; Khung năng lực tuyến đầu</p>
+                </div>
               </div>
+              <button
+                onClick={() => setIsSimOpen(false)}
+                className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-              {selectedSimOption === null ? (
-                <div className="space-y-5 text-left">
-                  <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 space-y-2">
-                    <span className="flex items-center gap-1.5 text-xs font-extrabold text-red-600 dark:text-red-400 uppercase">
-                      <AlertTriangle size={14} /> Tình huống khiếu nại khách hàng:
-                    </span>
-                    <p className="text-slate-800 dark:text-slate-200 font-bold text-xs sm:text-sm">
-                      &quot;Đơn hàng của tôi bị trễ 3 ngày so với cam kết, sản phẩm nhận được còn bị móp góc! Tôi muốn hủy dịch vụ và yêu cầu hoàn tiền ngay lập tức!&quot;
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <p className="text-xs font-extrabold text-slate-500 uppercase">Hãy chọn phương án phản hồi của tư vấn viên:</p>
-
-                    <button
-                      onClick={() => {
-                        playUiSound("click");
-                        setSelectedSimOption(1);
-                      }}
-                      className="w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-indigo-500 transition space-y-1 block"
-                    >
-                      <div className="font-bold text-slate-900 dark:text-white text-xs">
-                        Phương án A: &quot;Dạ đây là lỗi bên vận chuyển chứ không phải bên em. Anh/chị vui lòng tự gọi shipper nhé!&quot;
-                      </div>
-                      <p className="text-[11px] text-slate-500">Hành vi: Đổ lỗi cho đối tác vận chuyển, thoái thác trách nhiệm.</p>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        playUiSound("click");
-                        setSelectedSimOption(2);
-                      }}
-                      className="w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-indigo-500 transition space-y-1 block"
-                    >
-                      <div className="font-bold text-slate-950 dark:text-white text-xs">
-                        Phương án B: &quot;Dạ em rất hiểu sự thất vọng của anh/chị. Cho phép em gửi lời xin lỗi chân thành! Em xin phép gửi đổi sản phẩm mới ngay hôm nay kèm voucher đền bù 20% ạ.&quot;
-                      </div>
-                      <p className="text-[11px] text-slate-500">Hành vi: Đồng cảm sâu sắc, chủ động trao quyền đền bù tức thì tuyến đầu.</p>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        playUiSound("click");
-                        setSelectedSimOption(3);
-                      }}
-                      className="w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-indigo-500 transition space-y-1 block"
-                    >
-                      <div className="font-bold text-slate-900 dark:text-white text-xs">
-                        Phương án C: &quot;Anh/chị vui lòng viết email khiếu nại gửi bộ phận kỹ thuật, bên em sẽ xem xét phản hồi trong vòng 7 ngày làm việc.&quot;
-                      </div>
-                      <p className="text-[11px] text-slate-500">Hành vi: Xử lý quan liêu theo quy trình chậm chạp, gây ức chế thêm.</p>
-                    </button>
-                  </div>
+            {selectedSimOption === null ? (
+              <div className="space-y-5 text-left">
+                <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 space-y-2">
+                  <span className="flex items-center gap-1.5 text-xs font-extrabold text-red-600 dark:text-red-400 uppercase">
+                    <AlertTriangle size={14} /> Tình huống khiếu nại khách hàng:
+                  </span>
+                  <p className="text-slate-800 dark:text-slate-200 font-bold text-xs sm:text-sm">
+                    &quot;Đơn hàng của tôi bị trễ 3 ngày so với cam kết, sản phẩm nhận được còn bị móp góc! Tôi muốn hủy dịch vụ và yêu cầu hoàn tiền ngay lập tức!&quot;
+                  </p>
                 </div>
-              ) : (
-                <div className="space-y-4 text-left">
-                  {selectedSimOption === 2 ? (
-                    <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5 space-y-3">
-                      <span className="flex items-center gap-1.5 text-xs font-black text-emerald-800 dark:text-emerald-300 uppercase">
-                        <CheckCircle size={16} /> XỬ LÝ CHUẨN CUSTOMER-CENTRIC (+100 ĐIỂM QA)
-                      </span>
-                      <p className="text-xs text-emerald-900 dark:text-emerald-200 leading-relaxed font-semibold">
-                        Tuyệt vời! Bạn đã áp dụng đúng triết lý đồng cảm sâu sắc kết hợp cơ chế Trao quyền tuyến đầu bồi thường tức thì. Khách hàng cảm thấy bức xúc được giải tỏa ngay lập tức, chuyển hóa khiếu nại căng thẳng thành lòng trung thành lâu bền với thương hiệu!
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-5 space-y-3">
-                      <span className="flex items-center gap-1.5 text-xs font-black text-red-800 dark:text-red-300 uppercase">
-                        <ShieldAlert size={16} /> XỬ LÝ SAI QUY CHUẨN (0 ĐIỂM QA - FATAL)
-                      </span>
-                      <p className="text-xs text-red-900 dark:text-red-200 leading-relaxed">
-                        {selectedSimOption === 1
-                          ? "Hành vi đổ lỗi cho đối tác vận chuyển shipper làm khách hàng phẫn nộ đỉnh điểm, dẫn tới khủng hoảng khiếu nại leo thang trên mạng xã hội."
-                          : "Quy trình giải quyết hành chính trễ nải 7 ngày của bạn gây ra tỷ lệ rời bỏ dịch vụ (Churn Rate) tăng vọt, phá hỏng uy tín thương hiệu."}
-                      </p>
-                    </div>
-                  )}
+
+                <div className="space-y-3">
+                  <p className="text-xs font-extrabold text-slate-500 uppercase">Hãy chọn phương án phản hồi của tư vấn viên:</p>
 
                   <button
                     onClick={() => {
                       playUiSound("click");
-                      setSelectedSimOption(null);
+                      setSelectedSimOption(1);
                     }}
-                    className="cursor-pointer rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white dark:bg-white dark:text-slate-900"
+                    className="w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-indigo-500 space-y-1 block"
                   >
-                    Thử Lại Phương Án Khác
+                    <div className="font-bold text-slate-900 dark:text-white text-xs">
+                      Phương án A: &quot;Dạ đây là lỗi bên vận chuyển chứ không phải bên em. Anh/chị vui lòng tự gọi shipper nhé!&quot;
+                    </div>
+                    <p className="text-[11px] text-slate-500">Hành vi: Đổ lỗi cho đối tác vận chuyển, thoái thác trách nhiệm.</p>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      playUiSound("click");
+                      setSelectedSimOption(2);
+                    }}
+                    className="w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-indigo-500 space-y-1 block"
+                  >
+                    <div className="font-bold text-slate-950 dark:text-white text-xs">
+                      Phương án B: &quot;Dạ em rất hiểu sự thất vọng của anh/chị. Cho phép em gửi lời xin lỗi chân thành! Em xin phép gửi đổi sản phẩm mới ngay hôm nay kèm voucher đền bù 20% ạ.&quot;
+                    </div>
+                    <p className="text-[11px] text-slate-500">Hành vi: Đồng cảm sâu sắc, chủ động trao quyền đền bù tức thì tuyến đầu.</p>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      playUiSound("click");
+                      setSelectedSimOption(3);
+                    }}
+                    className="w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-indigo-500 space-y-1 block"
+                  >
+                    <div className="font-bold text-slate-900 dark:text-white text-xs">
+                      Phương án C: &quot;Anh/chị vui lòng viết email khiếu nại gửi bộ phận kỹ thuật, bên em sẽ xem xét phản hồi trong vòng 7 ngày làm việc.&quot;
+                    </div>
+                    <p className="text-[11px] text-slate-500">Hành vi: Xử lý quan liêu theo quy trình chậm chạp, gây ức chế thêm.</p>
                   </button>
                 </div>
-              )}
-            </motion.div>
+              </div>
+            ) : (
+              <div className="space-y-4 text-left">
+                {selectedSimOption === 2 ? (
+                  <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5 space-y-3">
+                    <span className="flex items-center gap-1.5 text-xs font-black text-emerald-800 dark:text-emerald-300 uppercase">
+                      <CheckCircle size={16} /> XỬ LÝ CHUẨN CUSTOMER-CENTRIC (+100 ĐIỂM QA)
+                    </span>
+                    <p className="text-xs text-emerald-900 dark:text-emerald-200 leading-relaxed font-semibold">
+                      Tuyệt vời! Bạn đã áp dụng đúng triết lý đồng cảm sâu sắc kết hợp cơ chế Trao quyền tuyến đầu bồi thường tức thì. Khách hàng cảm thấy bức xúc được giải tỏa ngay lập tức, chuyển hóa khiếu nại căng thẳng thành lòng trung thành lâu bền với thương hiệu!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-5 space-y-3">
+                    <span className="flex items-center gap-1.5 text-xs font-black text-red-800 dark:text-red-300 uppercase">
+                      <ShieldAlert size={16} /> XỬ LÝ SAI QUY CHUẨN (0 ĐIỂM QA - FATAL)
+                    </span>
+                    <p className="text-xs text-red-900 dark:text-red-200 leading-relaxed">
+                      {selectedSimOption === 1
+                        ? "Hành vi đổ lỗi cho đối tác vận chuyển shipper làm khách hàng phẫn nộ đỉnh điểm, dẫn tới khủng hoảng khiếu nại leo thang trên mạng xã hội."
+                        : "Quy trình giải quyết hành chính trễ nải 7 ngày của bạn gây ra tỷ lệ rời bỏ dịch vụ (Churn Rate) tăng vọt, phá hỏng uy tín thương hiệu."}
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => {
+                    playUiSound("click");
+                    setSelectedSimOption(null);
+                  }}
+                  className="cursor-pointer rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white dark:bg-white dark:text-slate-900"
+                >
+                  Thử Lại Phương Án Khác
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 };
