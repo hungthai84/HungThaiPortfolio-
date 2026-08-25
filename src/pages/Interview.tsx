@@ -162,7 +162,6 @@ export function Interview() {
           : "Sample video answering core CX/CS and operational questions."
       }
       icon={Video}
-      hideToolbar={true}
     >
       <div className="relative w-full flex flex-col gap-[10px]">
         {/* BLUR BACKDROP WHEN CARD IS EXPANDED TO 1.1x */}

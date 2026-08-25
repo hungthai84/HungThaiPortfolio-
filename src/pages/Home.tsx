@@ -325,26 +325,26 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
         data-name="Nội dung giới thiệu Nguyễn Hùng Thái"
         style={{ width: "350px", height: "200px" }}
         className={cn(
-          "group magic-card glass-glow-card relative z-30 flex w-[350px] h-[200px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-white/70 dark:border-white/20 bg-white/50 dark:bg-slate-900/50 !p-[15px] !m-0 text-[var(--text-primary)] shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:border-indigo-400/80 hover:shadow-[0_20px_45px_rgba(99,102,241,0.25)]",
+          "group magic-card glass-card relative z-30 flex w-[350px] h-[200px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border-2 border-solid border-[var(--border)] bg-[var(--card)] !p-[15px] !m-0 text-[var(--text-primary)] shadow-xl backdrop-blur-none transition-all duration-300 hover:border-indigo-500/40 hover:shadow-2xl",
           isMobilePos ? "max-w-[calc(100vw-32px)]" : ""
         )}
       >
-        {/* Soft multi-chromatic background glow & watermark */}
-        <div className="pointer-events-none absolute -inset-1 bg-gradient-to-r from-violet-500/20 via-cyan-500/20 to-pink-500/20 opacity-40 blur-xl transition-opacity duration-700 group-hover:opacity-100" />
+        {/* Soft background glow & watermark */}
+        <div className="pointer-events-none absolute -inset-1 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-100" />
         <div className="pointer-events-none absolute -right-4 -bottom-4 text-indigo-500/10 dark:text-indigo-400/15 transition-transform duration-500 group-hover:scale-110">
           <Sparkles size={100} />
         </div>
 
-        <div className="relative flex items-center justify-between gap-2 border-b border-white/30 dark:border-white/10 pb-2.5">
+        <div className="relative flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2.5">
           <div className="flex min-w-0 items-center gap-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/60 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-md dark:border-white/20">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-200/80 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-md dark:border-white/20">
               <Sparkles size={18} className="animate-pulse" />
             </div>
             <div className="flex min-w-0 flex-col">
               <span className="text-[10px] font-black tracking-widest text-[var(--muted)] uppercase">
                 {language === "vi" ? "Xin chào! Tôi là" : "Hello! I am"}
               </span>
-              <span className="truncate bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-[25px] font-black leading-tight text-transparent dark:from-indigo-300 dark:via-purple-300 dark:to-pink-300">
+              <span className="truncate bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-[25px] font-black leading-tight text-transparent dark:from-indigo-400 dark:to-purple-400">
                 Nguyễn Hùng Thái
               </span>
             </div>
@@ -352,12 +352,12 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
         </div>
 
         <div className="relative space-y-1 py-1 text-left">
-          <p className="text-[13px] leading-snug font-bold text-slate-800 dark:text-slate-100">
+          <p className="text-[13px] leading-snug font-bold text-[var(--text-primary)]">
             {language === "vi"
               ? "Chào mừng bạn đến với Portfolio của tôi ! 👋"
               : "Welcome to my Portfolio ! 👋"}
           </p>
-          <p className="text-[12px] leading-snug font-medium text-slate-600 dark:text-slate-300">
+          <p className="text-[12px] leading-snug font-medium text-[var(--text-secondary)]">
             {language === "vi"
               ? "Chúc bạn một ngày làm việc tràn đầy năng lượng !"
               : "Wishing you an energetic and productive day !"}
@@ -365,8 +365,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
         </div>
 
         {/* ACTION BUTTONS */}
-        <div className="relative flex flex-col gap-2 border-t border-white/30 dark:border-white/10 pt-2.5">
-          <nav className="custom-scrollbar flex w-full items-center justify-center gap-2">
+        <div className="relative flex flex-col gap-2 border-t border-[var(--border)] pt-2.5">
             {/* Unified Premium Play/Pause Video Button matching Interview style */}
             <motion.button
               whileHover={{ scale: 1.03 }}
@@ -387,8 +386,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                   handlePlayIntroVideo();
                 }
               }}
-              className="flex w-[281px] h-[51px] mx-auto cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-white/60 dark:border-white/20 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_4px_25px_rgba(99,102,241,0.5)] backdrop-blur-xl transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
-              style={{ width: '281px', height: '51px' }}
+              className="flex w-full h-[51px] cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-indigo-400/80 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_0_25px_rgba(99,102,241,0.6)] backdrop-blur-none transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
               title={
                 isIntro
                   ? language === "vi"
@@ -409,7 +407,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                   />
                 )}
               </div>
-              <span>
+              <span className="truncate flex-1 text-center">
                 {isIntro
                   ? language === "vi"
                     ? "Dừng video giới thiệu"
@@ -472,7 +470,6 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                 )}
               </div>
             </motion.button>
-          </nav>
         </div>
       </motion.div>
     );
@@ -587,11 +584,48 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
       }
     >
       <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 h-[705px] p-0">
+      {/* FLOATING DRAGGABLE RESPONSIVE TOGGLE BUTTON (CIRCULAR GLASS) - ON TOP OF ALL LAYERS */}
+      <motion.div
+        drag
+        dragMomentum={false}
+        dragElastic={0.08}
+        whileDrag={{ scale: 1.1, cursor: "grabbing" }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.94 }}
+        className="fixed top-6 left-6 z-[999999] flex h-12 w-12 cursor-grab items-center justify-center rounded-full border border-white/40 bg-white/75 p-0 text-slate-800 shadow-[0_8px_30px_rgba(0,0,0,0.22)] backdrop-blur-none transition-shadow select-none hover:shadow-amber-500/30 active:cursor-grabbing dark:border-white/15 dark:bg-slate-900/75 dark:text-slate-100"
+        title={
+          language === "vi"
+            ? isResponsive
+              ? "Giao diện: Co giãn (Fluid) - Nhấn để chuyển Cố định, Kéo để di chuyển"
+              : "Giao diện: Cố định (Fixed) - Nhấn để chuyển Co giãn, Kéo để di chuyển"
+            : isResponsive
+              ? "Layout: Fluid - Click to toggle, Drag to move"
+              : "Layout: Fixed - Click to toggle, Drag to move"
+        }
+      >
+        <button
+          id="sidebar-toggle-responsive-btn"
+          data-name="Nút co giãn thiết bị nổi (Floating Toggle Responsive Button)"
+          onClick={(e) => {
+            e.stopPropagation();
+            playUiSound("toggle");
+            window.dispatchEvent(new CustomEvent("app-toggle-responsive"));
+          }}
+          className="flex h-full w-full cursor-pointer items-center justify-center rounded-full text-amber-600 transition-colors hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300"
+        >
+          {isResponsive ? (
+            <Smartphone size={20} className="shrink-0 transition-transform hover:scale-110" />
+          ) : (
+            <Monitor size={20} className="shrink-0 transition-transform hover:scale-110" />
+          )}
+        </button>
+      </motion.div>
       {/* Top Right Stacked Interactive Action Cluster (Ngôn ngữ xếp chồng Giao diện xếp chồng Hình nền) */}
       <TopNavActionStack
         currentThemeMode={currentThemeMode}
         onToggleThemeMode={handleToggleThemeMode}
         onNavigate={onNavigate}
+        onOpenColorPicker={() => showToast("Color Picker coming soon!")}
         className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[60]"
       />
 
@@ -615,7 +649,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                   true,
                 )
               }
-              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/60 dark:border-white/20 bg-white/20 dark:bg-slate-900/40 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl transition-all hover:scale-110 hover:bg-white/30 dark:hover:bg-slate-900/60 active:scale-95"
+              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-slate-900/40 text-white shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-none transition-all hover:scale-110 hover:bg-slate-900/60 active:scale-95"
               title={
                 videoState === "idle_1"
                   ? "Chuyển sang Màn hình 2"
@@ -659,7 +693,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                   data-name="Nút hủy video đang phát (Cancel Intro Video Button)"
                   type="button"
                   onClick={handleCancelIntro}
-                  className="flex w-[281px] h-[51px] cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-white/60 dark:border-white/20 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_4px_25px_rgba(99,102,241,0.5)] backdrop-blur-xl transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
+                  className="flex w-[281px] h-[51px] cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-indigo-400/80 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_0_25px_rgba(99,102,241,0.6)] backdrop-blur-none transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
                   style={{ width: "281px", height: "51px" }}
                   title={language === "vi" ? "Dừng video giới thiệu" : "Stop Intro Video"}
                 >

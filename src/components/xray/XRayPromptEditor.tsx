@@ -41,7 +41,6 @@ import {
   FileCode,
   Save,
   FolderTree,
-  Share2,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { DomTreeViewer } from "./DomTreeViewer";
@@ -272,7 +271,6 @@ export function XRayPromptEditor() {
   const [selectRect, setSelectRect] = useState<DOMRect | null>(null);
   const [stackedLayers, setStackedLayers] = useState<HTMLElement[]>([]);
   const [layerHoverRect, setLayerHoverRect] = useState<DOMRect | null>(null);
-  const [isStackedWarningExpanded, setIsStackedWarningExpanded] = useState(false);
 
   useEffect(() => {
     if (selectedElement && isPanelOpen) {
@@ -1776,114 +1774,18 @@ export function XRayPromptEditor() {
                   <div className="animate-fadeIn space-y-4">
                     {selectedElement ? (
                       <>
-                        {/* Red Warning Card: Overlapping Stacked Layers Detection (Collapsed by default) */}
+                        {/* Red Warning Button: Overlapping Stacked Layers Detection */}
                         {stackedLayers.length >= 2 && (
-                          <div className="rounded-xl border border-red-500/80 bg-red-50/90 p-3 sm:p-3.5 shadow-md dark:border-red-500/80 dark:bg-red-950/40 text-red-900 dark:text-red-200 animate-fadeIn space-y-2">
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
-                                <h4 className="text-xs font-black uppercase tracking-wide text-red-700 dark:text-red-300 truncate">
-                                  ⚠️ Cảnh báo: Phát hiện {stackedLayers.length} lớp phần tử xếp chồng
-                                </h4>
-                              </div>
-                              <button
+                          <div className="flex items-center gap-2 mb-2 p-2 rounded-lg bg-red-50 border border-red-200">
+                             <button
                                 type="button"
-                                onClick={() => setIsStackedWarningExpanded(!isStackedWarningExpanded)}
-                                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-red-300 bg-white/95 px-2.5 py-1 text-[11px] font-bold text-red-700 shadow-2xs hover:bg-red-100 transition-colors cursor-pointer dark:border-red-800 dark:bg-slate-900 dark:text-red-300 dark:hover:bg-red-950"
-                              >
-                                <span>{isStackedWarningExpanded ? "Thu gọn" : `Xem ${stackedLayers.length} lớp`}</span>
-                                {isStackedWarningExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                              </button>
-                            </div>
-
-                            {isStackedWarningExpanded && (
-                              <div className="space-y-3 pt-2 border-t border-red-200 dark:border-red-800/60 animate-fadeIn">
-                                <p className="text-[11px] font-medium leading-relaxed text-red-800/90 dark:text-red-300/90">
-                                  Vị trí nhấp chuột có nhiều lớp phần tử nằm đè lên nhau (từ lớp trên cùng xuống lớp dưới). Bấm trực tiếp vào từng layer dưới đây để chuyển đổi:
-                                </p>
-
-                                {/* List of stacked layers */}
-                                <div className="grid grid-cols-1 gap-1.5">
-                                  {stackedLayers.map((layerEl, idx) => {
-                                    const isCurrentSelected = layerEl === selectedElement;
-                                    const tag = layerEl.tagName.toLowerCase();
-                                    const id = layerEl.id ? `#${layerEl.id}` : "";
-                                    const primaryClass = typeof layerEl.className === "string" && layerEl.className.trim()
-                                      ? `.${layerEl.className.trim().split(/\s+/)[0]}`
-                                      : "";
-                                    const isTopLayer = idx === 0;
-                                    const isBottomLayer = idx === stackedLayers.length - 1;
-                                    const textSample = layerEl.textContent?.trim().slice(0, 32) || "";
-                                    const rect = layerEl.getBoundingClientRect();
-                                    
-                                    return (
-                                      <button
-                                        key={idx}
-                                        type="button"
-                                        onClick={() => {
-                                          setSelectedElement(layerEl);
-                                          populateInspectorFields(layerEl);
-                                          autoDetectAction(layerEl);
-                                          showToast(`✓ Đã chuyển sang layer: <${tag}> ${id}`);
-                                        }}
-                                        onMouseEnter={() => setLayerHoverRect(rect)}
-                                        onMouseLeave={() => setLayerHoverRect(null)}
-                                        className={cn(
-                                          "flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-xs font-bold transition-all cursor-pointer",
-                                          isCurrentSelected
-                                            ? "border-red-600 bg-red-600 text-white shadow-sm ring-2 ring-red-400"
-                                            : "border-red-300 bg-white/90 text-slate-800 hover:border-red-500 hover:bg-red-100/70 dark:border-red-800/60 dark:bg-slate-900/90 dark:text-slate-200 dark:hover:bg-red-950/60"
-                                        )}
-                                      >
-                                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                                          <span className={cn(
-                                            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black",
-                                            isCurrentSelected
-                                              ? "bg-white text-red-600"
-                                              : "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
-                                          )}>
-                                            {idx + 1}
-                                          </span>
-                                          
-                                          <div className="min-w-0 flex-1 truncate">
-                                            <span className="font-mono font-bold">
-                                              &lt;{tag}&gt;
-                                            </span>
-                                            {id && <span className={cn("font-mono ml-1", isCurrentSelected ? "text-amber-200" : "text-amber-600 dark:text-amber-400")}>{id}</span>}
-                                            {primaryClass && <span className="font-mono opacity-70 ml-1">{primaryClass}</span>}
-                                            {textSample && <span className="text-[11px] font-normal opacity-80 ml-2 truncate">"{textSample}"</span>}
-                                          </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-1.5 shrink-0">
-                                          {isTopLayer && (
-                                            <span className={cn(
-                                              "rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase",
-                                              isCurrentSelected ? "bg-white/20 text-white" : "bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                            )}>
-                                              Lớp trên cùng
-                                            </span>
-                                          )}
-                                          {isBottomLayer && (
-                                            <span className={cn(
-                                              "rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase",
-                                              isCurrentSelected ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                                            )}>
-                                              Lớp đáy
-                                            </span>
-                                          )}
-                                          {isCurrentSelected && (
-                                            <span className="flex items-center gap-1 rounded bg-white px-2 py-0.5 text-[10px] font-black text-red-600 shadow-2xs">
-                                              <Check size={11} /> Đang chọn
-                                            </span>
-                                          )}
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
+                                onClick={() => { /* Open layer selection modal/menu */ }}
+                                className="flex items-center gap-2 rounded-lg border-2 border-red-500 bg-red-50 px-4 py-2 text-xs font-black text-red-700 shadow-sm animate-pulse hover:bg-red-100"
+                             >
+                               <AlertTriangle className="h-4 w-4" />
+                               Cảnh báo: {stackedLayers.length} lớp chồng chéo
+                             </button>
+                             <span className="text-[11px] text-slate-500 italic">Gần đối tượng</span>
                           </div>
                         )}
 
@@ -2002,25 +1904,21 @@ export function XRayPromptEditor() {
                           )}
                         </div>
 
-                        {/* 2. Thuộc Tính & Hiệu Ứng (Modular Panel with Active Effects) */}
-                        <div className="space-y-3 rounded-xl border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
-                          <div className="flex items-center justify-between">
+                        {/* 2. Thuộc Tính & Hiệu Ứng (Modular Panel with Active Effects on Side) */}
+                        <div className="rounded-xl border border-slate-200/50 bg-white/50 p-4 dark:border-white/5 dark:bg-[#151921]/50">
+                          <button
+                            onClick={() => setIsPropOpen(!isPropOpen)}
+                            className="flex w-full items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200"
+                          >
                             <div className="flex items-center gap-2">
-                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">2</span>
-                              <label className="text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200">
-                                2. Thuộc tính phần tử &amp; Hiệu ứng đang có (Active Effects)
-                              </label>
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">2</span>
+                              2. Thuộc tính & Hiệu ứng
                             </div>
-                            <button
-                              onClick={() => setIsPropOpen(!isPropOpen)}
-                              className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                            >
-                              {isPropOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                            </button>
-                          </div>
-
+                            {isPropOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                          </button>
+                          
                           {isPropOpen && (
-                            <div className="animate-fadeIn pt-1">
+                            <div className="mt-4">
                               <ElementPropertiesPanel
                                 selectedElement={selectedElement}
                                 editTagText={editTagText}
@@ -2122,32 +2020,18 @@ export function XRayPromptEditor() {
 
                           {isReqOpen && (
                             <div className="space-y-3.5 animate-fadeIn pt-1">
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                {[
-                                  { id: "chinh-sua", label: "Chỉnh sửa", icon: Edit3, color: "text-blue-500" },
-                                  { id: "xoa-doi-tuong", label: "Xóa phần tử", icon: Trash2, color: "text-red-500" },
-                                  { id: "ap-dung-mau", label: "Áp dụng mẫu", icon: Sparkles, color: "text-purple-500" },
-                                  { id: "dung-ap-dung-cho", label: "Áp dụng cho...", icon: Share2, color: "text-emerald-500" },
-                                ].map((item) => {
-                                  const IconComp = item.icon;
-                                  const isSelected = requirementOption === item.id;
-                                  return (
-                                    <button
-                                      key={item.id}
-                                      type="button"
-                                      onClick={() => setRequirementOption(item.id)}
-                                      className={cn(
-                                        "flex flex-col items-center justify-center gap-1.5 rounded-xl border p-2.5 text-xs font-bold transition-all cursor-pointer",
-                                        isSelected
-                                          ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                                          : "border-slate-200/80 bg-slate-50/70 text-slate-700 hover:bg-white hover:border-slate-300 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-300 dark:hover:bg-[#181D24]"
-                                      )}
-                                    >
-                                      <IconComp size={16} className={isSelected ? "text-white" : item.color} />
-                                      <span className="text-[11px] leading-none font-semibold">{item.label}</span>
-                                    </button>
-                                  );
-                                })}
+                              <div className="relative">
+                                <select
+                                  value={requirementOption}
+                                  onChange={(e) => setRequirementOption(e.target.value)}
+                                  className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200/80 bg-slate-50 py-2.5 pr-8 pl-3.5 text-xs font-bold text-slate-700 outline-none transition-all hover:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-200 dark:hover:bg-[#181D24]"
+                                >
+                                  <option value="chinh-sua">1. Chỉnh sửa (Mặc định)</option>
+                                  <option value="xoa-doi-tuong">2. Xóa đối tượng này</option>
+                                  <option value="ap-dung-mau">3. Áp dụng mẫu</option>
+                                  <option value="dung-ap-dung-cho">4. Dùng đối tượng này áp dụng cho</option>
+                                </select>
+                                <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-slate-400" />
                               </div>
 
                               {requirementOption === "chinh-sua" && (
@@ -2312,10 +2196,20 @@ export function XRayPromptEditor() {
                                     <span>Tạo Prompt</span>
                                   </button>
                                 ) : (
-                                  <div className="flex flex-1 gap-2">
+                                <div className="flex flex-1 gap-2">
                                     <button
-                                      onClick={() => setGeneratedPrompt("")}
-                                      className="cursor-pointer flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs font-bold text-slate-600 hover:bg-slate-100 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"
+                                      onClick={handleCopyPrompt}
+                                      className="cursor-pointer flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-slate-800"
+                                    >
+                                      <Copy size={14} />
+                                      <span>Copy Prompt</span>
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setGeneratedPrompt("");
+                                        handleGenerate();
+                                      }}
+                                      className="cursor-pointer flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"
                                       title="Tạo lại"
                                     >
                                       <RotateCcw size={14} />
@@ -2339,10 +2233,20 @@ export function XRayPromptEditor() {
                                     <span className="text-[11px] font-bold text-blue-900 dark:text-blue-300">Nội dung prompt xem trước:</span>
                                     <button
                                       onClick={handleCopyPrompt}
-                                      className="flex cursor-pointer items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-2xs hover:bg-blue-700 transition-all"
+                                      className="flex cursor-pointer items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white shadow-2xs hover:bg-slate-800 transition-all"
                                     >
                                       <Copy size={12} />
-                                      <span>Copy Prompt</span>
+                                      <span>Copy</span>
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setGeneratedPrompt("");
+                                        handleGenerate();
+                                      }}
+                                      className="flex cursor-pointer items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-200 transition-all dark:bg-white/10 dark:text-slate-300"
+                                    >
+                                      <RotateCcw size={12} />
+                                      <span>Tạo lại</span>
                                     </button>
                                   </div>
                                   <pre className="custom-scrollbar max-h-28 overflow-y-auto rounded-lg bg-white/80 p-2.5 text-xs font-mono text-slate-800 dark:bg-black/40 dark:text-slate-200 whitespace-pre-wrap">

@@ -51,14 +51,8 @@ export function Projects() {
   const isVi = language === "vi";
 
   // 1. Unified State & Hooks Extraction
-  const {
-    filterGroup,
-    setFilterGroup,
-    filterPhase,
-    setFilterPhase,
-    filterTag,
-    resetFilters,
-  } = useProjectFilter();
+  const { filterGroup, filterPhase, filterTag, resetFilters } =
+    useProjectFilter();
 
   const { searchQuery, deferredSearchQuery, setSearchQuery, clearSearch } =
     useProjectSearch();
@@ -164,42 +158,6 @@ export function Projects() {
     clearSearch();
   };
 
-  const groupOptions = useMemo(() => {
-    const uniqueGroups = Array.from(new Set(projectsData.map((p) => p.group)));
-    return [
-      {
-        id: "Tất cả",
-        labelVi: "Tất cả nhóm",
-        labelEn: "All Groups",
-        count: projectsData.length,
-      },
-      ...uniqueGroups.map((g) => ({
-        id: g,
-        labelVi: g,
-        labelEn: g,
-        count: projectsData.filter((p) => p.group === g).length,
-      })),
-    ];
-  }, []);
-
-  const phaseOptions = useMemo(() => {
-    const uniquePhases = Array.from(new Set(projectsData.map((p) => p.phase)));
-    return [
-      {
-        id: "Tất cả",
-        labelVi: "Tất cả giai đoạn",
-        labelEn: "All Phases",
-        count: projectsData.length,
-      },
-      ...uniquePhases.map((ph) => ({
-        id: ph,
-        labelVi: ph,
-        labelEn: ph,
-        count: projectsData.filter((p) => p.phase === ph).length,
-      })),
-    ];
-  }, []);
-
   const selectedProject = useMemo(() => {
     if (selectedProjectIndex === null) return null;
     return projectsData[selectedProjectIndex - 1] || null;
@@ -209,10 +167,10 @@ export function Projects() {
     <ErrorBoundary>
       <PageLayout
         id="projects-main-card"
-        rootClassName="w-full max-w-full relative flex flex-1 flex-col transition-all duration-300"
-        headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !shadow-none"
+        rootClassName="w-full max-w-full relative flex flex-1 flex-col transition-all duration-300 !bg-transparent !border-none !rounded-none shadow-none"
+        headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 !shadow-none !bg-transparent"
         headerContainerClassName="!px-0"
-        className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto"
+        className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent !border-none"
         pageId="projects"
         pageName="Projects Main Card"
         title={
@@ -240,39 +198,6 @@ export function Projects() {
         subtitleClassName={
           selectedProject ? "text-amber-600 dark:text-amber-400 font-bold" : ""
         }
-        hideToolbar={Boolean(selectedProject)}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder={
-          isVi ? "Tìm dự án, SOP, tag..." : "Search project, SOP, tag..."
-        }
-        groupOptions={groupOptions}
-        activeGroup={filterGroup}
-        onGroupChange={setFilterGroup}
-        groupLabel={{ vi: "Nhóm:", en: "Group:" }}
-        filterOptions={phaseOptions}
-        activeFilter={filterPhase}
-        onFilterChange={setFilterPhase}
-        filterLabel={{ vi: "Giai đoạn:", en: "Phase:" }}
-        viewModeOptions={[
-          {
-            id: "grid",
-            labelVi: "Dạng Lưới",
-            labelEn: "Grid",
-            icon: LayoutGrid,
-          },
-          {
-            id: "stacked",
-            labelVi: "Giai đoạn",
-            labelEn: "By Phase",
-            icon: Layers,
-          },
-        ]}
-        activeViewMode={projectListViewMode}
-        onViewModeChange={(m) => setProjectListViewMode(m as any)}
-        onReset={handleResetFiltersAndSearch}
-        totalCount={projectsData.length}
-        filteredCount={filteredProjects.length}
         headerActions={
           selectedProject ? (
             <button
@@ -301,7 +226,54 @@ export function Projects() {
               <X size={14} />
               <span>{isVi ? "Quay lại" : "Back"}</span>
             </button>
-          ) : undefined
+          ) : (
+            <div className="flex w-full flex-wrap items-center justify-end gap-2.5 sm:w-auto">
+              {/* View Mode Toggle Pill Bar */}
+              <div className="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white/80 p-1 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-slate-900/80">
+                <button
+                  type="button"
+                  onClick={() => {
+                    playUiSound("click");
+                    setProjectListViewMode("grid");
+                  }}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black",
+                    projectListViewMode === "grid"
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800",
+                  )}
+                  title={
+                    isVi
+                      ? "Tất cả dự án (Dạng Lưới)"
+                      : "All Projects Grid View"
+                  }
+                >
+                  <LayoutGrid size={14} />
+                  <span>{isVi ? "Dạng Lưới" : "Grid View"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    playUiSound("click");
+                    setProjectListViewMode("stacked");
+                  }}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black",
+                    projectListViewMode === "stacked"
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800",
+                  )}
+                  title={isVi ? "Nhóm theo giai đoạn" : "Grouped by Phase"}
+                >
+                  <Layers size={14} />
+                  <span>
+                    {isVi ? "Giai đoạn" : "By Phase"}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )
         }
       >
       <div className="mx-auto flex h-full w-full max-w-[1240px] flex-col gap-4">
@@ -340,7 +312,7 @@ export function Projects() {
                 {/* Content Detail Section */}
                 <div className="w-full space-y-8">
                   {/* Executive Experience Query Card (4 Mục: Giai đoạn, Thời gian, Nhóm, Vai trò) */}
-                  <div className="flex flex-col gap-4 rounded-[15px] border border-slate-200/90 bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:p-6 dark:border-white/10 dark:bg-slate-900/90">
+                  <div className="flex flex-col gap-4 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:p-6">
                     {/* 1. Giai đoạn (Phase) */}
                     <div className="flex flex-1 items-center gap-3.5 min-w-[180px]">
                       <div className="shrink-0 rounded-xl bg-emerald-500/10 p-3 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
@@ -456,7 +428,7 @@ export function Projects() {
                   ([groupName, groupProjects]) => (
                     <div
                       key={groupName}
-                      className="space-y-2 rounded-[15px] border border-slate-200/80 bg-white/80 p-4 text-left shadow-sm backdrop-blur-xl sm:p-5 dark:border-white/10 dark:bg-slate-900/60"
+                      className="space-y-2 p-4 text-left sm:p-5"
                     >
                       <div className="flex items-center gap-2.5">
                         <span
@@ -502,10 +474,9 @@ export function Projects() {
                 )}
               </div>
             ) : (
-              /* Smart Dense Bento Grid View */
-              <div className="responsive-card-container w-full">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full grid-flow-row-dense auto-rows-fr">
-                  {filteredProjects.map((project) => {
+              /* Grid View */
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-fr">
+                {filteredProjects.map((project) => {
                   const originalIndex =
                     projectsData.findIndex((p) => p.title === project.title) +
                     1;
@@ -525,7 +496,6 @@ export function Projects() {
                     />
                   );
                 })}
-                </div>
               </div>
             )}
           </div>

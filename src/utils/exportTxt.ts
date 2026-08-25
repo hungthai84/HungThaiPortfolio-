@@ -9,7 +9,7 @@ import { projectsData } from "../data/projectsData";
 import { PREDEFINED_ANSWERS, aiCategories } from "../data/aiQuestions";
 import { INTERVIEW_QUESTIONS, INTERVIEW_VIDEO_1_URL, INTERVIEW_VIDEO_2_URL } from "../data/interviewQuestions";
 
-export const generateTxtString = (): string => {
+export const generateAndDownloadTxt = () => {
   const now = new Date();
   const dd = String(now.getDate()).padStart(2, "0");
   const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -444,45 +444,7 @@ export const generateTxtString = (): string => {
   text += "        Bản quyền thông tin thuộc về Nguyễn Hùng Thái (Head of CX / CS Director)\n";
   text += sepLine;
 
-  return text;
-};
-
-export const runDataValidation = () => {
-  const data: any = contentData;
-  let totalItems = 0;
-
-  totalItems += (data.personalInfo?.length || 0) + (data.taglines?.length || 0);
-  totalItems += (principlesData?.length || 0) + (timelineData?.length || 0) + (coreValuesData?.length || 0);
-  totalItems += (data.experience?.length || 0) + (data.domains?.length || 0);
-  if (data.skills) {
-    totalItems += (data.skills.professional?.length || 0) +
-                 (data.skills.leadership?.length || 0) +
-                 (data.skills.collaboration?.length || 0) +
-                 (data.skills.innovation?.length || 0) +
-                 (data.skills.languages?.length || 0);
-  }
-  totalItems += (projectsData?.length || 0) + (INTERVIEW_QUESTIONS?.length || 0);
-  totalItems += Object.keys(PREDEFINED_ANSWERS || {}).length;
-  totalItems += 23; // admin modules
-  totalItems += 32; // memory photos
-
-  const txtString = generateTxtString();
-  const textLength = txtString.length;
-
-  return {
-    isValid: totalItems > 50 && textLength > 10000,
-    totalItems,
-    textLength,
-  };
-};
-
-export const generateAndDownloadTxt = () => {
-  const now = new Date();
-  const dd = String(now.getDate()).padStart(2, "0");
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const yy = String(now.getFullYear()).slice(-2);
-
-  const text = generateTxtString();
+  // Download logic with requested filename pattern: Data CV NguyenHungThai - (dd.mm.yy)
   const filename = `Data CV NguyenHungThai - (${dd}.${mm}.${yy}).txt`;
 
   const blob = new Blob([text], { type: "text/plain;charset=utf-8" });

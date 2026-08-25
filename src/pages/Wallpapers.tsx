@@ -27,7 +27,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { PageLayout } from "../components/PageLayout";
-
+import { ThemeComparison } from "../components/ThemeComparison";
 import { useLanguage } from "../context/LanguageContext";
 import { playUiSound } from "../lib/sound";
 import { cn } from "../lib/utils";
@@ -36,11 +36,6 @@ import {
   QUICK_PRESET_TEMPLATES,
   WallpaperOption,
 } from "../data/wallpapersData";
-import {
-  savePreferencesToCloud,
-  loadPreferencesFromCloud,
-  subscribePreferencesFromCloud,
-} from "../lib/wallpaperSync";
 
 export function Wallpapers() {
   const { language } = useLanguage();
@@ -146,27 +141,8 @@ export function Wallpapers() {
     }, 3500);
   };
 
-  // Sync state on external events and Cloud Firestore
+  // Sync state on external events
   useEffect(() => {
-    const unsubscribeCloud = subscribePreferencesFromCloud((cloudPrefs) => {
-      if (cloudPrefs.customWallpapers && cloudPrefs.customWallpapers.length > 0) {
-        setCustomWallpapers(cloudPrefs.customWallpapers);
-        localStorage.setItem("app_custom_wallpapers", JSON.stringify(cloudPrefs.customWallpapers));
-      }
-      if (cloudPrefs.deletedWallpaperIds) {
-        setDeletedWallpaperIds(cloudPrefs.deletedWallpaperIds);
-        localStorage.setItem("app_deleted_wallpaper_ids", JSON.stringify(cloudPrefs.deletedWallpaperIds));
-      }
-      if (cloudPrefs.selectedWallpaperId) {
-        setSelectedWallpaperId(cloudPrefs.selectedWallpaperId);
-        localStorage.setItem("app_selected_wallpaper", cloudPrefs.selectedWallpaperId);
-      }
-      if (typeof cloudPrefs.isWallpaperHidden === "boolean") {
-        setIsWallpaperHidden(cloudPrefs.isWallpaperHidden);
-        localStorage.setItem("app_wallpaper_hidden", String(cloudPrefs.isWallpaperHidden));
-      }
-    });
-
     const handleWpChanged = (e: Event) => {
       const custom = e as CustomEvent<{ wallpaperId?: string; id?: string }>;
       const targetId = custom.detail?.id || custom.detail?.wallpaperId;
@@ -192,7 +168,6 @@ export function Wallpapers() {
     );
 
     return () => {
-      unsubscribeCloud();
       window.removeEventListener("wallpaperChanged", handleWpChanged);
       window.removeEventListener("app-toggle-wallpaper-visibility", handleToggle);
       window.removeEventListener(
@@ -203,16 +178,6 @@ export function Wallpapers() {
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
   }, []);
-
-  // Save to Firestore whenever user updates custom wallpapers, deleted list, or active selection
-  useEffect(() => {
-    savePreferencesToCloud({
-      customWallpapers,
-      deletedWallpaperIds,
-      selectedWallpaperId,
-      isWallpaperHidden,
-    });
-  }, [customWallpapers, deletedWallpaperIds, selectedWallpaperId, isWallpaperHidden]);
 
   // Compute all available wallpapers
   const allWallpapers = useMemo(() => {
@@ -710,7 +675,7 @@ export function Wallpapers() {
       icon={Palette}
       titleClassName="text-cyan-600 dark:text-cyan-400"
       headerActions={
-        <div className="flex flex-wrap items-center gap-[10px]">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Toggle Visibility Button */}
           <button
             type="button"
@@ -951,7 +916,7 @@ export function Wallpapers() {
                         ? "Chọn nhanh một trong các hình nền 4K siêu nét được tuyển chọn sẵn:"
                         : "Pick a high-resolution 4K wallpaper preset to add with one click:"}
                     </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-[10px]">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {QUICK_PRESET_TEMPLATES.map((tmpl) => (
                         <div
                           key={tmpl.name}
@@ -1111,7 +1076,15 @@ export function Wallpapers() {
         )}
       </AnimatePresence>
 
-
+      {/* THEME COMPARISON SPLIT-SCREEN PREVIEW */}
+      <div className="relative mx-auto mb-5 w-full max-w-[1240px]">
+        <ThemeComparison
+          onApplyPreset={(preset) => {
+            setSelectedWallpaperId(preset.wallpaperId);
+            setThemeMode(preset.themeMode);
+          }}
+        />
+      </div>
 
       {/* THEME SELECTION BLOCK (TRANG PHONG CÁCH THÊM GIAO DIỆN SÁNG) */}
       <div className="relative mx-auto mb-5 flex w-full max-w-[1240px] flex-col gap-4 rounded-2xl border border-slate-200/85 dark:border-slate-800 bg-white/70 dark:bg-slate-900/75 p-5 backdrop-blur-[24px] shadow-sm">
@@ -1131,7 +1104,7 @@ export function Wallpapers() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* LIGHT THEME CARD */}
           <button
             type="button"
@@ -1265,7 +1238,7 @@ export function Wallpapers() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-[10px]">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-3 sm:gap-4">
             {filteredWallpapers.map((wp) => {
               const isSelected = selectedWallpaperId === wp.id;
               const isCustom =

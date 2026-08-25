@@ -12,7 +12,7 @@ export interface ProjectCardProps {
   project: Project;
   originalIndex: number;
   formattedIndex: string;
-  viewMode: "grid" | "horizontal" | "stacked" | "list" | "masonry";
+  viewMode: "grid" | "horizontal" | "stacked" | "list";
   onClick: () => void;
   indexInGroup?: number; // Used for stacked zIndex offset
 }
@@ -226,22 +226,21 @@ export const ProjectCard: React.FC<ProjectCardProps> = React.memo(
       );
     }
 
-    // STANDARD GRID / MASONRY MODE CARD (MAIN PROJECT CARD)
-    if (viewMode === "grid" || viewMode === "masonry") {
+    // STANDARD GRID MODE CARD (MAIN PROJECT CARD)
+    if (viewMode === "grid") {
       return (
         <div
           onClick={onClick}
           className={cn(
-            viewMode === "masonry" ? "masonry-card-item" : "view-card-item",
-            "group relative flex h-full min-h-[380px] sm:min-h-[420px] cursor-pointer flex-col overflow-hidden rounded-[16px] border border-slate-200/90 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-100 dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)]",
+            "group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[16px] border border-slate-200/90 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-100 dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)]",
             getPhaseCardBorderClass(project.phase),
           )}
         >
-          {/* Top Image Fills Top of Card - Exactly 50% Height */}
-          <div className="relative w-full h-[50%] min-h-[190px] sm:min-h-[210px] shrink-0 overflow-hidden rounded-t-[16px] border-b border-slate-200/80 bg-slate-100 dark:border-slate-800 dark:bg-slate-800 flex items-center justify-center">
+          {/* Top Image Fills Top of Card */}
+          <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-t-[16px] border-b border-slate-200/80 bg-slate-100 sm:h-52 dark:border-slate-800 dark:bg-slate-800">
             <img
               src={project.img}
-              className="card-img w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               alt={project.title}
               referrerPolicy="no-referrer"
             />

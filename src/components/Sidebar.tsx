@@ -488,7 +488,7 @@ export function Sidebar({
         id="desktop-left-sidebar"
         style={{ borderRadius: 0, boxShadow: "none" }}
         className={cn(
-          "!bg-transparent relative z-50 ml-0 hidden h-full max-h-full flex-shrink-0 flex-col justify-between overflow-hidden rounded-none border-r border-black/5 dark:border-white/5 px-2 py-4 font-bold !shadow-none shadow-none transition-all duration-300 lg:flex",
+          "!bg-transparent relative z-50 ml-0 hidden h-full max-h-full flex-shrink-0 flex-col justify-between overflow-hidden rounded-none border-r border-black/5 dark:border-white/5 px-2 py-4 font-bold !shadow-none shadow-none transition-all duration-300 lg:flex !bg-transparent !border-none !rounded-none !shadow-none",
           isExpanded ? "w-[180px] items-center" : "w-[100px] items-center",
         )}
       >

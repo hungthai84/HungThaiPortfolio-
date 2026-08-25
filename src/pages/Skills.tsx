@@ -7,7 +7,6 @@ import { Award } from "lucide-react";
 export function Skills() {
   const { language } = useLanguage();
   const isVi = language === "vi";
-  const [activeSection, setActiveSection] = React.useState("all");
 
   return (
     <PageLayout
@@ -24,34 +23,8 @@ export function Skills() {
       icon={Award}
       headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 transition-all duration-300 !bg-transparent !border-none !shadow-none !backdrop-blur-none"
       headerContainerClassName="!px-0 !bg-transparent"
-      groupOptions={[
-        {
-          id: "all",
-          labelVi: "Tất cả các phần",
-          labelEn: "All Sections",
-        },
-        {
-          id: "overview",
-          labelVi: "Tổng quan năng lực",
-          labelEn: "Overview",
-        },
-        {
-          id: "swot",
-          labelVi: "Ma trận SWOT",
-          labelEn: "SWOT Matrix",
-        },
-        {
-          id: "languages",
-          labelVi: "Trình độ ngoại ngữ",
-          labelEn: "Languages",
-        },
-      ]}
-      activeGroup={activeSection}
-      onGroupChange={setActiveSection}
-      groupLabel={{ vi: "Mục:", en: "Section:" }}
-      onReset={() => setActiveSection("all")}
     >
-      <SwotAnalysis activeSection={activeSection} />
+      <SwotAnalysis />
     </PageLayout>
   );
 }

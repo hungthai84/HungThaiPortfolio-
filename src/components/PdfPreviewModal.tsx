@@ -8,7 +8,6 @@ interface PdfPreviewModalProps {
   onClose: () => void;
   onDownload: (lang: "vi" | "en") => void;
   onPrint: (lang: "vi" | "en") => void;
-  onExportTxt?: () => void;
   isDownloading?: boolean;
   downloadPercent?: number;
   downloadStatus?: string;
@@ -19,7 +18,6 @@ export function PdfPreviewModal({
   onClose,
   onDownload,
   onPrint,
-  onExportTxt,
   isDownloading = false,
   downloadPercent = 0,
   downloadStatus = "",
@@ -140,15 +138,7 @@ export function PdfPreviewModal({
               <div className="flex items-center gap-1.5">
                 {/* Download TXT */}
                 <button
-                  onClick={() => {
-                    if (onExportTxt) {
-                      onExportTxt();
-                    } else {
-                      window.dispatchEvent(
-                        new CustomEvent("app-open-txt-export-modal")
-                      );
-                    }
-                  }}
+                  onClick={generateAndDownloadTxt}
                   className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-black text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
                 >
                   <FileText size={14} />

@@ -193,7 +193,6 @@ export function TuVi() {
 
   return (
     <PageLayout
-      hideToolbar={true}
       id="tuvi-page-main"
       pageId="tuvi"
       pageName="Tử Vi Bản Mệnh"
@@ -324,7 +323,7 @@ export function TuVi() {
               </span>
             </div>
 
-            <div className="tuvi-palace-masonry w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {palaces.map((p, idx) => (
                 <motion.div
                   key={p.id}
@@ -332,7 +331,7 @@ export function TuVi() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: idx * 0.05 }}
                   className={cn(
-                    "tuvi-masonry-item relative flex flex-col justify-between rounded-2xl border p-5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-white/70 dark:bg-slate-900/70",
+                    "relative flex flex-col justify-between rounded-2xl border p-5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-white/70 dark:bg-slate-900/70",
                     p.color
                   )}
                 >
@@ -384,7 +383,7 @@ export function TuVi() {
               </h3>
             </div>
 
-            <div className="tuvi-elements-masonry w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {fiveElementsOps.map((elem, idx) => (
                 <motion.div
                   key={idx}
@@ -392,7 +391,7 @@ export function TuVi() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3, delay: idx * 0.06 }}
                   className={cn(
-                    "tuvi-masonry-item flex flex-col justify-between rounded-2xl border p-4 shadow-md backdrop-blur-md transition-all hover:scale-105",
+                    "flex flex-col justify-between rounded-2xl border p-4 shadow-md backdrop-blur-md transition-all hover:scale-105",
                     elem.color
                   )}
                 >
@@ -458,96 +457,6 @@ export function TuVi() {
           </motion.div>
         )}
       </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        .tuvi-palace-masonry {
-          columns: 1;
-          column-gap: 10px;
-        }
-        @media (min-width: 640px) {
-          .tuvi-palace-masonry {
-            columns: 2;
-          }
-        }
-        @media (min-width: 1024px) {
-          .tuvi-palace-masonry {
-            columns: 3;
-          }
-        }
-
-        .tuvi-elements-masonry {
-          columns: 1;
-          column-gap: 10px;
-        }
-        @media (min-width: 640px) {
-          .tuvi-elements-masonry {
-            columns: 2;
-          }
-        }
-        @media (min-width: 768px) {
-          .tuvi-elements-masonry {
-            columns: 3;
-          }
-        }
-        @media (min-width: 1024px) {
-          .tuvi-elements-masonry {
-            columns: 5;
-          }
-        }
-
-        .tuvi-masonry-item {
-          break-inside: avoid;
-          margin-bottom: 10px;
-          display: inline-block;
-          width: 100%;
-        }
-
-        @supports (grid-template-rows: masonry) {
-          .tuvi-palace-masonry {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            grid-template-rows: masonry;
-            gap: 10px;
-          }
-          @media (min-width: 640px) {
-            .tuvi-palace-masonry {
-              grid-template-columns: repeat(2, 1fr);
-            }
-          }
-          @media (min-width: 1024px) {
-            .tuvi-palace-masonry {
-              grid-template-columns: repeat(3, 1fr);
-            }
-          }
-
-          .tuvi-elements-masonry {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            grid-template-rows: masonry;
-            gap: 10px;
-          }
-          @media (min-width: 640px) {
-            .tuvi-elements-masonry {
-              grid-template-columns: repeat(2, 1fr);
-            }
-          }
-          @media (min-width: 768px) {
-            .tuvi-elements-masonry {
-              grid-template-columns: repeat(3, 1fr);
-            }
-          }
-          @media (min-width: 1024px) {
-            .tuvi-elements-masonry {
-              grid-template-columns: repeat(5, 1fr);
-            }
-          }
-
-          .tuvi-masonry-item {
-            margin-bottom: 0;
-            display: flex;
-          }
-        }
-      `}} />
     </PageLayout>
   );
 }

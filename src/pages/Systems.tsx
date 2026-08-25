@@ -724,7 +724,6 @@ export function Systems() {
           : "Operational systems, technology infrastructure, and optimal solution architecture."
       }
       icon={Server}
-      hideToolbar={true}
     >
       <>
         <style>{`
@@ -1107,13 +1106,12 @@ export function Systems() {
                   <div
                     key={sys.key}
                     onClick={e => handleCardClick(sys.key, e)}
-                    className={`ultraflex-card-container group relative w-full cursor-pointer ${isExpanded ? 'is-expanded' : ''}`}
-                    style={{
-                      '--item-color': sys.color,
-                      transitionDelay: `${(idx % 6) * 35}ms`
-                    } as React.CSSProperties}
+                    className={cn(
+                      "group relative w-full p-4 transition-all duration-300 border border-transparent rounded-2xl",
+                      isExpanded ? "bg-white/10 dark:bg-black/10 backdrop-blur-md border-white/10" : "bg-transparent hover:bg-white/5 dark:hover:bg-black/5"
+                    )}
                   >
-                    <div className="glass-card h-full rounded-2xl overflow-hidden p-4 relative">
+                    <div className="relative">
                       
                       {/* Indicator Arrow Icon (Hidden) */}
                       <div className="hidden absolute top-3 left-3 z-20 text-slate-400 group-hover:text-indigo-500 transition-colors">
@@ -1124,19 +1122,19 @@ export function Systems() {
                         )}
                       </div>
 
-                      {/* Floating Multi-color Glass Icon Badge with 3D Duotone Gradient SVGs */}
+                      {/* Icon */}
                       <div 
-                        className="ultraflex-icon p-2 rounded-2xl shrink-0 flex items-center justify-center border border-white/40 dark:border-white/10"
+                        className="p-2 rounded-2xl shrink-0 flex items-center justify-center border border-white/40 dark:border-white/10 mb-2"
                         style={{
                           backgroundColor: `${sys.color}18`,
-                          boxShadow: `0 8px 24px -6px ${sys.color}40`
+                          width: "fit-content"
                         }}
                       >
-                        <SystemGradientIcon itemKey={sys.key} extraClass="w-8 h-8" />
+                        <SystemGradientIcon itemKey={sys.key} extraClass="w-6 h-6" />
                       </div>
 
                       {/* Heading */}
-                      <div className="ultraflex-heading">
+                      <div>
                         <div className="flex items-center gap-1.5">
                           <span className="font-black text-xs tracking-wider uppercase" style={{ color: sys.color }}>
                             {sys.key}
@@ -1194,7 +1192,7 @@ export function Systems() {
               </div>
             </div>
           ) : (
-            <div className="py-16 text-center text-slate-500 dark:text-slate-400 glass-card rounded-3xl border border-white/60 dark:border-slate-800">
+            <div className="py-16 text-center text-slate-500 dark:text-slate-400 rounded-3xl">
               <Search className="w-10 h-10 mx-auto text-slate-400 mb-3" />
               <p className="text-sm font-semibold">{t.noResults}</p>
             </div>
