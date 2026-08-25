@@ -223,6 +223,9 @@ export function Industries() {
   const [expandedItemTitle, setExpandedItemTitle] = useState<string | null>(
     null,
   );
+  const [ripplingItemTitle, setRipplingItemTitle] = useState<string | null>(
+    null,
+  );
 
   // Auto color rotation effect
   useEffect(() => {
@@ -231,6 +234,16 @@ export function Industries() {
     }, 3500);
     return () => clearInterval(timer);
   }, []);
+
+  const handleCardClick = (title: string) => {
+    if (expandedItemTitle || ripplingItemTitle) return;
+    playUiSound("click");
+    setRipplingItemTitle(title);
+    setTimeout(() => {
+      setExpandedItemTitle(title);
+      setRipplingItemTitle(null);
+    }, 320);
+  };
 
   const cardConfigs = [
     {
@@ -398,6 +411,7 @@ export function Industries() {
 
   return (
     <PageLayout
+      hideToolbar={true}
       id="industries-main-card"
       rootClassName="w-full max-w-full relative flex flex-1 flex-col transition-all duration-300"
       headerClassName="!py-2 sm:!py-3 md:!py-4 !mb-0 transition-all duration-300"
@@ -412,13 +426,43 @@ export function Industries() {
           : "Executive management across 6+ business verticals."
       }
       icon={Globe}
+      contentContainerClassName="!pb-0 pb-0"
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder={
+        isVi ? "Tìm ngành nghề, giải pháp..." : "Search industry, solution..."
+      }
+      groupOptions={[
+        {
+          id: "all",
+          labelVi: "Tất cả lĩnh vực",
+          labelEn: "All Industries",
+          icon: Globe,
+          count: combinedItems.length,
+        },
+        ...combinedItems.map((item) => ({
+          id: item.category || item.title,
+          labelVi: item.title,
+          labelEn: item.title,
+          count: 1,
+        })),
+      ]}
+      activeGroup={selectedCategory}
+      onGroupChange={(cat) => setSelectedCategory(cat)}
+      groupLabel={{ vi: "Lĩnh vực:", en: "Industry:" }}
+      onReset={() => {
+        setSearchQuery("");
+        setSelectedCategory("all");
+      }}
+      totalCount={combinedItems.length}
+      filteredCount={filteredItems.length}
     >
       <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[10px] p-0 text-center">
         {/* MAIN CARDS GRID - CENTERED LAYOUT WITH EMBEDDED ABSOLUTE OVERLAY */}
         <LayoutGroup>
           <div className="relative mx-auto w-full max-w-[1080px] flex-1">
             {/* The Grid of all 6 cards */}
-            <div className="mx-auto grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-auto place-content-center items-stretch justify-items-center justify-center gap-[10px] !p-[10px]">
+            <div className="mx-auto grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-auto place-content-center items-stretch justify-items-center justify-center gap-4 !p-2">
               {filteredItems.map((item, index) => {
                 const colorIndex =
                   (index - colorStep + COLOR_PALETTE.length * 100) %
@@ -428,95 +472,98 @@ export function Industries() {
                 const Icon = MappedIcon || item.cfg.icon || Globe;
                 const isSomeCardExpanded = expandedItemTitle !== null;
                 const isThisExpanded = expandedItemTitle === item.title;
+                const isRippling = ripplingItemTitle === item.title;
 
                 return (
                   <motion.div
                     key={`card-${item.title}`}
                     layout
                     layoutId={`industry-card-${item.title}`}
-                    onClick={() => {
-                      if (!isSomeCardExpanded) {
-                        playUiSound("click");
-                        setExpandedItemTitle(item.title);
-                      }
-                    }}
+                    onClick={() => handleCardClick(item.title)}
                     className={cn(
-                      "group relative col-span-1 flex h-full min-h-[280px] w-full max-w-[340px] cursor-pointer flex-col mx-auto justify-self-center transition-all duration-500",
+                      "group relative col-span-1 flex min-h-[300px] w-full max-w-[340px] cursor-pointer flex-col mx-auto justify-self-center transition-all duration-300 rounded-2xl overflow-hidden p-5 text-center shadow-xs hover:shadow-xl hover:-translate-y-1 backdrop-blur-xl select-none",
                       isSomeCardExpanded && !isThisExpanded ? "opacity-20 blur-[2px] scale-95 pointer-events-none" : "",
                       isThisExpanded ? "opacity-0 pointer-events-none" : ""
                     )}
+                    style={{
+                      backgroundColor: `color-mix(in srgb, ${currentColor} 6%, rgba(255, 255, 255, 0.45))`,
+                      borderColor: `color-mix(in srgb, ${currentColor} 24%, rgba(255, 255, 255, 0.6))`,
+                      borderWidth: "1.5px",
+                      borderStyle: "solid",
+                    }}
                   >
-                    {/* Main Glass Card */}
-                    <div
-                      className="industries-card group/card relative z-10 flex h-full w-full flex-col items-center justify-between rounded-[12px] border-2 p-5 text-center shadow-md backdrop-blur-xl transition-all overflow-hidden"
-                      style={{
-                        backgroundColor: `color-mix(in srgb, ${currentColor} 5%, rgba(255, 255, 255, 0.05))`,
-                        borderColor: currentColor,
-                        transition: "all 1000ms ease-in-out",
-                      }}
-                    >
-                      {/* Expanding Hover Circle */}
-                      <div 
-                        className="absolute z-0 w-8 h-8 rounded-full transition-all duration-700 ease-in-out scale-0 group-hover/card:scale-[35] opacity-0 group-hover/card:opacity-100"
-                        style={{ 
-                          backgroundColor: currentColor,
-                          top: '40px',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          transformOrigin: 'center'
-                        }}
-                      />
+                    {/* Ripple spreading from icon on click */}
+                    <AnimatePresence>
+                      {isRippling && (
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0.85 }}
+                          animate={{ scale: 45, opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                          className="absolute z-30 h-12 w-12 rounded-full pointer-events-none"
+                          style={{
+                            backgroundColor: currentColor,
+                            top: "24px",
+                            left: "50%",
+                            marginLeft: "-24px",
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
 
-                      <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-between text-center">
-                        {/* Header: Icon, Title & Experience Badge */}
-                        <div className="mb-3 flex w-full shrink-0 items-center justify-center">
-                          <div className="flex w-full flex-col items-center justify-center gap-3 text-center">
-                            <div
-                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-[var(--bg)]/20 p-2 transition-all duration-500 group-hover/card:bg-white group-hover/card:border-white"
+                    {/* Card Content */}
+                    <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-between text-center">
+                      {/* Header: Icon, Title & Experience Badge */}
+                      <div className="mb-2 flex w-full shrink-0 items-center justify-center">
+                        <div className="flex w-full flex-col items-center justify-center gap-2 text-center">
+                          <div
+                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-xs backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
+                            style={{
+                              color: currentColor,
+                              borderColor: `color-mix(in srgb, ${currentColor} 35%, transparent)`,
+                              backgroundColor: `color-mix(in srgb, ${currentColor} 12%, rgba(255, 255, 255, 0.65))`,
+                            }}
+                          >
+                            <Icon className="h-6 w-6" strokeWidth={2.2} />
+                          </div>
+                          <div className="text-center w-full">
+                            <h3
+                              className="text-base sm:text-lg font-black tracking-tight mt-1"
+                              style={{ color: currentColor }}
+                            >
+                              {item.title}
+                            </h3>
+                            <span
+                              className="inline-flex items-center justify-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full border shadow-2xs mt-1"
                               style={{
-                                borderColor: `${currentColor}35`,
                                 color: currentColor,
-                                transition: "all 1000ms ease-in-out",
+                                borderColor: `color-mix(in srgb, ${currentColor} 30%, transparent)`,
+                                backgroundColor: `color-mix(in srgb, ${currentColor} 10%, rgba(255, 255, 255, 0.65))`,
                               }}
                             >
-                              <Icon className="h-6 w-6 transition-colors duration-500 group-hover/card:text-[currentColor]" style={{ color: 'inherit' }} strokeWidth={2} />
-                            </div>
-                            <div className="text-center">
-                              <h3
-                                className="text-center text-lg font-black tracking-tight transition-colors duration-500 group-hover/card:text-white"
-                                style={{
-                                  color: currentColor,
-                                  transition: "color 1000ms ease-in-out",
-                                }}
-                              >
-                                {item.title}
-                              </h3>
-                              <span className="flex items-center justify-center gap-1 text-center text-[10px] font-bold text-[var(--muted)] transition-colors duration-500 group-hover/card:text-white/80">
-                                <span>
-                                  {item.details.experienceYears} kinh nghiệm
-                                </span>
+                              <span>
+                                {item.details.experienceYears} kinh nghiệm
                               </span>
-                            </div>
+                            </span>
                           </div>
                         </div>
-
-                        {/* Body Description */}
-                        <p className="my-auto line-clamp-3 text-center text-xs leading-relaxed font-medium text-[var(--text)] sm:text-sm transition-colors duration-500 group-hover/card:text-white">
-                          {item.desc}
-                        </p>
                       </div>
+
+                      {/* Body Description */}
+                      <p className="my-auto line-clamp-3 text-center text-xs leading-relaxed font-medium text-slate-700 dark:text-slate-200 sm:text-sm py-2">
+                        {item.desc}
+                      </p>
 
                       {/* Brand Logos Footer */}
                       {item.logos && item.logos.length > 0 && (
-                        <div className="relative z-10 mt-auto flex w-full shrink-0 items-center justify-center border-t border-[var(--border)]/50 pt-3 pb-1 transition-colors duration-500 group-hover/card:border-white/20">
-                          <div className="flex items-center justify-center -space-x-3 flex-nowrap">
+                        <div className="relative z-10 mt-auto flex w-full shrink-0 items-center justify-center border-t border-slate-200/60 dark:border-white/10 pt-3 pb-0.5">
+                          <div className="flex items-center justify-center -space-x-2.5 flex-nowrap">
                             {item.logos.map((logoObj: BrandLogo, lIdx: number) => (
                               <div
                                 key={lIdx}
-                                className="group/logo relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 bg-white shadow-md transition-all duration-300 hover:z-20 hover:scale-110 hover:shadow-xl"
+                                className="group/logo relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white/90 dark:border-white/20 bg-white/95 shadow-sm transition-all duration-300 hover:z-20 hover:scale-115 hover:shadow-md"
                                 style={{
-                                  borderColor: logoObj.color || currentColor,
-                                  boxShadow: `0 4px 12px ${logoObj.color || currentColor}30`,
+                                  boxShadow: `0 3px 8px ${logoObj.color || currentColor}30`,
                                 }}
                                 title={logoObj.name}
                               >
@@ -535,15 +582,15 @@ export function Industries() {
                               </div>
                             ))}
                           </div>
-                     </div>
-                       )}
-                     </div>
-                   </motion.div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
                 );
               })}
             </div>
 
-            {/* Absolute overlay mimicking standard container dimension and containing the detailed information beautifully */}
+            {/* Absolute overlay taking full dimensions of the 6-card container */}
             <AnimatePresence>
               {expandedItemTitle && (() => {
                 const expandedItem = filteredItems.find((i) => i.title === expandedItemTitle);
@@ -561,31 +608,31 @@ export function Industries() {
                     key={`card-expanded-${expandedItem.title}`}
                     layout
                     layoutId={`industry-card-${expandedItem.title}`}
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.96 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
                     transition={{
-                      duration: 0.5,
-                      ease: [0.25, 1, 0.2, 1],
+                      duration: 0.45,
+                      ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="absolute inset-3 sm:inset-5 z-30 flex flex-col gap-4 rounded-[16px] border-2 text-left shadow-2xl backdrop-blur-2xl p-5 sm:p-6 overflow-hidden"
+                    className="absolute inset-0 z-30 flex flex-col gap-4 rounded-2xl border-2 text-left shadow-2xl backdrop-blur-2xl p-5 sm:p-7 overflow-hidden"
                     style={{
                       borderColor: currentColor,
-                      backgroundColor: `color-mix(in srgb, ${currentColor} 8%, rgba(255, 255, 255, 0.92))`,
+                      backgroundColor: `color-mix(in srgb, ${currentColor} 10%, var(--expanded-card-bg, rgba(255, 255, 255, 0.96)))`,
                     }}
                   >
                     {/* Background fallback for better readability in both dark and light modes */}
-                    <div className="absolute inset-0 -z-10 bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl" />
+                    <div className="absolute inset-0 -z-10 bg-white/90 dark:bg-slate-900/95 backdrop-blur-3xl" />
 
                     {/* Header Bar */}
-                    <div className="relative border-b border-[var(--border)] pr-12 pb-4 shrink-0">
+                    <div className="relative border-b border-slate-200/80 dark:border-white/10 pr-12 pb-4 shrink-0">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           playUiSound("click");
                           setExpandedItemTitle(null);
                         }}
-                        className="absolute top-0 right-0 z-30 cursor-pointer rounded-full border-2 border-solid border-[var(--border)] bg-[var(--bg)]/85 p-2.5 text-[var(--muted)] shadow-md transition-all hover:bg-rose-500 hover:text-white hover:scale-105 active:scale-95"
+                        className="absolute top-0 right-0 z-30 cursor-pointer rounded-full border border-slate-300 dark:border-white/20 bg-white/90 dark:bg-slate-800/90 p-2.5 text-slate-600 dark:text-slate-300 shadow-md transition-all hover:bg-rose-500 hover:text-white hover:border-rose-500 hover:scale-105 active:scale-95"
                         title={
                           isVi ? "Đóng / Thu gọn thẻ" : "Close / Collapse Card"
                         }
@@ -597,11 +644,11 @@ export function Industries() {
                         {/* Title & Icon */}
                         <div className="flex flex-wrap items-center gap-3">
                           <div
-                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] border p-2.5 sm:h-12 sm:w-12"
+                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border p-2.5 sm:h-14 sm:w-14 shadow-sm"
                             style={{
-                              borderColor: `${currentColor}35`,
+                              borderColor: `${currentColor}40`,
                               color: currentColor,
-                              backgroundColor: `${currentColor}10`,
+                              backgroundColor: `${currentColor}15`,
                             }}
                           >
                             <Icon
@@ -609,30 +656,28 @@ export function Industries() {
                               strokeWidth={2.5}
                             />
                           </div>
-                          <h3
-                            className="text-2xl leading-none font-black tracking-tight sm:text-3xl"
-                            style={{ color: currentColor }}
-                          >
-                            {expandedItem.title}
-                          </h3>
-                        </div>
-
-                        {/* Badges */}
-                        <div>
-                          <span
-                            className="inline-block rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase sm:text-xs"
-                            style={{
-                              borderColor: `${currentColor}35`,
-                              color: currentColor,
-                              backgroundColor: `${currentColor}15`,
-                            }}
-                          >
-                            {expandedItem.details.coreRole}
-                          </span>
+                          <div>
+                            <h3
+                              className="text-2xl leading-tight font-black tracking-tight sm:text-3xl"
+                              style={{ color: currentColor }}
+                            >
+                              {expandedItem.title}
+                            </h3>
+                            <span
+                              className="inline-block rounded-full border px-3 py-0.5 text-[10px] font-black tracking-wider uppercase sm:text-xs mt-1"
+                              style={{
+                                borderColor: `${currentColor}35`,
+                                color: currentColor,
+                                backgroundColor: `${currentColor}15`,
+                              }}
+                            >
+                              {expandedItem.details.coreRole}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Tagline */}
-                        <p className="mt-1 text-xs font-semibold text-[var(--muted)] sm:text-sm">
+                        <p className="mt-1 text-xs font-semibold text-slate-600 dark:text-slate-300 sm:text-sm">
                           {expandedItem.details.tagline}
                         </p>
                       </div>
@@ -643,33 +688,33 @@ export function Industries() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                         {/* Col 1: Scope & Details & Associated Brands */}
                         <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-2.5 rounded-[10px] border-2 border-solid border-[var(--border)] bg-[var(--bg)]/50 p-3 shadow-inner">
+                          <div className="grid grid-cols-2 gap-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-800/60 p-3 shadow-xs">
                             <div>
-                              <span className="block text-[10px] font-bold text-[var(--muted)]">
+                              <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400">
                                 {isVi ? "Thâm niên:" : "Experience:"}
                               </span>
-                              <span className="text-xs font-black text-[var(--text)] sm:text-sm">
+                              <span className="text-xs font-black text-slate-800 dark:text-slate-100 sm:text-sm">
                                 {expandedItem.details.experienceYears}
                               </span>
                             </div>
                             <div>
-                              <span className="block text-[10px] font-bold text-[var(--muted)]">
+                              <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400">
                                 {isVi ? "Quy mô:" : "Headcount:"}
                               </span>
-                              <span className="text-xs font-black text-[var(--text)] sm:text-sm">
+                              <span className="text-xs font-black text-slate-800 dark:text-slate-100 sm:text-sm">
                                 {expandedItem.details.headcountScope}
                               </span>
                             </div>
                           </div>
 
-                          <p className="text-xs leading-relaxed font-semibold text-[var(--text)] sm:text-sm">
+                          <p className="text-xs leading-relaxed font-medium text-slate-700 dark:text-slate-300 sm:text-sm">
                             {expandedItem.desc}
                           </p>
 
                           {/* Brand Logos */}
                           {expandedItem.logos && expandedItem.logos.length > 0 && (
-                            <div className="space-y-2 border-t border-[var(--border)] pt-4">
-                              <span className="block text-[10px] font-black tracking-wider text-[var(--muted)] uppercase">
+                            <div className="space-y-2 border-t border-slate-200/80 dark:border-white/10 pt-4">
+                              <span className="block text-[10px] font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
                                 {isVi
                                   ? "Thương hiệu trực thuộc:"
                                   : "Associated Brands:"}
@@ -679,9 +724,8 @@ export function Industries() {
                                   (logoObj: BrandLogo, lIdx: number) => (
                                      <div
                                        key={lIdx}
-                                       className="group/logo relative flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 bg-white shadow-md transition-all duration-300 hover:z-20 hover:scale-115 hover:shadow-xl"
+                                       className="group/logo relative flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white/90 dark:border-white/20 bg-white shadow-md transition-all duration-300 hover:z-20 hover:scale-115 hover:shadow-xl"
                                        style={{
-                                         borderColor: logoObj.color || currentColor,
                                          boxShadow: `0 4px 12px ${logoObj.color || currentColor}30`,
                                        }}
                                        title={logoObj.name}
@@ -709,7 +753,7 @@ export function Industries() {
                         {/* Col 2: Key Achievements */}
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <h4 className="flex items-center gap-1.5 text-xs font-black tracking-wider text-[var(--muted)] uppercase">
+                            <h4 className="flex items-center gap-1.5 text-xs font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
                               <CheckCircle2
                                 size={14}
                                 className="text-emerald-500"
@@ -725,7 +769,7 @@ export function Industries() {
                                 (ach: string, aIdx: number) => (
                                   <li
                                     key={aIdx}
-                                    className="flex items-start gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/5 p-3 text-xs font-semibold text-[var(--text)] hover:bg-emerald-500/10 transition-colors"
+                                    className="flex items-start gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-950/20 p-3 text-xs font-medium text-slate-800 dark:text-slate-200 hover:bg-emerald-500/10 transition-colors"
                                   >
                                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
                                     <span>{ach}</span>
@@ -739,7 +783,7 @@ export function Industries() {
                         {/* Col 3: Key Projects & Tech Stack */}
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <h4 className="flex items-center gap-1.5 text-xs font-black tracking-wider text-[var(--muted)] uppercase">
+                            <h4 className="flex items-center gap-1.5 text-xs font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
                               <Briefcase size={14} className="text-purple-500" />
                               <span>
                                 {isVi
@@ -770,7 +814,7 @@ export function Industries() {
                                         }),
                                       );
                                     }}
-                                    className="group/proj flex cursor-pointer items-center justify-between rounded-xl border-2 border-solid border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-left text-xs font-bold text-[var(--text)] shadow-xs transition-all hover:bg-purple-600 hover:text-white"
+                                    className="group/proj flex cursor-pointer items-center justify-between rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 px-3 py-2 text-left text-xs font-bold text-slate-800 dark:text-slate-100 shadow-xs transition-all hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600"
                                     title={
                                       isVi
                                         ? `Xem chi tiết dự án: ${proj}`
@@ -790,8 +834,8 @@ export function Industries() {
                             </div>
                           </div>
 
-                          <div className="space-y-2 border-t border-[var(--border)] pt-4">
-                            <h4 className="flex items-center gap-1.5 text-xs font-black tracking-wider text-[var(--muted)] uppercase">
+                          <div className="space-y-2 border-t border-slate-200/80 dark:border-white/10 pt-4">
+                            <h4 className="flex items-center gap-1.5 text-xs font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
                               <Sparkles size={14} className="text-sky-500" />
                               <span>
                                 {isVi ? "Công nghệ & Công cụ:" : "Tech & Tools:"}
@@ -802,7 +846,7 @@ export function Industries() {
                                 (tech: string, tIdx: number) => (
                                   <span
                                     key={tIdx}
-                                    className="rounded-lg border-2 border-solid border-[var(--border)] bg-[var(--bg)]/50 px-2.5 py-1 font-mono text-[11px] font-bold text-[var(--text)] shadow-xs"
+                                    className="rounded-lg border border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-800/60 px-2.5 py-1 font-mono text-[11px] font-bold text-slate-700 dark:text-slate-200 shadow-xs"
                                   >
                                     {tech}
                                   </span>
@@ -820,6 +864,17 @@ export function Industries() {
           </div>
         </LayoutGroup>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        :root {
+          --card-bg: rgba(255, 255, 255, 0.9);
+          --expanded-card-bg: rgba(255, 255, 255, 0.96);
+        }
+        .dark {
+          --card-bg: rgba(15, 23, 42, 0.85);
+          --expanded-card-bg: rgba(15, 23, 42, 0.95);
+        }
+      `}} />
     </PageLayout>
   );
 }

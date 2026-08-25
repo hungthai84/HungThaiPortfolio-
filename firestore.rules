@@ -46,5 +46,16 @@ service cloud.firestore {
         allow read, write: if isSignedIn() && isValidId(userId) && userId == request.auth.uid && isValidId(prefId);
       }
     }
+
+    // 6. Shared Wallpapers & Configurations
+    match /wallpapers/{wallpaperId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /system_config/{configId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
   }
 }

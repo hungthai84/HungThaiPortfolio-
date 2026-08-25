@@ -42,6 +42,7 @@ import {  PageId } from "../types";
 import {  cn } from "../lib/utils";
 import {  useLanguage } from "../context/LanguageContext";
 import {  playUiSound } from "../lib/sound";
+import { HamburgerCollapseButton } from "./HamburgerCollapseButton";
 
 interface SidebarProps {
   activePage: PageId;
@@ -93,6 +94,15 @@ export const allNavItemsList: NavItemConfig[] = [
     activePill: "bg-indigo-400 dark:bg-indigo-300",
   },
   {
+    id: "education",
+    icon: GraduationCap,
+    glassBg: "from-emerald-400/30 via-teal-400/25 to-blue-400/20 border-emerald-300/40",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    hoverColor: "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+    activeBg: "from-emerald-500 via-teal-500 to-blue-500",
+    activePill: "bg-emerald-400 dark:bg-emerald-300",
+  },
+  {
     id: "experience",
     icon: Briefcase,
     glassBg: "from-blue-500/30 via-indigo-500/25 to-purple-500/20 border-blue-400/40",
@@ -100,15 +110,6 @@ export const allNavItemsList: NavItemConfig[] = [
     hoverColor: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
     activeBg: "from-blue-600 via-indigo-600 to-purple-600",
     activePill: "bg-blue-500 dark:bg-blue-400",
-  },
-  {
-    id: "skills",
-    icon: Award,
-    glassBg: "from-purple-500/30 via-indigo-500/25 to-blue-500/20 border-purple-400/40",
-    iconColor: "text-purple-600 dark:text-purple-400",
-    hoverColor: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
-    activeBg: "from-purple-600 via-indigo-600 to-blue-600",
-    activePill: "bg-purple-500 dark:bg-purple-400",
   },
   {
     id: "industries",
@@ -120,6 +121,15 @@ export const allNavItemsList: NavItemConfig[] = [
     activePill: "bg-indigo-500 dark:bg-indigo-400",
   },
   {
+    id: "skills",
+    icon: Award,
+    glassBg: "from-purple-500/30 via-indigo-500/25 to-blue-500/20 border-purple-400/40",
+    iconColor: "text-purple-600 dark:text-purple-400",
+    hoverColor: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
+    activeBg: "from-purple-600 via-indigo-600 to-blue-600",
+    activePill: "bg-purple-500 dark:bg-purple-400",
+  },
+  {
     id: "projects",
     icon: FolderKanban,
     glassBg: "from-blue-400/30 via-purple-400/25 to-indigo-400/20 border-blue-300/40",
@@ -127,42 +137,6 @@ export const allNavItemsList: NavItemConfig[] = [
     hoverColor: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
     activeBg: "from-blue-500 via-purple-500 to-indigo-500",
     activePill: "bg-blue-400 dark:bg-blue-300",
-  },
-  {
-    id: "memories",
-    icon: Images,
-    glassBg: "from-amber-400/30 via-orange-400/25 to-red-400/20 border-amber-300/40",
-    iconColor: "text-amber-600 dark:text-amber-400",
-    hoverColor: "group-hover:text-amber-600 dark:group-hover:text-amber-400",
-    activeBg: "from-amber-500 via-orange-500 to-red-500",
-    activePill: "bg-amber-400 dark:bg-amber-300",
-  },
-  {
-    id: "education",
-    icon: GraduationCap,
-    glassBg: "from-emerald-400/30 via-teal-400/25 to-blue-400/20 border-emerald-300/40",
-    iconColor: "text-emerald-600 dark:text-emerald-400",
-    hoverColor: "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
-    activeBg: "from-emerald-500 via-teal-500 to-blue-500",
-    activePill: "bg-emerald-400 dark:bg-emerald-300",
-  },
-  {
-    id: "systems",
-    icon: Server,
-    glassBg: "from-indigo-400/30 via-purple-400/25 to-blue-400/20 border-indigo-300/40",
-    iconColor: "text-indigo-600 dark:text-indigo-400",
-    hoverColor: "group-hover:text-indigo-600 dark:group-hover:text-indigo-400",
-    activeBg: "from-indigo-500 via-purple-500 to-blue-500",
-    activePill: "bg-indigo-400 dark:bg-indigo-300",
-  },
-  {
-    id: "websiteManagement",
-    icon: Settings,
-    glassBg: "from-slate-400/30 via-gray-400/25 to-zinc-400/20 border-slate-300/40",
-    iconColor: "text-slate-600 dark:text-slate-400",
-    hoverColor: "group-hover:text-slate-700 dark:group-hover:text-slate-300",
-    activeBg: "from-slate-500 via-gray-500 to-zinc-500",
-    activePill: "bg-slate-400 dark:bg-slate-300",
   },
   {
     id: "interview",
@@ -174,8 +148,17 @@ export const allNavItemsList: NavItemConfig[] = [
     activePill: "bg-purple-400 dark:bg-purple-300",
   },
   {
-    id: "aiChat",
-    icon: Bot,
+    id: "tuvi",
+    icon: Compass,
+    glassBg: "from-amber-400/30 via-yellow-400/25 to-amber-500/20 border-amber-300/40",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    hoverColor: "group-hover:text-amber-600 dark:group-hover:text-amber-400",
+    activeBg: "from-amber-500 via-yellow-500 to-amber-600",
+    activePill: "bg-amber-400 dark:bg-amber-300",
+  },
+  {
+    id: "systems",
+    icon: Server,
     glassBg: "from-indigo-400/30 via-purple-400/25 to-blue-400/20 border-indigo-300/40",
     iconColor: "text-indigo-600 dark:text-indigo-400",
     hoverColor: "group-hover:text-indigo-600 dark:group-hover:text-indigo-400",
@@ -183,30 +166,17 @@ export const allNavItemsList: NavItemConfig[] = [
     activePill: "bg-indigo-400 dark:bg-indigo-300",
   },
   {
-    id: "wallpapers",
-    icon: Palette,
-    glassBg: "from-blue-400/30 via-indigo-400/25 to-purple-400/20 border-blue-300/40",
-    iconColor: "text-blue-600 dark:text-blue-400",
-    hoverColor: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
-    activeBg: "from-blue-500 via-indigo-500 to-purple-500",
-    activePill: "bg-blue-400 dark:bg-blue-300",
-  },
-  {
-    id: "templateTest",
-    icon: Sparkles,
-    glassBg: "from-purple-400/30 via-indigo-400/25 to-blue-400/20 border-purple-300/40",
-    iconColor: "text-purple-600 dark:text-purple-400",
-    hoverColor: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
-    activeBg: "from-purple-500 via-indigo-500 to-blue-500",
-    activePill: "bg-purple-400 dark:bg-purple-300",
+    id: "memories",
+    icon: Images,
+    glassBg: "from-amber-400/30 via-orange-400/25 to-red-400/20 border-amber-300/40",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    hoverColor: "group-hover:text-amber-600 dark:group-hover:text-amber-400",
+    activeBg: "from-amber-500 via-orange-500 to-red-500",
+    activePill: "bg-amber-400 dark:bg-amber-300",
   },
 ];
 
-const desktopNavItemsList = allNavItemsList.filter(
-  (item) =>
-    item.id !== "wallpapers" &&
-    item.id !== "templateTest",
-);
+const desktopNavItemsList = allNavItemsList;
 
 export function Sidebar({
   activePage,
@@ -267,26 +237,28 @@ export function Sidebar({
       <header className="sticky top-0 z-40 flex w-full shrink-0 items-center justify-between border-none !bg-[#ffffff]/0 px-3.5 py-2.5 shadow-none backdrop-blur-none lg:hidden">
         <div className="flex items-center gap-2">
           {/* Hamburger Menu Trigger Button */}
-          <button
+          <div
             id="mobile-menu-trigger-btn"
             data-name="Nút mở thanh điều hướng di động (Mobile Navigation Trigger)"
-            onClick={() => {
-              playUiSound("click");
-              setIsMobileMenuOpen(true);
-            }}
             className={cn(
               "glass-xs hover:glass-sm group relative flex shrink-0 cursor-pointer items-center justify-center rounded-xl p-2 text-[var(--text-primary)] transition-all focus-visible:ring-2 focus-visible:ring-violet-500 active:scale-95",
               isMobileMenuOpen && "ring-2 ring-violet-500",
             )}
-            aria-label="Open Navigation Menu"
             title={language === "vi" ? "Mở Menu điều hướng" : "Open Menu"}
           >
-            <Menu
-              size={20}
-              className="text-violet-600 transition-transform duration-300 group-hover:rotate-90 dark:text-violet-400"
+            <HamburgerCollapseButton
+              id="sidebar-mobile-hamburger-toggle"
+              checked={isMobileMenuOpen}
+              onClick={() => {
+                playUiSound("click");
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }}
+              scale={0.4}
+              title={language === "vi" ? "Mở Menu điều hướng" : "Open Menu"}
+              aria-label="Open Navigation Menu"
             />
-            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-[var(--bg)] bg-emerald-500" />
-          </button>
+            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-[var(--bg)] bg-emerald-500 pointer-events-none" />
+          </div>
 
           {/* User Avatar & Active Page Tag */}
           <div className="flex shrink-0 items-center gap-2">
@@ -513,15 +485,16 @@ export function Sidebar({
 
       {/* Desktop Vertical Sidebar (>= lg) */}
       <aside
+        id="desktop-left-sidebar"
         style={{ borderRadius: 0, boxShadow: "none" }}
         className={cn(
-          "!bg-transparent relative z-50 ml-0 hidden h-full flex-shrink-0 flex-col justify-between rounded-none border-r border-black/5 dark:border-white/5 px-2 py-4 font-bold !shadow-none shadow-none transition-all duration-300 lg:flex",
-          isExpanded ? "w-[200px] items-center" : "w-[100px] items-center",
+          "!bg-transparent relative z-50 ml-0 hidden h-full max-h-full flex-shrink-0 flex-col justify-between overflow-hidden rounded-none border-r border-black/5 dark:border-white/5 px-2 py-4 font-bold !shadow-none shadow-none transition-all duration-300 lg:flex",
+          isExpanded ? "w-[180px] items-center" : "w-[100px] items-center",
         )}
       >
         {/* 1. TOP SECTION: Avatar */}
         <div
-          className="mb-4 flex w-full pt-2 items-center justify-center"
+          className="mb-2 flex w-full shrink-0 pt-2 items-center justify-center"
         >
           <div
             className="group relative shrink-0 cursor-pointer"
@@ -532,13 +505,13 @@ export function Sidebar({
               alt="Avatar"
               className={cn(
                 "rounded-full border-2 border-violet-500 object-cover shadow-lg transition-all duration-300",
-                isExpanded ? "h-14 w-14" : "h-10 w-10",
+                isExpanded ? "h-12 w-12" : "h-10 w-10",
               )}
             />
             <span
               className={cn(
                 "absolute right-0 bottom-0 animate-pulse rounded-full border-2 border-[var(--bg)] bg-emerald-500",
-                isExpanded ? "h-4 w-4" : "h-3 w-3",
+                isExpanded ? "h-3.5 w-3.5" : "h-3 w-3",
               )}
             />
           </div>
@@ -547,8 +520,8 @@ export function Sidebar({
         {/* 2. CENTER SECTION: Menu Icons */}
         <nav
           className={cn(
-            "my-auto flex w-full flex-col space-y-2 overflow-visible py-2",
-            isExpanded ? "items-stretch px-2" : "items-center px-0",
+            "custom-scrollbar my-auto flex w-full flex-1 min-h-0 flex-col justify-center space-y-1.5 overflow-y-auto overflow-x-hidden py-1",
+            isExpanded ? "items-stretch px-1" : "items-center px-0",
           )}
         >
           {desktopNavItemsList.map((item) => {
@@ -566,31 +539,33 @@ export function Sidebar({
                   playUiSound("pageSwitch");
                   onNavigate(item.id);
                 }}
-                whileHover={{ scale: 1.08 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 data-active={isActive}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "sidebar-nav-item group relative flex h-11 shrink-0 cursor-pointer items-center rounded-2xl transition-all duration-300",
+                  "sidebar-nav-item group relative flex h-10 shrink-0 cursor-pointer items-center rounded-2xl transition-all duration-300",
                   isExpanded
-                    ? "w-full justify-start gap-3 px-3.5"
-                    : "mx-auto w-11 justify-center",
+                    ? "w-full justify-start gap-2.5 px-2.5"
+                    : "mx-auto w-10 justify-center",
                   isActive
                     ? `bg-white/80 dark:bg-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-white/60 dark:border-white/15 backdrop-blur-md ${item.iconColor}`
                     : `hover:bg-white/40 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white ${item.iconColor}`,
                 )}
               >
-                <Icon
-                  size={20}
-                  className={cn(
-                    "shrink-0 transition-transform duration-300 group-hover:scale-110",
-                    item.iconColor,
-                  )}
-                />
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                  <Icon
+                    size={19}
+                    className={cn(
+                      "shrink-0 transition-transform duration-300 group-hover:scale-110",
+                      item.iconColor,
+                    )}
+                  />
+                </div>
                 {isExpanded && (
                   <span
                     className={cn(
-                      "truncate text-left text-[13px] font-bold tracking-tight whitespace-nowrap",
+                      "truncate text-left text-[12.5px] font-bold tracking-tight whitespace-nowrap",
                       isActive ? "font-black" : "font-semibold text-slate-700 dark:text-slate-300",
                     )}
                   >
@@ -607,17 +582,10 @@ export function Sidebar({
 
         {/* 3. BOT SECTION: Toggle Collapse/Expand Button */}
         <div
-          className={cn(
-            "flex w-full shrink-0 items-center justify-center border-t border-[var(--border)] px-0 pt-3",
-          )}
+          className="flex h-11 w-full shrink-0 items-center justify-center border-t border-[var(--border)] px-0 pt-1"
         >
-          <motion.button
-            onClick={onToggleExpand}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={cn(
-              "group flex cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-2 text-[var(--muted)] shadow-none transition-colors hover:bg-[var(--shadow-color)]/5 hover:text-[var(--text-primary)]",
-            )}
+          <div
+            className="flex items-center justify-center p-1 rounded-xl transition-colors hover:bg-[var(--shadow-color)]/5"
             title={
               isExpanded
                 ? language === "vi"
@@ -628,8 +596,26 @@ export function Sidebar({
                   : "Expand Sidebar"
             }
           >
-            <MoreHorizontal size={20} className="shrink-0 transition-transform group-hover:scale-110" />
-          </motion.button>
+            <HamburgerCollapseButton
+              id="sidebar-desktop-collapse-toggle"
+              checked={isExpanded}
+              onClick={() => {
+                playUiSound("click");
+                onToggleExpand();
+              }}
+              scale={0.30}
+              title={
+                isExpanded
+                  ? language === "vi"
+                    ? "Thu gọn thanh menu"
+                    : "Collapse Sidebar"
+                  : language === "vi"
+                    ? "Mở rộng thanh menu"
+                    : "Expand Sidebar"
+              }
+              aria-label="Toggle Sidebar"
+            />
+          </div>
         </div>
       </aside>
     </>

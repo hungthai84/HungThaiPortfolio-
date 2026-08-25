@@ -21,6 +21,11 @@ import { playUiSound } from "../lib/sound";
 import { PageId } from "../types";
 import { pageSummariesData, PageSummaryInfo } from "../data/pageSummaries";
 import { allNavItemsList } from "./Sidebar";
+import {
+  UnifiedPageToolbar,
+  ToolbarOption,
+  ViewModeOption,
+} from "./UnifiedPageToolbar";
 
 export const standardPageTitles: Record<string, { vi: string; en: string }> = {
   home: {
@@ -30,6 +35,10 @@ export const standardPageTitles: Record<string, { vi: string; en: string }> = {
   coverLetter: {
     vi: "Thư Ngỏ",
     en: "Cover Letter",
+  },
+  education: {
+    vi: "Học Vấn",
+    en: "Education",
   },
   experience: {
     vi: "Kinh Nghiệm",
@@ -47,10 +56,21 @@ export const standardPageTitles: Record<string, { vi: string; en: string }> = {
     vi: "Dự Án",
     en: "Projects",
   },
-
+  systems: {
+    vi: "Hệ Thống",
+    en: "Systems",
+  },
   interview: {
     vi: "Phỏng Vấn",
     en: "Interview",
+  },
+  tuvi: {
+    vi: "Tử Vi & Phong Thủy",
+    en: "Horoscope & Feng Shui",
+  },
+  memories: {
+    vi: "Kỷ Niệm",
+    en: "Memories",
   },
   settings: {
     vi: "Cài Đặt & Giao Diện",
@@ -79,6 +99,10 @@ export const shortSubtitles: Record<string, { vi: string; en: string }> = {
     vi: "Sứ mệnh của tôi là phụng sự và tạo giá trị thực.",
     en: "My mission is to serve and create real value.",
   },
+  education: {
+    vi: "Học vấn là hành trình tích lũy tri thức và nâng tầm năng lực.",
+    en: "Education is a journey of knowledge accumulation and capability elevation.",
+  },
   experience: {
     vi: "Mỗi thử thách là một bài học đắt giá trên hành trình trưởng thành.",
     en: "Every challenge is a valuable lesson on the journey of growth.",
@@ -95,10 +119,21 @@ export const shortSubtitles: Record<string, { vi: string; en: string }> = {
     vi: "Chi tiết làm nên sự hoàn hảo, và hoàn hảo không phải là chi tiết.",
     en: "Details make perfection, and perfection is not a detail.",
   },
-
+  systems: {
+    vi: "Hệ thống vận hành, hạ tầng công nghệ và kiến trúc giải pháp tối ưu.",
+    en: "Operational systems, technology infrastructure, and optimal solution architecture.",
+  },
   interview: {
     vi: "Chuẩn bị kỹ lưỡng là 50% của thành công.",
     en: "Thorough preparation is 50% of success.",
+  },
+  tuvi: {
+    vi: "Chiêm nghiệm quy luật tự nhiên, vận mệnh và sự cân bằng trong cuộc sống.",
+    en: "Contemplating natural laws, destiny, and balance in life.",
+  },
+  memories: {
+    vi: "Những khoảnh khắc quý giá và cột mốc đáng nhớ trên hành trình sự nghiệp.",
+    en: "Precious moments and memorable milestones on the career journey.",
   },
   settings: {
     vi: "Giao diện đơn giản là sự tinh tế tối thượng.",
@@ -129,6 +164,7 @@ interface PageLayoutProps {
   background?: React.ReactNode;
   className?: string;
   rootClassName?: string;
+  contentContainerClassName?: string;
   titleClassName?: string;
   subtitleClassName?: string;
   iconContainerClassName?: string;
@@ -138,10 +174,33 @@ interface PageLayoutProps {
   headerActions?: React.ReactNode;
   onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
 
-  // Custom Filters & View modes
-  filterOptions?: { id: string; labelVi: string; labelEn: string }[];
+  // Unified Toolbar Props (Search, Group, Filter, View, Actions)
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  searchPlaceholder?: string;
+  showSearch?: boolean;
+
+  groupOptions?: ToolbarOption[];
+  activeGroup?: string;
+  onGroupChange?: (groupId: string) => void;
+  groupLabel?: { vi: string; en: string };
+
+  filterOptions?: (ToolbarOption | { id: string; labelVi: string; labelEn: string })[];
   activeFilter?: string;
   onFilterChange?: (filterId: string) => void;
+  filterLabel?: { vi: string; en: string };
+
+  viewModeOptions?: ViewModeOption[];
+  activeViewMode?: string;
+  onViewModeChange?: (mode: string) => void;
+
+  toolbarActions?: React.ReactNode;
+  onReset?: () => void;
+  showReset?: boolean;
+  hideToolbar?: boolean;
+  toolbarClassName?: string;
+  totalCount?: number;
+  filteredCount?: number;
 
   // Custom video popup URL override
   videoUrl?: string;
@@ -166,6 +225,7 @@ export function PageLayout({
   background,
   className,
   rootClassName,
+  contentContainerClassName,
   titleClassName,
   subtitleClassName,
   iconContainerClassName,
@@ -174,9 +234,28 @@ export function PageLayout({
   hideHeader = false,
   headerActions,
   onScroll,
+  searchQuery,
+  onSearchChange,
+  searchPlaceholder,
+  showSearch = true,
+  groupOptions = [],
+  activeGroup,
+  onGroupChange,
+  groupLabel,
   filterOptions = [],
   activeFilter,
   onFilterChange,
+  filterLabel,
+  viewModeOptions = [],
+  activeViewMode,
+  onViewModeChange,
+  toolbarActions,
+  onReset,
+  showReset,
+  hideToolbar = false,
+  toolbarClassName,
+  totalCount,
+  filteredCount,
   videoUrl = "https://cdn.scena.ai/project/9306/95e20a75c4af34a76d83b97ffc7ddc0b099bd815eebaad65a9ceef3c73fa19dd.mp4",
   videoTitle,
   isVideoModalOpen: controlledVideoModalOpen,
@@ -186,7 +265,6 @@ export function PageLayout({
   const { language, toggleLanguage, t } = useLanguage();
   const [viewMode, setViewMode] = useState<"grid" | "timeline">("grid");
   const [localVideoModalOpen, setLocalVideoModalOpen] = useState(false);
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(true);
 
   const isVideoModalOpen = controlledVideoModalOpen !== undefined ? controlledVideoModalOpen : localVideoModalOpen;
@@ -302,14 +380,15 @@ export function PageLayout({
         <div
           className={cn(
             "relative mx-auto flex w-full flex-col gap-6 pb-8 px-4 sm:px-6 md:px-0",
-            pageId === "home" ? "max-w-full h-full min-h-full flex-1" : "max-w-[1240px]"
+            pageId === "home" ? "max-w-full h-full min-h-full flex-1" : "max-w-[1240px]",
+            contentContainerClassName
           )}
         >
-          {/* 2.1 TOP HEADER BAR: Tiêu đề, Popup Video, Filter, View Mode, Giao Diện Icon, Ngôn Ngữ */}
+          {/* 2.1 TOP HEADER BAR: Tiêu đề & Thẻ thanh công cụ tích hợp trang */}
           {!shouldHideHeader && (
             <div
               className={cn(
-                "relative z-20 w-full px-0 !bg-[#ffffff]/0 h-[70px]",
+                "relative z-20 w-full px-0 !bg-transparent space-y-2.5",
                 headerContainerClassName,
               )}
             >
@@ -320,13 +399,13 @@ export function PageLayout({
                 className={cn(
                   "relative overflow-hidden w-full px-4 sm:px-6",
                   "transition-all duration-300",
-                  "flex flex-col items-center justify-between gap-2 md:flex-row",
-                  "h-[70px] py-0 mb-0 !bg-[#ffffff]/0",
+                  "flex flex-col items-start justify-center",
+                  "py-1 mb-0 !bg-transparent",
                   headerClassName,
                 )}
               >
-                {/* Left: Title & Subtitle */}
-                <div className="flex w-full min-w-0 items-center gap-2.5 md:w-auto">
+                {/* Title & Subtitle */}
+                <div className="flex w-full min-w-0 items-center justify-between gap-2.5">
                   <div
                     className={cn(
                       "flex min-w-0 flex-col text-left",
@@ -374,88 +453,49 @@ export function PageLayout({
                     )}
                   </div>
                 </div>
-
-                {/* Right: Interactive Control Tools Bar */}
-                <div className="flex w-full shrink-0 flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] pt-2 md:w-auto md:border-t-0 md:pt-0">
-                  {/* Custom Header Actions passed from parent */}
-                  {headerActions}
-
-                  {/* Filter Dropdown (If filterOptions available) */}
-                  {filterOptions.length > 0 && onFilterChange && (
-                    <div className="relative z-50">
-                      <button
-                        onClick={() => {
-                          playUiSound("click");
-                          setIsFilterDropdownOpen(!isFilterDropdownOpen);
-                        }}
-                        className={cn(
-                          "flex cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black shadow-xs transition-all duration-200 select-none",
-                          activeFilter && activeFilter !== "All"
-                            ? "border-indigo-500/50 bg-indigo-500/15 text-indigo-700 dark:border-indigo-400/40 dark:bg-indigo-500/25 dark:text-indigo-300 ring-2 ring-indigo-500/20"
-                            : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-indigo-500/30 hover:bg-[var(--border)]"
-                        )}
-                        title={
-                          language === "vi" ? "Bộ lọc danh mục" : "Filter category"
-                        }
-                      >
-                        <Filter size={14} className={cn("shrink-0", activeFilter && activeFilter !== "All" ? "text-indigo-600 dark:text-indigo-400" : iconColorClass)} />
-                        <span className="hidden sm:inline">
-                          {language === "vi" ? "Lọc danh mục:" : "Filter:"}
-                        </span>
-                        <span className={cn("font-black", activeFilter && activeFilter !== "All" ? "text-indigo-600 dark:text-indigo-300" : iconColorClass)}>
-                          {filterOptions.find((f) => f.id === activeFilter)?.[
-                            language === "vi" ? "labelVi" : "labelEn"
-                          ] || (language === "vi" ? "Tất cả" : "All")}
-                        </span>
-                        <ChevronDown size={13} className="text-[var(--muted)]" />
-                      </button>
-
-                      <AnimatePresence>
-                        {isFilterDropdownOpen && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 6, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 6, scale: 0.95 }}
-                            className="absolute right-0 mt-1.5 flex w-52 flex-col gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1.5 shadow-xl backdrop-blur-xl"
-                          >
-                            {filterOptions.map((opt) => (
-                              <button
-                                key={opt.id}
-                                onClick={() => {
-                                  playUiSound("toggle");
-                                  onFilterChange(opt.id);
-                                  setIsFilterDropdownOpen(false);
-                                }}
-                                className={cn(
-                                  "flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-black transition-all",
-                                  activeFilter === opt.id
-                                    ? `bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 font-extrabold border border-indigo-500/30`
-                                    : "text-[var(--text-secondary)] hover:bg-[var(--border)]",
-                                )}
-                              >
-                                <span>
-                                  {language === "vi" ? opt.labelVi : opt.labelEn}
-                                </span>
-                                {activeFilter === opt.id && (
-                                  <Check size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
-                                )}
-                              </button>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  )}
-                </div>
               </motion.header>
 
+              {/* THẺ CHỨA CÁC THÔNG SỐ: TÌM KIẾM, NHÓM, FILTER, DẠNG VIEW, NÚT TÍNH NĂNG (NẰM DƯỚI TIÊU ĐỀ) */}
+              {/* Only show attached toolbar object on Experience & Projects pages */}
+              {!hideToolbar && (pageId === "experience" || pageId === "projects") && (
+                <div className="w-full px-4 sm:px-6">
+                  <UnifiedPageToolbar
+                    searchQuery={searchQuery}
+                    onSearchChange={onSearchChange}
+                    searchPlaceholder={searchPlaceholder}
+                    showSearch={showSearch}
+                    groupOptions={groupOptions}
+                    activeGroup={activeGroup}
+                    onGroupChange={onGroupChange}
+                    groupLabel={groupLabel}
+                    filterOptions={filterOptions as ToolbarOption[]}
+                    activeFilter={activeFilter}
+                    onFilterChange={onFilterChange}
+                    filterLabel={filterLabel}
+                    viewModeOptions={viewModeOptions}
+                    activeViewMode={activeViewMode}
+                    onViewModeChange={onViewModeChange}
+                    toolbarActions={toolbarActions || headerActions}
+                    onReset={onReset}
+                    showReset={showReset}
+                    totalCount={totalCount}
+                    filteredCount={filteredCount}
+                    videoUrl={videoUrl}
+                    onVideoClick={() => setIsVideoModalOpen(true)}
+                    className={toolbarClassName}
+                  />
+                </div>
+              )}
+
               {/* Refined Horizontal Divider */}
-              <motion.div 
-                initial={{ opacity: 0, scaleX: 0.5 }}
-                animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="mx-auto mt-4 mb-2 w-4/5 max-w-lg h-[1px] bg-gradient-to-r from-transparent via-[var(--border)] to-transparent opacity-60 dark:opacity-40"
-              />
+              {!hideToolbar && (pageId === "experience" || pageId === "projects") && (
+                <motion.div 
+                  initial={{ opacity: 0, scaleX: 0.5 }}
+                  animate={{ opacity: 1, scaleX: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="mx-auto mt-2 mb-1 w-4/5 max-w-lg h-[1px] bg-gradient-to-r from-transparent via-[var(--border)] to-transparent opacity-60 dark:opacity-40"
+                />
+              )}
             </div>
           )}
 

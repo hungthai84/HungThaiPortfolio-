@@ -58,6 +58,7 @@ import { Sidebar } from "./components/Sidebar";
 import { RightSidebar } from "./components/RightSidebar";
 import { PrintableResume } from "./components/PrintableResume";
 import { PdfPreviewModal } from "./components/PdfPreviewModal";
+import { TxtExportProgressModal } from "./components/TxtExportProgressModal";
 import { useLanguage } from "./context/LanguageContext";
 import { playUiSound } from "./lib/sound";
 import { savePreferencesToCloud, loadPreferencesFromCloud } from "./lib/wallpaperSync";
@@ -78,6 +79,7 @@ import { Systems } from "./pages/Systems";
 import { Education } from "./pages/Education";
 import { Skills } from "./pages/Skills";
 import { Interview } from "./pages/Interview";
+import { TuVi } from "./pages/TuVi";
 import { AIChat } from "./pages/AIChat";
 import { Wallpapers } from "./pages/Wallpapers";
 import { WebsiteManagement } from "./pages/WebsiteManagement";
@@ -94,6 +96,7 @@ import { XRayPromptEditor } from "./components/xray/XRayPromptEditor";
 import { GenerativeWaveWallpaper } from "./components/GenerativeWaveWallpaper";
 import { GlassSoundEffect } from "./components/GlassSoundEffect";
 import { MouseMagicCursor } from "./components/MouseMagicCursor";
+import { MultiChromaticGlassMesh } from "./components/MultiChromaticGlassMesh";
 
 export interface WallpaperOption {
   id: string;
@@ -410,6 +413,15 @@ export type RainbowColorId =
   | "green"
   | "violet"
   | "rainbow"
+  | "cyber-neon"
+  | "emerald-aurora"
+  | "sunset-flare"
+  | "royal-violet"
+  | "oceanic-blue"
+  | "tokyo-crimson"
+  | "neo-mint-glass"
+  | "luxury-amber"
+  | "custom-hex"
   | "wallpaper-adaptive"
   | "wallpaper-harmonic";
 
@@ -793,6 +805,70 @@ export const RAINBOW_PRIMARY_COLORS: PrimaryThemeColor[] = [
     glowColor: "rgba(139, 92, 246, 0.4)",
     hex: "#8b5cf6",
   },
+  {
+    id: "cyber-neon",
+    name: "Cyber Neon",
+    gradientClass: "bg-gradient-to-r from-fuchsia-500 via-cyan-400 to-indigo-500 text-white animate-pulse",
+    badgeBg: "bg-gradient-to-r from-fuchsia-500 to-cyan-400 text-white",
+    glowColor: "rgba(217, 70, 239, 0.4)",
+    hex: "#d946ef",
+  },
+  {
+    id: "emerald-aurora",
+    name: "Emerald Aurora",
+    gradientClass: "bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-white animate-gradient-slow",
+    badgeBg: "bg-gradient-to-r from-emerald-400 to-cyan-500 text-white",
+    glowColor: "rgba(16, 185, 129, 0.4)",
+    hex: "#10b981",
+  },
+  {
+    id: "sunset-flare",
+    name: "Sunset Flare",
+    gradientClass: "bg-gradient-to-r from-rose-500 via-orange-500 to-amber-400 text-white",
+    badgeBg: "bg-gradient-to-r from-rose-500 to-amber-400 text-white",
+    glowColor: "rgba(244, 63, 94, 0.4)",
+    hex: "#f43f5e",
+  },
+  {
+    id: "royal-violet",
+    name: "Royal Violet",
+    gradientClass: "bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-500 text-white",
+    badgeBg: "bg-gradient-to-r from-violet-600 to-pink-500 text-white",
+    glowColor: "rgba(124, 58, 237, 0.4)",
+    hex: "#7c3aed",
+  },
+  {
+    id: "oceanic-blue",
+    name: "Oceanic Blue",
+    gradientClass: "bg-gradient-to-r from-blue-600 via-sky-500 to-teal-400 text-white",
+    badgeBg: "bg-gradient-to-r from-blue-600 to-teal-400 text-white",
+    glowColor: "rgba(37, 99, 235, 0.4)",
+    hex: "#2563eb",
+  },
+  {
+    id: "tokyo-crimson",
+    name: "Tokyo Crimson",
+    gradientClass: "bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 text-white",
+    badgeBg: "bg-gradient-to-r from-red-600 to-pink-600 text-white",
+    glowColor: "rgba(220, 38, 38, 0.4)",
+    hex: "#dc2626",
+  },
+  {
+    id: "neo-mint-glass",
+    name: "Neo Mint Glass",
+    gradientClass: "bg-gradient-to-r from-teal-300 via-emerald-400 to-cyan-400 text-slate-900 font-bold",
+    badgeBg: "bg-gradient-to-r from-teal-300 to-cyan-400 text-slate-900 font-bold",
+    glowColor: "rgba(52, 211, 153, 0.4)",
+    hex: "#34d399",
+  },
+  {
+    id: "luxury-amber",
+    name: "Luxury Amber",
+    gradientClass: "bg-gradient-to-r from-amber-600 via-yellow-500 to-orange-500 text-white",
+    badgeBg: "bg-gradient-to-r from-amber-600 to-orange-500 text-white",
+    glowColor: "rgba(217, 119, 6, 0.4)",
+    hex: "#d97706",
+  },
 ];
 
 export default function App() {
@@ -824,10 +900,26 @@ export default function App() {
   }, [activePage, language]);
   const [navDirection, setNavDirection] = useState<number>(1);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(activePage === "home");
+
+  // Keep sidebar expanded ONLY on home page, default collapsed for all other pages
+  useEffect(() => {
+    setIsSidebarExpanded(activePage === "home");
+  }, [activePage]);
   const [isRightSidebarExpanded, setIsRightSidebarExpanded] = useState(false);
   const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
+  const [isTxtExportModalOpen, setIsTxtExportModalOpen] = useState(false);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [printLanguage, setPrintLanguage] = useState<"vi" | "en">("vi");
+
+  useEffect(() => {
+    const handleOpenTxtExport = () => setIsTxtExportModalOpen(true);
+    window.addEventListener("app-open-txt-export-modal", handleOpenTxtExport);
+    return () =>
+      window.removeEventListener(
+        "app-open-txt-export-modal",
+        handleOpenTxtExport
+      );
+  }, []);
 
   // Settings Modal Active Tab State ('appearance' | 'typography' | 'sound_lang' | 'sync_system' | 'backup_pdf')
   const [activeSettingsTab, setActiveSettingsTab] = useState<
@@ -2320,9 +2412,36 @@ export default function App() {
     const handleToggleResponsive = () => {
       setIsResponsive(prev => !prev);
     };
+    const handleSetResponsive = (e: Event) => {
+      const custom = e as CustomEvent<{ isResponsive: boolean }>;
+      if (custom.detail && typeof custom.detail.isResponsive === "boolean") {
+        setIsResponsive(custom.detail.isResponsive);
+      }
+    };
     window.addEventListener("app-toggle-responsive", handleToggleResponsive);
-    return () => window.removeEventListener("app-toggle-responsive", handleToggleResponsive);
+    window.addEventListener("app-set-responsive", handleSetResponsive);
+    return () => {
+      window.removeEventListener("app-toggle-responsive", handleToggleResponsive);
+      window.removeEventListener("app-set-responsive", handleSetResponsive);
+    };
   }, []);
+
+  const [viewportMode, setViewportMode] = useState<string>(() => {
+    return localStorage.getItem("app_viewport_mode") || "desktop";
+  });
+
+  useEffect(() => {
+    const handleVp = (e: Event) => {
+      const custom = e as CustomEvent<{ mode: string }>;
+      if (custom.detail?.mode) {
+        setViewportMode(custom.detail.mode);
+        localStorage.setItem("app_viewport_mode", custom.detail.mode);
+      }
+    };
+    window.addEventListener("app-set-viewport-mode", handleVp);
+    return () => window.removeEventListener("app-set-viewport-mode", handleVp);
+  }, []);
+
 
   const [fontFamily, setFontFamily] = useState<string>("font-play");
 
@@ -2391,7 +2510,7 @@ export default function App() {
   }, [fontFamily, isFontOverrideActive]);
 
   const [uiStyle, setUiStyle] = useState<"glass" | "neumorphism" | "soft">(
-    "glass",
+    () => (localStorage.getItem("app_ui_style") as "glass" | "neumorphism" | "soft") || "glass",
   );
 
   useEffect(() => {
@@ -2620,7 +2739,6 @@ export default function App() {
     const nextIndex = pageSequence.indexOf(page);
     setNavDirection(nextIndex >= currentIndex ? 1 : -1);
     setActivePage(page);
-    setIsSidebarExpanded(page === "home");
   };
 
   const handleResetToDefaults = () => {
@@ -3081,7 +3199,6 @@ export default function App() {
     const targetPage = pageSequence[nextIndex] as PageId;
     setNavDirection(1);
     setActivePage(targetPage);
-    setIsSidebarExpanded(targetPage === "home");
   };
 
   const handlePrev = () => {
@@ -3091,7 +3208,6 @@ export default function App() {
     const targetPage = pageSequence[prevIndex] as PageId;
     setNavDirection(-1);
     setActivePage(targetPage);
-    setIsSidebarExpanded(targetPage === "home");
   };
 
   // Language Change Toast Notification
@@ -3207,7 +3323,7 @@ export default function App() {
         )}
       </AnimatePresence>
       {/* Background Layer with Selected Light Wallpaper */}
-      <div className="area pointer-events-none fixed inset-0 z-0 overflow-hidden transition-all duration-700">
+      <div className="area pointer-events-none fixed inset-0 z-0 overflow-hidden transition-all duration-700 bg-slate-100/60 dark:bg-transparent">
         {/* Ambient Gradient Floating Blobs */}
         <div className="ambient-blob ambient-blob-1" />
         <div className="ambient-blob ambient-blob-2" />
@@ -3299,16 +3415,93 @@ export default function App() {
           </>
         )}
 
+        {/* Dynamic Multi-chromatic Ambient Glassmorphism Mesh Aura */}
+        <MultiChromaticGlassMesh intensity="vibrant" />
+
         {/* Crisp Soft Ambient Tint Overlay for UI readability (without blurring background image) */}
         <div className="pointer-events-none absolute inset-0 bg-transparent transition-colors duration-700 dark:bg-transparent" />
       </div>
 
+      {/* Top Floating Responsive Preview Device Bar when in simulated mode */}
+      {viewportMode !== "desktop" && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-4 py-2 rounded-2xl bg-slate-900/90 border border-slate-700/80 text-white shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-center gap-2 pr-2 border-r border-slate-700">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-black text-slate-200">
+              {viewportMode === "tablet"
+                ? "📱 Tablet (iPad Mini • 768px)"
+                : viewportMode === "mobile"
+                ? "📲 Mobile (iPhone 14/15 • 390px)"
+                : viewportMode === "mobile-sm"
+                ? "📱 Mobile Compact (iPhone SE • 375px)"
+                : "💻 Small Laptop (1024px)"}
+            </span>
+          </div>
+
+          {/* Quick Viewport Switchers */}
+          <div className="flex items-center gap-1">
+            {[
+              { id: "desktop", label: "Desktop" },
+              { id: "laptop", label: "1024px" },
+              { id: "tablet", label: "768px" },
+              { id: "mobile", label: "390px" },
+              { id: "mobile-sm", label: "375px" },
+            ].map((vp) => (
+              <button
+                key={vp.id}
+                type="button"
+                onClick={() => {
+                  playUiSound("click");
+                  setViewportMode(vp.id);
+                  localStorage.setItem("app_viewport_mode", vp.id);
+                  window.dispatchEvent(
+                    new CustomEvent("app-set-viewport-mode", { detail: { mode: vp.id } })
+                  );
+                }}
+                className={cn(
+                  "px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer",
+                  viewportMode === vp.id
+                    ? "bg-indigo-600 text-white shadow"
+                    : "bg-slate-800/80 hover:bg-slate-700 text-slate-300",
+                )}
+              >
+                {vp.label}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              playUiSound("click");
+              setViewportMode("desktop");
+              localStorage.setItem("app_viewport_mode", "desktop");
+              window.dispatchEvent(
+                new CustomEvent("app-set-viewport-mode", { detail: { mode: "desktop" } })
+              );
+            }}
+            className="ml-1 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer text-xs font-bold"
+            title="Thoát chế độ mô phỏng / Reset về Full Desktop"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       <div
         className={cn(
           "relative z-10 flex items-center justify-center p-2 transition-all duration-500 sm:p-4 lg:p-8",
-          isResponsive
-            ? "min-h-screen w-full overflow-hidden lg:h-screen"
-            : "h-screen w-screen shrink-0 overflow-hidden",
+          viewportMode === "desktop"
+            ? isResponsive
+              ? "min-h-screen w-full overflow-hidden lg:h-screen"
+              : "h-screen w-screen shrink-0 overflow-hidden"
+            : viewportMode === "tablet"
+            ? "w-full max-w-[768px] mx-auto min-h-screen pt-16 pb-8"
+            : viewportMode === "mobile"
+            ? "w-full max-w-[390px] mx-auto min-h-screen pt-16 pb-8"
+            : viewportMode === "mobile-sm"
+            ? "w-full max-w-[375px] mx-auto min-h-screen pt-16 pb-8"
+            : "w-full max-w-[1024px] mx-auto min-h-screen pt-16 pb-8",
         )}
       >
         <div id="external-timeline-portal-root" className="pointer-events-none absolute inset-0 z-50 overflow-hidden" />
@@ -3352,6 +3545,8 @@ export default function App() {
           }}
           className={cn(
             "relative overflow-hidden border transition-all duration-500",
+            viewportMode !== "desktop" &&
+              "ring-8 ring-slate-800/80 dark:ring-slate-700/80 rounded-[36px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]",
             glassElevation && "glass-elevation",
             uiStyle === "glass"
               ? glassMirrorEffect
@@ -3359,8 +3554,8 @@ export default function App() {
                 : "border-white/70 shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)]"
               : "border-slate-200/90 shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)]",
             isResponsive
-              ? "mx-auto flex h-full max-h-[750px] w-full flex-col gap-[5px] overflow-hidden border border-white/80 p-[10px] shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)] !rounded-[32px] lg:h-[750px] lg:max-w-[1250px] lg:flex-row"
-              : "flex gap-[5px] border-white/80 p-[10px] shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)] dark:border-white/15 dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.85),0_10px_25px_-5px_rgba(0,0,0,0.6)]",
+              ? "mx-auto flex h-full max-h-[750px] w-full flex-col gap-[5px] overflow-hidden border border-white/80 p-[5px] shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)] !rounded-[32px] lg:h-[750px] lg:max-w-[1250px] lg:flex-row"
+              : "flex gap-[5px] border-white/80 p-[5px] shadow-[0_20px_50px_rgba(15,23,42,0.12),0_8px_20px_rgba(15,23,42,0.06)] dark:border-white/15 dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.85),0_10px_25px_-5px_rgba(0,0,0,0.6)]",
           )}
         >
           <Sidebar
@@ -3432,6 +3627,7 @@ export default function App() {
                   {activePage === "systems" && <Systems />}
                   {activePage === "education" && <Education />}
                   {activePage === "interview" && <Interview />}
+                  {activePage === "tuvi" && <TuVi />}
                   {activePage === "wallpapers" && <Wallpapers />}
                   {activePage === "websiteManagement" && <WebsiteManagement />}
                   {activePage === "templateTest" && <TemplateTest />}
@@ -3778,13 +3974,20 @@ export default function App() {
         onClose={() => setIsPdfPreviewOpen(false)}
         onDownload={(lang) => handleDownloadDirectPdf(lang)}
         onPrint={(lang) => handlePrintPdf(lang)}
+        onExportTxt={() => setIsTxtExportModalOpen(true)}
         isDownloading={pdfProgress.isOpen}
         downloadPercent={pdfProgress.percent}
         downloadStatus={pdfProgress.statusText}
       />
 
+      {/* TXT Data Verification & Progress Export Notification Modal */}
+      <TxtExportProgressModal
+        isOpen={isTxtExportModalOpen}
+        onClose={() => setIsTxtExportModalOpen(false)}
+      />
+
       <XRayPromptEditor />
-      <MouseMagicCursor />
+            <MouseMagicCursor />
     </main>
   );
 }

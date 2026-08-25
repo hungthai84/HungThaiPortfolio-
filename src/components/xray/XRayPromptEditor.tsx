@@ -7,6 +7,8 @@ import {
   Wand2,
   MousePointerClick,
   CheckCircle2,
+  AlertTriangle,
+  Check,
   Sun,
   Moon,
   Monitor,
@@ -38,8 +40,13 @@ import {
   Globe,
   FileCode,
   Save,
+  FolderTree,
+  Share2,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { DomTreeViewer } from "./DomTreeViewer";
+import { ElementPropertiesPanel } from "./ElementPropertiesPanel";
+import { WebsiteStructureTree, StructureNode } from "./WebsiteStructureTree";
 
 const ACTIONS = [
   "Đổi nội dung",
@@ -255,7 +262,7 @@ interface EditableStyleProp {
 }
 
 export function XRayPromptEditor() {
-  const [activeTab, setActiveTab] = useState<"generator" | "library">("generator");
+  const [activeTab, setActiveTab] = useState<"generator" | "structure" | "library">("generator");
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [isSelectModePaused, setIsSelectModePaused] = useState(false);
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null);
@@ -263,6 +270,9 @@ export function XRayPromptEditor() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [hoverRect, setHoverRect] = useState<DOMRect | null>(null);
   const [selectRect, setSelectRect] = useState<DOMRect | null>(null);
+  const [stackedLayers, setStackedLayers] = useState<HTMLElement[]>([]);
+  const [layerHoverRect, setLayerHoverRect] = useState<DOMRect | null>(null);
+  const [isStackedWarningExpanded, setIsStackedWarningExpanded] = useState(false);
 
   useEffect(() => {
     if (selectedElement && isPanelOpen) {
@@ -437,6 +447,37 @@ export function XRayPromptEditor() {
     showToast(`✓ Đã lưu format "${name}" thành công!`);
   };
 
+  const handleGeneratePromptForNodes = (nodes: StructureNode[], actionType: "custom" | "edit" | "add" | "delete") => {
+    if (nodes.length === 0) return;
+    const names = nodes.map(n => `"${n.name}" (${n.type}${n.selector ? `: ${n.selector}` : ""})`).join(", ");
+    
+    let p = "";
+    if (actionType === "add") {
+      p = `Hãy thêm các thành phần mới sau vào cấu trúc website: ${names}. Yêu cầu: thiết kế chuẩn Fluent UI, bố cục gọn gàng, không bo góc (rounded-none), màu nền đồng bộ với sidebar.`;
+    } else if (actionType === "edit") {
+      p = `Hãy chỉnh sửa và tối ưu hóa các thành phần sau trong cấu trúc website: ${names}. Cải thiện tính thẩm mỹ, độ tương phản và căn chỉnh nội dung trực quan.`;
+    } else if (actionType === "delete") {
+      p = `Yêu cầu xóa hoàn toàn các thành phần sau khỏi cấu trúc website: ${names}.`;
+    } else {
+      p = `Hãy tối ưu, hoàn thiện và đồng bộ các thành phần sau trong cấu trúc website: ${names}. Đảm bảo các khối thông tin hiển thị mạch lạc và phản hồi mượt mà trên mọi thiết bị.`;
+    }
+    
+    setGeneratedPrompt(p);
+    setLastPrompt(p);
+    const updatedQueue = [...promptQueue, p];
+    setPromptQueue(updatedQueue);
+    try {
+      localStorage.setItem("xray_prompt_queue_saved", JSON.stringify(updatedQueue));
+    } catch {}
+    showToast(`✓ Đã sinh Prompt cho ${nodes.length} mục cấu trúc website!`);
+    setActiveTab("generator");
+  };
+
+  const handleCopyText = (text: string) => {
+    navigator.clipboard.writeText(text);
+    showToast("✓ Đã sao chép vào Clipboard!");
+  };
+
   const handleApplyFormatPreset = (preset: SavedFormatPreset) => {
     if (!selectedElement) return;
     if (preset.classes) {
@@ -541,6 +582,22 @@ export function XRayPromptEditor() {
   }, [isPanelOpen, lastPrompt, generatedPrompt]);
 
   const populateInspectorFields = (el: HTMLElement) => {
+    // Detect all stacked layers at this element's bounding rect
+    const rect = el.getBoundingClientRect();
+    const centerX = rect.left + Math.min(Math.max(rect.width / 2, 5), 80);
+    const centerY = rect.top + Math.min(Math.max(rect.height / 2, 5), 80);
+    if (centerX >= 0 && centerY >= 0 && centerX <= window.innerWidth && centerY <= window.innerHeight) {
+      const raw = document.elementsFromPoint(centerX, centerY)
+        .filter((e): e is HTMLElement => e instanceof HTMLElement && !isXRayElement(e) && e.tagName.toLowerCase() !== "html");
+      const unique = Array.from(new Set(raw));
+      if (!unique.includes(el)) {
+        unique.unshift(el);
+      }
+      setStackedLayers(unique);
+    } else {
+      setStackedLayers([el]);
+    }
+
     setEditTagText((el.innerText || el.textContent || "").trim());
     setEditClasses(getClassString(el));
     setEditImageSrc(el.getAttribute("src") || "");
@@ -988,6 +1045,12 @@ export function XRayPromptEditor() {
 
       e.preventDefault();
       e.stopPropagation();
+
+      // Find all stacked elements directly under cursor position
+      const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY)
+        .filter((el): el is HTMLElement => el instanceof HTMLElement && !isXRayElement(el) && el.tagName.toLowerCase() !== "html");
+      const uniqueLayers = Array.from(new Set(elementsAtPoint));
+      setStackedLayers(uniqueLayers.length > 0 ? uniqueLayers : [target]);
 
       setSelectedElement(target);
       setIsSelectMode(false);
@@ -1545,6 +1608,23 @@ export function XRayPromptEditor() {
         </div>
       )}
 
+      {/* Overlapping Layer Hover Preview Highlighter */}
+      {layerHoverRect && (
+        <div
+          style={{
+            top: layerHoverRect.top,
+            left: layerHoverRect.left,
+            width: layerHoverRect.width,
+            height: layerHoverRect.height,
+          }}
+          className="fixed z-[999999] pointer-events-none border-2 border-dashed border-red-500 bg-red-500/20 rounded transition-all duration-75 shadow-lg animate-pulse"
+        >
+          <div className="absolute -top-7 left-0 flex items-center gap-1.5 rounded bg-red-600 px-2.5 py-0.5 text-[10px] font-mono font-bold text-white shadow-md whitespace-nowrap">
+            <span>Layer xem trước (Preview)</span>
+          </div>
+        </div>
+      )}
+
       {isSelectMode && (
         <div
           className="xray-exclude"
@@ -1615,11 +1695,11 @@ export function XRayPromptEditor() {
               transition={{ type: "spring", damping: 25, stiffness: 220 }}
               className="fixed top-1/2 left-1/2 z-[999999] flex h-[88vh] max-h-[860px] w-[95vw] sm:w-[90vw] md:w-[86vw] lg:w-[860px] max-w-[900px] -translate-x-1/2 flex-col overflow-hidden rounded-[20px] border border-slate-200/80 bg-white/95 font-sans text-slate-800 shadow-[0_25px_70px_rgba(0,0,0,0.35)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0B0D10]/95 dark:text-slate-100"
             >
-              {/* Header */}
+              {/* Header with Navigation Tabs */}
               <div className="flex shrink-0 flex-col border-b border-slate-200/60 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-[#12161C]/60">
                 <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-[20px] bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
                       <Wand2 size={18} />
                     </div>
                     <div>
@@ -1627,7 +1707,7 @@ export function XRayPromptEditor() {
                         X-Ray Prompt &amp; Element Inspector
                       </h2>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Kiểm tra phần tử trực quan &amp; Sinh câu lệnh Prompt AI chuẩn xác
+                        Kiểm tra phần tử trực quan &amp; sinh câu lệnh Prompt AI chuẩn xác
                       </p>
                     </div>
                   </div>
@@ -1635,193 +1715,302 @@ export function XRayPromptEditor() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setShowPromptLibraryModal(true)}
-                      className="flex cursor-pointer items-center gap-1.5 rounded-[12px] bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 transition-colors hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20"
+                      className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 transition-colors hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20"
                     >
                       <BookOpen size={14} />
-                      <span className="hidden sm:inline">Prompt Mẫu</span>
+                      <span className="hidden sm:inline">Prompt mẫu</span>
                     </button>
                     <button
                       onClick={() => setIsPanelOpen(false)}
-                      className="cursor-pointer rounded-[20px] p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-white/5 dark:hover:text-slate-200"
+                      className="cursor-pointer rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-white/5 dark:hover:text-slate-200"
                     >
                       <X size={18} />
                     </button>
                   </div>
                 </div>
+
+                {/* Sub Header Tabs */}
+                <div className="flex items-center gap-1 border-t border-slate-200/50 bg-slate-50/70 px-5 dark:border-white/5 dark:bg-[#151921]/60">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("generator")}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-2 border-b-2 px-3.5 py-2 text-xs font-bold transition-all",
+                      activeTab === "generator"
+                        ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                        : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    )}
+                  >
+                    <Wand2 size={13} />
+                    <span>Kiểm tra phần tử &amp; Sinh Prompt</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("structure")}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-2 border-b-2 px-3.5 py-2 text-xs font-bold transition-all",
+                      activeTab === "structure"
+                        ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                        : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    )}
+                  >
+                    <FolderTree size={13} />
+                    <span>Cấu trúc Website (Tree)</span>
+                  </button>
+                </div>
               </div>
 
               {/* Scrollable Content Area */}
               <div className="custom-scrollbar flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
-                <div className="animate-fadeIn space-y-4">
-                  {selectedElement ? (
-                    <>
-                      {/* 1. Đối tượng */}
-                      <div className="rounded-[20px] border border-blue-500/25 bg-blue-50/40 p-4 shadow-xs dark:border-blue-500/20 dark:bg-blue-950/20">
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-blue-500/15 pb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">1</span>
-                            <span className="text-xs font-black tracking-wider text-blue-900 dark:text-blue-200 uppercase">Đối Tượng</span>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setShowDomHierarchy(!showDomHierarchy)}
-                              className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold transition-all ${showDomHierarchy ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200/80 bg-white text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"}`}
-                            >
-                              <Layers size={13} className={showDomHierarchy ? "text-white" : "text-violet-500"} />
-                              <span>Phả hệ DOM ({elementHierarchy.length + elementChildren.length})</span>
-                              {showDomHierarchy ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                            </button>
-
-                            <button
-                              onClick={() => {
-                                setIsSelectMode(true);
-                                setIsPanelOpen(false);
-                              }}
-                              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-blue-500/30 bg-blue-600 px-3 py-1 text-xs font-bold text-white shadow-xs transition-all hover:bg-blue-700"
-                            >
-                              <MousePointerClick size={13} />
-                              Chọn đối tượng khác
-                            </button>
-
-                            <div className="relative">
+                {activeTab === "structure" ? (
+                  /* Website Structure Tree Tab */
+                  <div className="animate-fadeIn">
+                    <WebsiteStructureTree
+                      onGeneratePromptForNodes={handleGeneratePromptForNodes}
+                      onCopyText={handleCopyText}
+                    />
+                  </div>
+                ) : (
+                  /* Inspector & Prompt Generator Tab */
+                  <div className="animate-fadeIn space-y-4">
+                    {selectedElement ? (
+                      <>
+                        {/* Red Warning Card: Overlapping Stacked Layers Detection (Collapsed by default) */}
+                        {stackedLayers.length >= 2 && (
+                          <div className="rounded-xl border border-red-500/80 bg-red-50/90 p-3 sm:p-3.5 shadow-md dark:border-red-500/80 dark:bg-red-950/40 text-red-900 dark:text-red-200 animate-fadeIn space-y-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+                                <h4 className="text-xs font-black uppercase tracking-wide text-red-700 dark:text-red-300 truncate">
+                                  ⚠️ Cảnh báo: Phát hiện {stackedLayers.length} lớp phần tử xếp chồng
+                                </h4>
+                              </div>
                               <button
-                                onClick={() => setShowWidgetPicker(!showWidgetPicker)}
-                                className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-xs transition-all hover:bg-emerald-700"
+                                type="button"
+                                onClick={() => setIsStackedWarningExpanded(!isStackedWarningExpanded)}
+                                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-red-300 bg-white/95 px-2.5 py-1 text-[11px] font-bold text-red-700 shadow-2xs hover:bg-red-100 transition-colors cursor-pointer dark:border-red-800 dark:bg-slate-900 dark:text-red-300 dark:hover:bg-red-950"
                               >
-                                <Boxes size={13} />
-                                Chọn Widget
+                                <span>{isStackedWarningExpanded ? "Thu gọn" : `Xem ${stackedLayers.length} lớp`}</span>
+                                {isStackedWarningExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                               </button>
-
-                              {showWidgetPicker && (
-                                <div className="absolute right-0 top-full mt-2 z-50 w-72 rounded-xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#151921] animate-fadeIn">
-                                  <div className="px-2 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-white/10 mb-1">
-                                    Chọn Widget Hệ Thống
-                                  </div>
-                                  <div className="space-y-1 max-h-60 overflow-y-auto">
-                                    {WIDGET_TARGETS.map((widget) => (
-                                      <button
-                                        key={widget.id}
-                                        onClick={() => handleSelectWidgetTarget(widget.selector, widget.name)}
-                                        className="w-full text-left px-2.5 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 dark:text-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer"
-                                      >
-                                        <span className="truncate">{widget.name}</span>
-                                        <ChevronRight size={12} className="opacity-50 shrink-0 ml-1" />
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
                             </div>
 
-                            <button
-                              onClick={() => setIsObjOpen(!isObjOpen)}
-                              className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                            >
-                              {isObjOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                            </button>
-                          </div>
-                        </div>
+                            {isStackedWarningExpanded && (
+                              <div className="space-y-3 pt-2 border-t border-red-200 dark:border-red-800/60 animate-fadeIn">
+                                <p className="text-[11px] font-medium leading-relaxed text-red-800/90 dark:text-red-300/90">
+                                  Vị trí nhấp chuột có nhiều lớp phần tử nằm đè lên nhau (từ lớp trên cùng xuống lớp dưới). Bấm trực tiếp vào từng layer dưới đây để chuyển đổi:
+                                </p>
 
-                        {isObjOpen && (
-                          <div className="mt-3 space-y-3 animate-fadeIn">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-black tracking-wider text-white uppercase shadow-xs">
-                                <Code size={12} />
-                                &lt;{selectedElement.tagName.toLowerCase()}&gt;
-                              </span>
-                              <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-300">
-                                {getElementMetadata(selectedElement).targetStr}
-                              </span>
-                            </div>
-
-                            {/* Location Badges */}
-                            <div className="grid grid-cols-1 gap-2 text-xs font-medium sm:grid-cols-3">
-                              <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-white/90 px-3 py-2 dark:border-white/5 dark:bg-[#151921]/90">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase">Trang:</span>
-                                <span className="truncate font-semibold text-slate-700 dark:text-slate-200">
-                                  {getElementMetadata(selectedElement).page}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-white/90 px-3 py-2 dark:border-white/5 dark:bg-[#151921]/90">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase">Section:</span>
-                                <span className="truncate font-semibold text-slate-700 dark:text-slate-200">
-                                  {getElementMetadata(selectedElement).section}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-white/90 px-3 py-2 dark:border-white/5 dark:bg-[#151921]/90">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase">Component:</span>
-                                <span className="truncate font-semibold text-slate-700 dark:text-slate-200">
-                                  {getElementMetadata(selectedElement).component}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* DOM Hierarchy */}
-                            {showDomHierarchy && (
-                              <div className="space-y-2.5 rounded-xl border border-slate-200/60 bg-white/95 p-3 dark:border-white/10 dark:bg-[#12161C]/95 animate-fadeIn">
-                                <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                                  <span className="text-[10px] font-bold text-slate-400 uppercase">Phần tử cha:</span>
-                                  {elementHierarchy.length > 0 ? (
-                                    elementHierarchy.map((ancestor, idx) => (
-                                      <React.Fragment key={idx}>
-                                        <button
-                                          onClick={() => handleSelectSubElement(ancestor)}
-                                          className="flex cursor-pointer items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[11px] font-semibold text-slate-700 hover:border-violet-500 hover:bg-violet-50 hover:text-violet-700 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"
-                                        >
-                                          &lt;{ancestor.tagName.toLowerCase()}&gt;
-                                          {ancestor.id && <span className="text-slate-400">#{ancestor.id}</span>}
-                                        </button>
-                                        <ChevronRight size={11} className="text-slate-300 dark:text-slate-600" />
-                                      </React.Fragment>
-                                    ))
-                                  ) : (
-                                    <span className="text-[11px] text-slate-400">(Không có)</span>
-                                  )}
-                                  <span className="rounded-md bg-blue-600 px-2 py-0.5 font-mono text-[11px] font-bold text-white">
-                                    &lt;{selectedElement.tagName.toLowerCase()}&gt; (Hiện tại)
-                                  </span>
-                                </div>
-
-                                {elementChildren.length > 0 && (
-                                  <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-200/50 pt-2 text-xs dark:border-white/5">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">
-                                      Thành phần con ({elementChildren.length}):
-                                    </span>
-                                    {elementChildren.slice(0, 8).map((child, idx) => (
+                                {/* List of stacked layers */}
+                                <div className="grid grid-cols-1 gap-1.5">
+                                  {stackedLayers.map((layerEl, idx) => {
+                                    const isCurrentSelected = layerEl === selectedElement;
+                                    const tag = layerEl.tagName.toLowerCase();
+                                    const id = layerEl.id ? `#${layerEl.id}` : "";
+                                    const primaryClass = typeof layerEl.className === "string" && layerEl.className.trim()
+                                      ? `.${layerEl.className.trim().split(/\s+/)[0]}`
+                                      : "";
+                                    const isTopLayer = idx === 0;
+                                    const isBottomLayer = idx === stackedLayers.length - 1;
+                                    const textSample = layerEl.textContent?.trim().slice(0, 32) || "";
+                                    const rect = layerEl.getBoundingClientRect();
+                                    
+                                    return (
                                       <button
                                         key={idx}
-                                        onClick={() => handleSelectSubElement(child)}
-                                        className="flex cursor-pointer items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[11px] font-semibold text-slate-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedElement(layerEl);
+                                          populateInspectorFields(layerEl);
+                                          autoDetectAction(layerEl);
+                                          showToast(`✓ Đã chuyển sang layer: <${tag}> ${id}`);
+                                        }}
+                                        onMouseEnter={() => setLayerHoverRect(rect)}
+                                        onMouseLeave={() => setLayerHoverRect(null)}
+                                        className={cn(
+                                          "flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-xs font-bold transition-all cursor-pointer",
+                                          isCurrentSelected
+                                            ? "border-red-600 bg-red-600 text-white shadow-sm ring-2 ring-red-400"
+                                            : "border-red-300 bg-white/90 text-slate-800 hover:border-red-500 hover:bg-red-100/70 dark:border-red-800/60 dark:bg-slate-900/90 dark:text-slate-200 dark:hover:bg-red-950/60"
+                                        )}
                                       >
-                                        &lt;{child.tagName.toLowerCase()}&gt;
-                                        {child.id && <span className="text-slate-400">#{child.id}</span>}
+                                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                                          <span className={cn(
+                                            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black",
+                                            isCurrentSelected
+                                              ? "bg-white text-red-600"
+                                              : "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
+                                          )}>
+                                            {idx + 1}
+                                          </span>
+                                          
+                                          <div className="min-w-0 flex-1 truncate">
+                                            <span className="font-mono font-bold">
+                                              &lt;{tag}&gt;
+                                            </span>
+                                            {id && <span className={cn("font-mono ml-1", isCurrentSelected ? "text-amber-200" : "text-amber-600 dark:text-amber-400")}>{id}</span>}
+                                            {primaryClass && <span className="font-mono opacity-70 ml-1">{primaryClass}</span>}
+                                            {textSample && <span className="text-[11px] font-normal opacity-80 ml-2 truncate">"{textSample}"</span>}
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                          {isTopLayer && (
+                                            <span className={cn(
+                                              "rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase",
+                                              isCurrentSelected ? "bg-white/20 text-white" : "bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                            )}>
+                                              Lớp trên cùng
+                                            </span>
+                                          )}
+                                          {isBottomLayer && (
+                                            <span className={cn(
+                                              "rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase",
+                                              isCurrentSelected ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                                            )}>
+                                              Lớp đáy
+                                            </span>
+                                          )}
+                                          {isCurrentSelected && (
+                                            <span className="flex items-center gap-1 rounded bg-white px-2 py-0.5 text-[10px] font-black text-red-600 shadow-2xs">
+                                              <Check size={11} /> Đang chọn
+                                            </span>
+                                          )}
+                                        </div>
                                       </button>
-                                    ))}
-                                    {elementChildren.length > 8 && (
-                                      <span className="text-[10px] text-slate-400">+{elementChildren.length - 8} mục khác</span>
-                                    )}
-                                  </div>
-                                )}
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
                         )}
-                      </div>
 
-                      {/* 2. Thuộc Tính & Style */}
-                      <div className="space-y-3 rounded-[20px] border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
-                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-3 dark:border-white/10">
-                          <div className="flex items-center gap-2">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">2</span>
-                            <h3 className="text-xs font-black tracking-wider text-slate-700 uppercase dark:text-slate-200">
-                              Thuộc Tính &amp; Style
-                            </h3>
+                        {/* 1. Đối tượng */}
+                        <div className="rounded-xl border border-blue-500/25 bg-blue-50/40 p-4 shadow-2xs dark:border-blue-500/20 dark:bg-blue-950/20">
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-blue-500/15 pb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">1</span>
+                              <span className="text-xs font-bold tracking-wide text-blue-900 dark:text-blue-200">1. Đối tượng</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => setShowDomHierarchy(!showDomHierarchy)}
+                                className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold transition-all ${showDomHierarchy ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200/80 bg-white text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"}`}
+                              >
+                                <Layers size={13} className={showDomHierarchy ? "text-white" : "text-violet-500"} />
+                                <span>Phả hệ DOM ({elementHierarchy.length + elementChildren.length})</span>
+                                {showDomHierarchy ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  setIsSelectMode(true);
+                                  setIsPanelOpen(false);
+                                }}
+                                className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-blue-500/30 bg-blue-600 px-3 py-1 text-xs font-bold text-white shadow-2xs transition-all hover:bg-blue-700"
+                              >
+                                <MousePointerClick size={13} />
+                                <span>Chọn đối tượng khác</span>
+                              </button>
+
+                              <div className="relative">
+                                <button
+                                  onClick={() => setShowWidgetPicker(!showWidgetPicker)}
+                                  className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-600 px-3 py-1 text-xs font-bold text-white shadow-2xs transition-all hover:bg-emerald-700"
+                                >
+                                  <Boxes size={13} />
+                                  <span>Chọn widget</span>
+                                </button>
+
+                                {showWidgetPicker && (
+                                  <div className="absolute right-0 top-full mt-2 z-50 w-72 rounded-xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#151921] animate-fadeIn">
+                                    <div className="px-2 py-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-white/10 mb-1">
+                                      Chọn widget hệ thống
+                                    </div>
+                                    <div className="space-y-1 max-h-60 overflow-y-auto">
+                                      {WIDGET_TARGETS.map((widget) => (
+                                        <button
+                                          key={widget.id}
+                                          onClick={() => handleSelectWidgetTarget(widget.selector, widget.name)}
+                                          className="w-full text-left px-2.5 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 dark:text-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer"
+                                        >
+                                          <span className="truncate">{widget.name}</span>
+                                          <ChevronRight size={12} className="opacity-50 shrink-0 ml-1" />
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              <button
+                                onClick={() => setIsObjOpen(!isObjOpen)}
+                                className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                              >
+                                {isObjOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-semibold text-slate-400">
-                              Chỉnh sửa trực tiếp 2 cột
-                            </span>
+
+                          {isObjOpen && (
+                            <div className="mt-3 space-y-3 animate-fadeIn">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-bold text-white shadow-2xs">
+                                  <Code size={12} />
+                                  &lt;{selectedElement.tagName.toLowerCase()}&gt;
+                                </span>
+                                <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-300">
+                                  {getElementMetadata(selectedElement).targetStr}
+                                </span>
+                              </div>
+
+                              {/* Location Badges */}
+                              <div className="grid grid-cols-1 gap-2 text-xs font-medium sm:grid-cols-3">
+                                <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-white/90 px-3 py-2 dark:border-white/5 dark:bg-[#151921]/90">
+                                  <span className="text-[10px] font-bold text-slate-400">Trang:</span>
+                                  <span className="truncate font-semibold text-slate-700 dark:text-slate-200">
+                                    {getElementMetadata(selectedElement).page}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-white/90 px-3 py-2 dark:border-white/5 dark:bg-[#151921]/90">
+                                  <span className="text-[10px] font-bold text-slate-400">Section:</span>
+                                  <span className="truncate font-semibold text-slate-700 dark:text-slate-200">
+                                    {getElementMetadata(selectedElement).section}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 rounded-xl border border-slate-200/60 bg-white/90 px-3 py-2 dark:border-white/5 dark:bg-[#151921]/90">
+                                  <span className="text-[10px] font-bold text-slate-400">Component:</span>
+                                  <span className="truncate font-semibold text-slate-700 dark:text-slate-200">
+                                    {getElementMetadata(selectedElement).component}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* DOM Tree Hierarchy Component */}
+                              {showDomHierarchy && (
+                                <DomTreeViewer
+                                  selectedElement={selectedElement}
+                                  elementHierarchy={elementHierarchy}
+                                  elementChildren={elementChildren}
+                                  onSelectElement={handleSelectSubElement}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 2. Thuộc Tính & Hiệu Ứng (Modular Panel with Active Effects) */}
+                        <div className="space-y-3 rounded-xl border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">2</span>
+                              <label className="text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200">
+                                2. Thuộc tính phần tử &amp; Hiệu ứng đang có (Active Effects)
+                              </label>
+                            </div>
                             <button
                               onClick={() => setIsPropOpen(!isPropOpen)}
                               className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
@@ -1829,544 +2018,446 @@ export function XRayPromptEditor() {
                               {isPropOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                             </button>
                           </div>
-                        </div>
 
-                        {isPropOpen && (
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-1 animate-fadeIn">
-                            {/* Cột 1 */}
-                            <div className="space-y-3 text-xs">
-                              <div className="space-y-1">
-                                <label className="flex items-center gap-1 font-bold text-slate-600 dark:text-slate-300">
-                                  <Type size={12} /> Nội dung văn bản (Text)
-                                </label>
-                                <textarea
-                                  value={editTagText}
-                                  onChange={(e) => setEditTagText(e.target.value)}
-                                  rows={2}
-                                  className="w-full rounded-xl border border-slate-200/60 bg-slate-50/80 p-2.5 text-xs font-medium transition-all outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/5 dark:bg-[#12161C]/80 dark:text-white"
-                                  placeholder="Nhập nội dung mới..."
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <label className="flex items-center gap-1 font-bold text-slate-600 dark:text-slate-300">
-                                  <Code size={12} /> Lớp Tailwind CSS
-                                </label>
-                                <textarea
-                                  value={editClasses}
-                                  onChange={(e) => setEditClasses(e.target.value)}
-                                  rows={2}
-                                  className="w-full rounded-xl border border-slate-200/60 bg-slate-50/80 p-2.5 font-mono text-xs transition-all outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/5 dark:bg-[#12161C]/80 dark:text-white"
-                                  placeholder="Nhập class Tailwind..."
-                                />
-                              </div>
-
-                              {(selectedElement.tagName.toLowerCase() === "img" || editImageSrc) && (
-                                <div className="space-y-1">
-                                  <label className="flex items-center gap-1 font-bold text-slate-600 dark:text-slate-300">
-                                    <ImageIcon size={12} /> Image Src
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={editImageSrc}
-                                    onChange={(e) => setEditImageSrc(e.target.value)}
-                                    className="w-full rounded-xl border border-slate-200/60 bg-slate-50/80 p-2 font-mono text-xs transition-all outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/5 dark:bg-[#12161C]/80 dark:text-white"
-                                  />
-                                </div>
-                              )}
-                              {(selectedElement.tagName.toLowerCase() === "a" || editHref) && (
-                                <div className="space-y-1">
-                                  <label className="flex items-center gap-1 font-bold text-slate-600 dark:text-slate-300">
-                                    <LinkIcon size={12} /> Href Link
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={editHref}
-                                    onChange={(e) => setEditHref(e.target.value)}
-                                    className="w-full rounded-xl border border-slate-200/60 bg-slate-50/80 p-2 font-mono text-xs transition-all outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/5 dark:bg-[#12161C]/80 dark:text-white"
-                                  />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Cột 2: CSS Computed Properties in 2 columns */}
-                            <div className="space-y-3 text-xs">
-                              <div className="space-y-1">
-                                <label className="flex items-center gap-1 font-bold text-slate-600 dark:text-slate-300">
-                                  <CheckSquare size={12} className="text-blue-500" />
-                                  Màu Nền &amp; Độ Mờ
-                                </label>
-                                <div className="flex gap-2">
-                                  <input
-                                    type="color"
-                                    value={bgColor}
-                                    onChange={(e) => setBgColor(e.target.value)}
-                                    className="h-8 w-12 cursor-pointer rounded-lg border border-slate-200/60 p-0.5 outline-none dark:border-white/10"
-                                  />
-                                  <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-200/60 bg-slate-50/80 px-2.5 py-1 dark:border-white/5 dark:bg-[#12161C]/80">
-                                    <span className="text-slate-500 text-[11px]">Độ mờ:</span>
-                                    <input
-                                      type="range"
-                                      min="0"
-                                      max="100"
-                                      value={bgOpacity}
-                                      onChange={(e) => setBgOpacity(e.target.value)}
-                                      className="flex-1"
-                                    />
-                                    <span className="w-8 text-right font-mono text-[11px]">{bgOpacity}%</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="space-y-1">
-                                <label className="flex items-center gap-1 font-bold text-slate-600 dark:text-slate-300">
-                                  <Wand2 size={12} /> Hiệu ứng (Effect)
-                                </label>
-                                <select
-                                  value={effectType}
-                                  onChange={(e) => setEffectType(e.target.value)}
-                                  className="w-full rounded-xl border border-slate-200/60 bg-slate-50/80 p-2 font-medium transition-all outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/5 dark:bg-[#12161C]/80 dark:text-white"
-                                >
-                                  <option value="none">Không có (None)</option>
-                                  <option value="shadow-sm">Đổ bóng nhỏ (Shadow sm)</option>
-                                  <option value="shadow-md">Đổ bóng vừa (Shadow md)</option>
-                                  <option value="shadow-lg">Đổ bóng lớn (Shadow lg)</option>
-                                  <option value="shadow-xl">Đổ bóng rất lớn (Shadow xl)</option>
-                                  <option value="glow">Phát sáng (Glow)</option>
-                                  <option value="glass">Kính mờ (Glassmorphism)</option>
-                                </select>
-                              </div>
-
-                              <div className="pt-1">
-                                <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                                  <span>CSS Computed Properties</span>
-                                  <div className="flex items-center gap-1">
-                                    <button onClick={() => handleSelectAllStyles(true)} className="rounded px-1.5 py-0.5 hover:bg-slate-200 text-[10px] dark:hover:bg-white/10">All</button>
-                                    <button onClick={() => handleSelectAllStyles(false)} className="rounded px-1.5 py-0.5 hover:bg-slate-200 text-[10px] dark:hover:bg-white/10">None</button>
-                                  </div>
-                                </div>
-                                <div className="custom-scrollbar grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1">
-                                  {styleProperties.map((prop) => (
-                                    <div key={prop.id} className="flex flex-col gap-1 rounded-lg border border-slate-200/60 bg-slate-50/50 p-2 text-[11px] dark:border-white/5 dark:bg-[#181D24]/50">
-                                      <label className="flex cursor-pointer items-center gap-1.5 truncate">
-                                        <input
-                                          type="checkbox"
-                                          checked={prop.selected}
-                                          onChange={() => handleToggleStyleSelect(prop.id)}
-                                          className="h-3 w-3 rounded border-slate-300"
-                                        />
-                                        <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">{prop.label}</span>
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={prop.value}
-                                        onChange={(e) => handleUpdateStyleValue(prop.id, e.target.value)}
-                                        className="w-full rounded bg-white px-1.5 py-0.5 font-mono text-[10px] outline-none border border-slate-200 dark:border-white/10 dark:bg-[#12161C] dark:text-white"
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 3. Phạm Vi Áp Dụng */}
-                      <div className="space-y-2.5 rounded-[20px] border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">3</span>
-                            <label className="text-xs font-black tracking-wider text-slate-700 uppercase dark:text-slate-200">
-                              Phạm Vi Áp Dụng
-                            </label>
-                          </div>
-                          <button
-                            onClick={() => setIsScopeOpen(!isScopeOpen)}
-                            className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                          >
-                            {isScopeOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                          </button>
-                        </div>
-                        
-                        {isScopeOpen && (
-                          <div className="space-y-2 animate-fadeIn pt-1">
-                            <div className="relative">
-                              <select
-                                value={targetScope}
-                                onChange={(e) => setTargetScope(e.target.value as any)}
-                                className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200/80 bg-slate-50 py-3 pr-8 pl-3.5 text-xs font-bold text-slate-700 outline-none transition-all hover:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-200 dark:hover:bg-[#181D24]"
-                              >
-                                <option value="self">1. Chỉ riêng phần tử này (&lt;{selectedElement.tagName.toLowerCase()}&gt;)</option>
-                                <option value="same-tag">2. Tất cả thẻ cùng loại (&lt;{selectedElement.tagName.toLowerCase()}&gt;)</option>
-                                <option value="same-class">3. Cùng Class / Component tương tự</option>
-                                <option value="parent-section">4. Toàn bộ Section ({getElementMetadata(selectedElement).section})</option>
-                                <option value="entire-page">5. Toàn bộ trang hiện tại ({getElementMetadata(selectedElement).page})</option>
-                              </select>
-                              <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-slate-400" />
-                            </div>
-
-                            <label className="flex cursor-pointer items-center gap-2 pt-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                              <input
-                                type="checkbox"
-                                checked={normalizeAllPages}
-                                onChange={(e) => setNormalizeAllPages(e.target.checked)}
-                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-white/20 dark:bg-[#12161C]"
+                          {isPropOpen && (
+                            <div className="animate-fadeIn pt-1">
+                              <ElementPropertiesPanel
+                                selectedElement={selectedElement}
+                                editTagText={editTagText}
+                                setEditTagText={setEditTagText}
+                                editClasses={editClasses}
+                                setEditClasses={setEditClasses}
+                                editImageSrc={editImageSrc}
+                                setEditImageSrc={setEditImageSrc}
+                                editHref={editHref}
+                                setEditHref={setEditHref}
+                                bgColor={bgColor}
+                                setBgColor={setBgColor}
+                                bgOpacity={bgOpacity}
+                                setBgOpacity={setBgOpacity}
+                                effectType={effectType}
+                                setEffectType={setEffectType}
+                                styleProperties={styleProperties}
+                                onToggleStyleSelect={handleToggleStyleSelect}
+                                onUpdateStyleValue={handleUpdateStyleValue}
+                                onSelectAllStyles={handleSelectAllStyles}
                               />
-                              <span>Chuẩn hóa đối tượng này cho tất cả các trang</span>
-                            </label>
-                          </div>
-                        )}
-                      </div>
+                            </div>
+                          )}
+                        </div>
 
-                      {/* 4. Yêu Cầu Thực Hiện */}
-                      <div className="space-y-3.5 rounded-[20px] border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">4</span>
-                            <label className="text-xs font-black tracking-wider text-slate-700 uppercase dark:text-slate-200">
-                              Yêu Cầu Thực Hiện
-                            </label>
-                          </div>
-                          <div className="flex items-center gap-2">
+                        {/* 3. Phạm Vi Áp Dụng */}
+                        <div className="space-y-2.5 rounded-xl border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">3</span>
+                              <label className="text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200">
+                                3. Phạm vi áp dụng
+                              </label>
+                            </div>
                             <button
-                              type="button"
-                              onClick={() => setShowPromptLibraryModal(true)}
-                              className="flex cursor-pointer items-center gap-1 rounded-lg bg-blue-600/10 px-2.5 py-1 text-[11px] font-bold text-blue-600 transition-all hover:bg-blue-600/20 dark:text-blue-400 border border-blue-500/20"
-                            >
-                              <BookOpen size={12} />
-                              <span>Kho prompt mẫu</span>
-                            </button>
-                            <button
-                              onClick={() => setIsReqOpen(!isReqOpen)}
+                              onClick={() => setIsScopeOpen(!isScopeOpen)}
                               className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                             >
-                              {isReqOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              {isScopeOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                             </button>
                           </div>
-                        </div>
-
-                        {isReqOpen && (
-                          <div className="space-y-3.5 animate-fadeIn pt-1">
-                            <div className="relative">
-                              <select
-                                value={requirementOption}
-                                onChange={(e) => setRequirementOption(e.target.value)}
-                                className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200/80 bg-slate-50 py-3 pr-8 pl-3.5 text-xs font-bold text-slate-700 outline-none transition-all hover:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-200 dark:hover:bg-[#181D24]"
-                              >
-                                <option value="chinh-sua">1. Chỉnh sửa (Mặc định)</option>
-                                <option value="xoa-doi-tuong">2. Xóa đối tượng này</option>
-                                <option value="ap-dung-mau">3. Áp dụng mẫu</option>
-                                <option value="dung-ap-dung-cho">4. Dùng đối tượng này áp dụng cho</option>
-                              </select>
-                              <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-slate-400" />
-                            </div>
-
-                            {requirementOption === "chinh-sua" && (
-                              <div className="space-y-3 animate-fadeIn">
-                                <div className="relative">
-                                  <textarea
-                                    value={instruction}
-                                    onChange={(e) => setInstruction(e.target.value)}
-                                    className="h-24 w-full resize-none rounded-xl border border-slate-200/80 bg-slate-50/80 p-3.5 text-xs leading-relaxed font-medium transition-all outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C]/80 dark:text-white"
-                                    placeholder="Nhập mô tả chi tiết yêu cầu chỉnh sửa..."
-                                  />
-                                  {instruction && (
-                                    <button
-                                      type="button"
-                                      onClick={() => setInstruction("")}
-                                      className="absolute top-3 right-3 text-slate-400 hover:text-slate-600"
-                                    >
-                                      <X size={14} />
-                                    </button>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="relative flex-1">
-                                    <select
-                                      value={selectedSaveCategory}
-                                      onChange={(e) => setSelectedSaveCategory(e.target.value)}
-                                      className="w-full appearance-none rounded-xl border border-slate-200/60 bg-white p-2.5 pl-3.5 pr-8 text-xs font-bold text-slate-700 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-200"
-                                    >
-                                      <option value="my_saved">Tất cả (Mẫu lưu sẵn của tôi)</option>
-                                      {PROMPT_LIBRARY.map((cat) => (
-                                        <option key={cat.id} value={cat.id}>
-                                          {cat.name}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    <ChevronDown size={14} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={handleSaveInstructionPreset}
-                                    disabled={!instruction.trim()}
-                                    className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-200 disabled:opacity-50 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10"
-                                  >
-                                    <Save size={14} />
-                                    Lưu mẫu prompt
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-
-                            {requirementOption === "ap-dung-mau" && (
-                              <div className="space-y-3.5 animate-fadeIn">
-                                <div className="rounded-xl border border-blue-500/25 bg-blue-50/40 p-3.5 shadow-xs dark:border-blue-500/20 dark:bg-blue-950/20">
-                                  <span className="block text-xs font-bold text-blue-900 dark:text-blue-200 mb-2">
-                                    Áp dụng format giống từ &lt;{selectedElement.tagName.toLowerCase()}&gt;:
-                                  </span>
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <input
-                                      type="text"
-                                      value={formatPresetName}
-                                      onChange={(e) => setFormatPresetName(e.target.value)}
-                                      placeholder="Tên format (vd: Card Kính Mờ)..."
-                                      className="flex-1 rounded-lg border border-slate-200/80 bg-white px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-white/10 dark:bg-[#12161C] dark:text-white"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={handleSaveFormat}
-                                      className="cursor-pointer rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-700 transition-all"
-                                    >
-                                      Lưu Format Hiện Tại
-                                    </button>
-                                  </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                                    Danh sách format đã lưu:
-                                  </span>
-                                  {savedFormats.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                      {savedFormats.map((preset) => (
-                                        <div
-                                          key={preset.id}
-                                          onClick={() => {
-                                            setAppliedPresetId(preset.id);
-                                            handleApplyFormatPreset(preset);
-                                          }}
-                                          className={`group flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition-all ${
-                                            appliedPresetId === preset.id
-                                              ? "border-blue-600 bg-blue-600 text-white shadow-xs"
-                                              : "border-slate-200 bg-white hover:border-blue-500/50 dark:border-white/10 dark:bg-[#181D24] text-slate-700 dark:text-slate-200"
-                                          }`}
-                                        >
-                                          <span className="font-semibold">{preset.name}</span>
-                                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${appliedPresetId === preset.id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400"}`}>
-                                            &lt;{preset.tagName}&gt;
-                                          </span>
-                                          <button
-                                            type="button"
-                                            onClick={(e) => handleDeletePreset(preset.id, e)}
-                                            className="text-slate-400 hover:text-red-500 opacity-60 group-hover:opacity-100 cursor-pointer ml-1"
-                                          >
-                                            <X size={13} />
-                                          </button>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  ) : (
-                                    <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-500 dark:border-white/10">
-                                      Chưa có mẫu format nào.
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-
-                            {requirementOption === "xoa-doi-tuong" && (
-                              <div className="rounded-xl border border-rose-500/30 bg-rose-50/50 p-3.5 text-xs text-rose-700 dark:bg-rose-950/20 dark:text-rose-300 animate-fadeIn">
-                                <p className="font-bold">⚠️ Yêu cầu: Xóa đối tượng này</p>
-                                <p className="mt-1">Khi bấm "Tạo Prompt", hệ thống sẽ sinh lệnh yêu cầu xóa hoàn toàn phần tử <code className="font-mono bg-rose-100 dark:bg-rose-900 px-1 rounded">&lt;{selectedElement.tagName.toLowerCase()}&gt;</code> khỏi bố cục giao diện.</p>
-                              </div>
-                            )}
-
-                            {requirementOption === "dung-ap-dung-cho" && (
-                              <div className="rounded-xl border border-blue-500/30 bg-blue-50/50 p-3.5 text-xs text-blue-700 dark:bg-blue-950/20 dark:text-blue-300 animate-fadeIn space-y-2">
-                                <p className="font-bold">🔗 Dùng đối tượng này áp dụng cho:</p>
-                                <p className="text-[11px] text-slate-600 dark:text-slate-400">Đối tượng mẫu hiện tại <code className="font-mono bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;{selectedElement.tagName.toLowerCase()}&gt;</code> sẽ được dùng làm chuẩn để áp dụng style/format sang các thành phần khác trong cùng trang.</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 5. Tạo Prompt */}
-                      <div className="space-y-3 rounded-[20px] border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">5</span>
-                            <h3 className="text-xs font-black tracking-wider text-slate-700 uppercase dark:text-slate-200">
-                              Tạo Prompt
-                            </h3>
-                          </div>
-                          <button
-                            onClick={() => setIsGenOpen(!isGenOpen)}
-                            className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                          >
-                            {isGenOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                          </button>
-                        </div>
-
-                        {isGenOpen && (
-                          <div className="space-y-3 animate-fadeIn pt-1">
-                            <div className="flex gap-2">
-                              {!generatedPrompt ? (
-                                <button
-                                  onClick={() => {
-                                    handleGenerate();
-                                  }}
-                                  className="flex-1 cursor-pointer flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-[0.99]"
+                          
+                          {isScopeOpen && (
+                            <div className="space-y-2 animate-fadeIn pt-1">
+                              <div className="relative">
+                                <select
+                                  value={targetScope}
+                                  onChange={(e) => setTargetScope(e.target.value as any)}
+                                  className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200/80 bg-slate-50 py-2.5 pr-8 pl-3.5 text-xs font-bold text-slate-700 outline-none transition-all hover:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-200 dark:hover:bg-[#181D24]"
                                 >
-                                  <Wand2 size={14} />
-                                  <span>Tạo Prompt</span>
-                                </button>
-                              ) : (
-                                <div className="flex flex-1 gap-2">
-                                  <button
-                                    onClick={handleCopyPrompt}
-                                    className="flex-1 cursor-pointer flex items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-xs font-bold text-white shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-700 active:scale-[0.99]"
-                                  >
-                                    <Copy size={14} />
-                                    <span>Copy Prompt</span>
-                                  </button>
-                                  <button
-                                    onClick={() => setGeneratedPrompt("")}
-                                    className="cursor-pointer flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs font-bold text-slate-600 hover:bg-slate-100 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"
-                                    title="Tạo lại"
-                                  >
-                                    <RotateCcw size={14} />
-                                    <span>Tạo lại</span>
-                                  </button>
+                                  <option value="self">1. Chỉ riêng phần tử này (&lt;{selectedElement.tagName.toLowerCase()}&gt;)</option>
+                                  <option value="same-tag">2. Tất cả thẻ cùng loại (&lt;{selectedElement.tagName.toLowerCase()}&gt;)</option>
+                                  <option value="same-class">3. Cùng Class / Component tương tự</option>
+                                  <option value="parent-section">4. Toàn bộ Section ({getElementMetadata(selectedElement).section})</option>
+                                  <option value="entire-page">5. Toàn bộ trang hiện tại ({getElementMetadata(selectedElement).page})</option>
+                                </select>
+                                <ChevronDown size={14} className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-slate-400" />
+                              </div>
+
+                              <label className="flex cursor-pointer items-center gap-2 pt-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                <input
+                                  type="checkbox"
+                                  checked={normalizeAllPages}
+                                  onChange={(e) => setNormalizeAllPages(e.target.checked)}
+                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-white/20 dark:bg-[#12161C]"
+                                />
+                                <span>Chuẩn hóa đối tượng này cho tất cả các trang</span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 4. Yêu Cầu Thực Hiện */}
+                        <div className="space-y-3.5 rounded-xl border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">4</span>
+                              <label className="text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200">
+                                4. Yêu cầu thực hiện
+                              </label>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setShowPromptLibraryModal(true)}
+                                className="flex cursor-pointer items-center gap-1 rounded-lg bg-blue-600/10 px-2.5 py-1 text-[11px] font-bold text-blue-600 transition-all hover:bg-blue-600/20 dark:text-blue-400 border border-blue-500/20"
+                              >
+                                <BookOpen size={12} />
+                                <span>Kho prompt mẫu</span>
+                              </button>
+                              <button
+                                onClick={() => setIsReqOpen(!isReqOpen)}
+                                className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                              >
+                                {isReqOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              </button>
+                            </div>
+                          </div>
+
+                          {isReqOpen && (
+                            <div className="space-y-3.5 animate-fadeIn pt-1">
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {[
+                                  { id: "chinh-sua", label: "Chỉnh sửa", icon: Edit3, color: "text-blue-500" },
+                                  { id: "xoa-doi-tuong", label: "Xóa phần tử", icon: Trash2, color: "text-red-500" },
+                                  { id: "ap-dung-mau", label: "Áp dụng mẫu", icon: Sparkles, color: "text-purple-500" },
+                                  { id: "dung-ap-dung-cho", label: "Áp dụng cho...", icon: Share2, color: "text-emerald-500" },
+                                ].map((item) => {
+                                  const IconComp = item.icon;
+                                  const isSelected = requirementOption === item.id;
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => setRequirementOption(item.id)}
+                                      className={cn(
+                                        "flex flex-col items-center justify-center gap-1.5 rounded-xl border p-2.5 text-xs font-bold transition-all cursor-pointer",
+                                        isSelected
+                                          ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                                          : "border-slate-200/80 bg-slate-50/70 text-slate-700 hover:bg-white hover:border-slate-300 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-300 dark:hover:bg-[#181D24]"
+                                      )}
+                                    >
+                                      <IconComp size={16} className={isSelected ? "text-white" : item.color} />
+                                      <span className="text-[11px] leading-none font-semibold">{item.label}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {requirementOption === "chinh-sua" && (
+                                <div className="space-y-3 animate-fadeIn">
+                                  <div className="relative">
+                                    <textarea
+                                      value={instruction}
+                                      onChange={(e) => setInstruction(e.target.value)}
+                                      className="h-24 w-full resize-none rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 text-xs leading-relaxed font-medium transition-all outline-none placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C]/80 dark:text-white"
+                                      placeholder="Nhập mô tả chi tiết yêu cầu chỉnh sửa..."
+                                    />
+                                    {instruction && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setInstruction("")}
+                                        className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 cursor-pointer"
+                                      >
+                                        <X size={14} />
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="relative flex-1">
+                                      <select
+                                        value={selectedSaveCategory}
+                                        onChange={(e) => setSelectedSaveCategory(e.target.value)}
+                                        className="w-full appearance-none rounded-xl border border-slate-200/60 bg-white p-2 pl-3 pr-8 text-xs font-bold text-slate-700 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-white/10 dark:bg-[#12161C] dark:text-slate-200"
+                                      >
+                                        <option value="my_saved">Tất cả (Mẫu lưu sẵn của tôi)</option>
+                                        {PROMPT_LIBRARY.map((cat) => (
+                                          <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={handleSaveInstructionPreset}
+                                      disabled={!instruction.trim()}
+                                      className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-700 transition-all hover:bg-slate-200 disabled:opacity-50 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 cursor-pointer"
+                                    >
+                                      <Save size={13} />
+                                      <span>Lưu mẫu prompt</span>
+                                    </button>
+                                  </div>
                                 </div>
                               )}
 
-                              <button
-                                onClick={handleAddToQueue}
-                                className="cursor-pointer flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-all dark:border-white/10 dark:bg-[#181D24] dark:text-slate-200"
-                              >
-                                <Bookmark size={14} className="text-emerald-500" />
-                                <span>Danh sách chờ ({promptQueue.length})</span>
-                              </button>
-                            </div>
+                              {requirementOption === "ap-dung-mau" && (
+                                <div className="space-y-3.5 animate-fadeIn">
+                                  <div className="rounded-xl border border-blue-500/25 bg-blue-50/40 p-3.5 shadow-2xs dark:border-blue-500/20 dark:bg-blue-950/20">
+                                    <span className="block text-xs font-bold text-blue-900 dark:text-blue-200 mb-2">
+                                      Áp dụng format giống từ &lt;{selectedElement.tagName.toLowerCase()}&gt;:
+                                    </span>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <input
+                                        type="text"
+                                        value={formatPresetName}
+                                        onChange={(e) => setFormatPresetName(e.target.value)}
+                                        placeholder="Tên format (vd: Card Kính Mờ)..."
+                                        className="flex-1 rounded-lg border border-slate-200/80 bg-white px-3 py-2 text-xs font-medium outline-none focus:border-blue-500 dark:border-white/10 dark:bg-[#12161C] dark:text-white"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={handleSaveFormat}
+                                        className="cursor-pointer rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-bold text-white shadow-2xs hover:bg-blue-700 transition-all"
+                                      >
+                                        Lưu format hiện tại
+                                      </button>
+                                    </div>
+                                  </div>
 
-                            {generatedPrompt && (
-                              <div className="mt-3 space-y-2 rounded-xl border border-blue-500/30 bg-blue-50/50 p-3 dark:border-blue-500/20 dark:bg-blue-950/20 animate-fadeIn">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[11px] font-bold text-blue-900 dark:text-blue-300">Nội dung prompt xem trước:</span>
-                                  <button
-                                    onClick={handleCopyPrompt}
-                                    className="flex cursor-pointer items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-blue-700 transition-all"
-                                  >
-                                    <Copy size={12} />
-                                    <span>Copy Prompt</span>
-                                  </button>
-                                </div>
-                                <pre className="custom-scrollbar max-h-28 overflow-y-auto rounded-lg bg-white/80 p-2.5 text-xs font-mono text-slate-800 dark:bg-black/40 dark:text-slate-200 whitespace-pre-wrap">
-                                  {generatedPrompt}
-                                </pre>
-                              </div>
-                            )}
-
-                            {promptQueue.length > 0 && (
-                              <div className="mt-4 space-y-2 pt-3 border-t border-slate-200/60 dark:border-white/10 animate-fadeIn">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    Danh sách chờ lưu trữ ({promptQueue.length} mục):
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <button
-                                      onClick={handleCopySelectedQueue}
-                                      className="flex cursor-pointer items-center gap-1 text-[11px] font-bold text-blue-600 hover:underline dark:text-blue-400"
-                                    >
-                                      <Copy size={12} />
-                                      <span>Copy đã chọn ({queueSelectedIds.length})</span>
-                                    </button>
-                                    <span className="text-slate-300">|</span>
-                                    <button
-                                      onClick={() => {
-                                        setPromptQueue([]);
-                                        setQueueSelectedIds([]);
-                                        try { localStorage.removeItem("xray_prompt_queue_saved"); } catch {}
-                                        showToast("Đã xóa toàn bộ danh sách chờ.");
-                                      }}
-                                      className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer"
-                                    >
-                                      Xóa hết
-                                    </button>
+                                  <div className="space-y-2">
+                                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                                      Danh sách format đã lưu:
+                                    </span>
+                                    {savedFormats.length > 0 ? (
+                                      <div className="flex flex-wrap gap-2">
+                                        {savedFormats.map((preset) => (
+                                          <div
+                                            key={preset.id}
+                                            onClick={() => {
+                                              setAppliedPresetId(preset.id);
+                                              handleApplyFormatPreset(preset);
+                                            }}
+                                            className={`group flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition-all ${
+                                              appliedPresetId === preset.id
+                                                ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
+                                                : "border-slate-200 bg-white hover:border-blue-500/50 dark:border-white/10 dark:bg-[#181D24] text-slate-700 dark:text-slate-200"
+                                            }`}
+                                          >
+                                            <span className="font-semibold">{preset.name}</span>
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${appliedPresetId === preset.id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400"}`}>
+                                              &lt;{preset.tagName}&gt;
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={(e) => handleDeletePreset(preset.id, e)}
+                                              className="text-slate-400 hover:text-red-500 opacity-60 group-hover:opacity-100 cursor-pointer ml-1"
+                                            >
+                                              <X size={13} />
+                                            </button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-500 dark:border-white/10">
+                                        Chưa có mẫu format nào.
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
+                              )}
 
-                                <div className="custom-scrollbar max-h-48 space-y-2 overflow-y-auto pr-1">
-                                  {promptQueue.map((item, idx) => (
-                                    <div
-                                      key={idx}
-                                      className="flex items-start gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 text-xs dark:border-white/10 dark:bg-[#12161C] shadow-2xs"
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        checked={queueSelectedIds.includes(idx)}
-                                        onChange={() => handleToggleQueueSelect(idx)}
-                                        className="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer text-blue-600"
-                                      />
-                                      <div className="min-w-0 flex-1 space-y-1">
-                                        <span className="font-bold text-blue-600 dark:text-blue-400 mr-1.5">{idx + 1}.</span>
-                                        <span className="text-slate-800 dark:text-slate-200 leading-relaxed font-medium">{item}</span>
-                                      </div>
-                                      <div className="flex items-center gap-1.5 shrink-0">
-                                        <button
-                                          onClick={() => handleCopyQueueItem(item)}
-                                          className="flex cursor-pointer items-center gap-1 rounded-lg bg-blue-500/10 px-2 py-1 text-[10px] font-bold text-blue-600 hover:bg-blue-500/20 dark:text-blue-400"
-                                        >
-                                          <Copy size={11} />
-                                          <span>Copy</span>
-                                        </button>
-                                        <button
-                                          onClick={() => handleDeleteQueueItem(idx)}
-                                          className="flex cursor-pointer items-center gap-1 rounded-lg bg-rose-500/10 px-2 py-1 text-[10px] font-bold text-rose-600 hover:bg-rose-500/20 dark:text-rose-400"
-                                        >
-                                          <Trash2 size={11} />
-                                          <span>Xóa</span>
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ))}
+                              {requirementOption === "xoa-doi-tuong" && (
+                                <div className="rounded-xl border border-rose-500/30 bg-rose-50/50 p-3.5 text-xs text-rose-700 dark:bg-rose-950/20 dark:text-rose-300 animate-fadeIn">
+                                  <p className="font-bold">⚠️ Yêu cầu: Xóa đối tượng này</p>
+                                  <p className="mt-1">Khi bấm "Tạo Prompt", hệ thống sẽ sinh lệnh yêu cầu xóa hoàn toàn phần tử <code className="font-mono bg-rose-100 dark:bg-rose-900 px-1 rounded">&lt;{selectedElement.tagName.toLowerCase()}&gt;</code> khỏi bố cục giao diện.</p>
                                 </div>
-                              </div>
-                            )}
+                              )}
+
+                              {requirementOption === "dung-ap-dung-cho" && (
+                                <div className="rounded-xl border border-blue-500/30 bg-blue-50/50 p-3.5 text-xs text-blue-700 dark:bg-blue-950/20 dark:text-blue-300 animate-fadeIn space-y-2">
+                                  <p className="font-bold">🔗 Dùng đối tượng này áp dụng cho:</p>
+                                  <p className="text-[11px] text-slate-600 dark:text-slate-400">Đối tượng mẫu hiện tại <code className="font-mono bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;{selectedElement.tagName.toLowerCase()}&gt;</code> sẽ được dùng làm chuẩn để áp dụng style/format sang các thành phần khác trong cùng trang.</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 5. Tạo Prompt */}
+                        <div className="space-y-3 rounded-xl border border-slate-200/70 bg-white/80 p-4 shadow-2xs dark:border-white/5 dark:bg-[#151921]/80">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] font-black text-white">5</span>
+                              <h3 className="text-xs font-bold tracking-wide text-slate-700 dark:text-slate-200">
+                                5. Tạo prompt
+                              </h3>
+                            </div>
+                            <button
+                              onClick={() => setIsGenOpen(!isGenOpen)}
+                              className="cursor-pointer rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            >
+                              {isGenOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
                           </div>
-                        )}
+
+                          {isGenOpen && (
+                            <div className="space-y-3 animate-fadeIn pt-1">
+                              <div className="flex gap-2">
+                                {!generatedPrompt ? (
+                                  <button
+                                    onClick={() => {
+                                      handleGenerate();
+                                    }}
+                                    className="flex-1 cursor-pointer flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-[0.99]"
+                                  >
+                                    <Wand2 size={14} />
+                                    <span>Tạo Prompt</span>
+                                  </button>
+                                ) : (
+                                  <div className="flex flex-1 gap-2">
+                                    <button
+                                      onClick={() => setGeneratedPrompt("")}
+                                      className="cursor-pointer flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs font-bold text-slate-600 hover:bg-slate-100 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-300"
+                                      title="Tạo lại"
+                                    >
+                                      <RotateCcw size={14} />
+                                      <span>Tạo lại</span>
+                                    </button>
+                                  </div>
+                                )}
+
+                                <button
+                                  onClick={handleAddToQueue}
+                                  className="cursor-pointer flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-all dark:border-white/10 dark:bg-[#181D24] dark:text-slate-200"
+                                >
+                                  <Bookmark size={14} className="text-emerald-500" />
+                                  <span>Danh sách chờ ({promptQueue.length})</span>
+                                </button>
+                              </div>
+
+                              {generatedPrompt && (
+                                <div className="mt-3 space-y-2 rounded-xl border border-blue-500/30 bg-blue-50/50 p-3 dark:border-blue-500/20 dark:bg-blue-950/20 animate-fadeIn">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-[11px] font-bold text-blue-900 dark:text-blue-300">Nội dung prompt xem trước:</span>
+                                    <button
+                                      onClick={handleCopyPrompt}
+                                      className="flex cursor-pointer items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-2xs hover:bg-blue-700 transition-all"
+                                    >
+                                      <Copy size={12} />
+                                      <span>Copy Prompt</span>
+                                    </button>
+                                  </div>
+                                  <pre className="custom-scrollbar max-h-28 overflow-y-auto rounded-lg bg-white/80 p-2.5 text-xs font-mono text-slate-800 dark:bg-black/40 dark:text-slate-200 whitespace-pre-wrap">
+                                    {generatedPrompt}
+                                  </pre>
+                                </div>
+                              )}
+
+                              {promptQueue.length > 0 && (
+                                <div className="mt-4 space-y-2 pt-3 border-t border-slate-200/60 dark:border-white/10 animate-fadeIn">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                      Danh sách chờ lưu trữ ({promptQueue.length} mục):
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={handleCopySelectedQueue}
+                                        className="flex cursor-pointer items-center gap-1 text-[11px] font-bold text-blue-600 hover:underline dark:text-blue-400"
+                                      >
+                                        <Copy size={12} />
+                                        <span>Copy đã chọn ({queueSelectedIds.length})</span>
+                                      </button>
+                                      <span className="text-slate-300">|</span>
+                                      <button
+                                        onClick={() => {
+                                          setPromptQueue([]);
+                                          setQueueSelectedIds([]);
+                                          try { localStorage.removeItem("xray_prompt_queue_saved"); } catch {}
+                                          showToast("Đã xóa toàn bộ danh sách chờ.");
+                                        }}
+                                        className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer"
+                                      >
+                                        Xóa hết
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="custom-scrollbar max-h-48 space-y-2 overflow-y-auto pr-1">
+                                    {promptQueue.map((item, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="flex items-start gap-2.5 rounded-xl border border-slate-200/80 bg-white p-3 text-xs dark:border-white/10 dark:bg-[#12161C] shadow-2xs"
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={queueSelectedIds.includes(idx)}
+                                          onChange={() => handleToggleQueueSelect(idx)}
+                                          className="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer text-blue-600"
+                                        />
+                                        <div className="min-w-0 flex-1 space-y-1">
+                                          <span className="font-bold text-blue-600 dark:text-blue-400 mr-1.5">{idx + 1}.</span>
+                                          <span className="text-slate-800 dark:text-slate-200 leading-relaxed font-medium">{item}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                          <button
+                                            onClick={() => handleCopyQueueItem(item)}
+                                            className="flex cursor-pointer items-center gap-1 rounded-lg bg-blue-500/10 px-2 py-1 text-[10px] font-bold text-blue-600 hover:bg-blue-500/20 dark:text-blue-400"
+                                          >
+                                            <Copy size={11} />
+                                            <span>Copy</span>
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteQueueItem(idx)}
+                                            className="flex cursor-pointer items-center gap-1 rounded-lg bg-rose-500/10 px-2 py-1 text-[10px] font-bold text-rose-600 hover:bg-rose-500/20 dark:text-rose-400"
+                                          >
+                                            <Trash2 size={11} />
+                                            <span>Xóa</span>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      /* Empty State */
+                      <div className="flex flex-col items-center justify-center gap-3.5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-10 text-center dark:border-white/5 dark:bg-[#12161C]/30">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                          <MousePointerClick size={32} className="animate-bounce" />
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="text-base font-bold text-slate-800 dark:text-white">
+                            Chưa chọn đối tượng nào trên giao diện
+                          </h3>
+                          <p className="max-w-md text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                            Nhấn nút bên dưới hoặc phím <kbd className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-200">X</kbd> trên bàn phím, sau đó click chuột vào bất kỳ phần tử nào trên website để kiểm tra và sinh prompt AI.
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                          <button
+                            onClick={() => {
+                              setIsSelectMode(true);
+                              setIsPanelOpen(false);
+                            }}
+                            className="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-95"
+                          >
+                            <MousePointerClick size={15} />
+                            <span>Chọn đối tượng ngay (Phím X)</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab("structure")}
+                            className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 dark:border-white/10 dark:bg-[#181D24] dark:text-slate-200"
+                          >
+                            <FolderTree size={15} className="text-blue-600 dark:text-blue-400" />
+                            <span>Xem cây cấu trúc website</span>
+                          </button>
+                        </div>
                       </div>
-                    </>
-                  ) : (
-                    /* Empty State */
-                    <div className="flex flex-col items-center justify-center gap-3.5 rounded-[20px] border border-dashed border-slate-200 bg-slate-50/50 p-10 text-center dark:border-white/5 dark:bg-[#12161C]/30">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                        <MousePointerClick size={32} className="animate-bounce" />
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-base font-bold text-slate-800 dark:text-white">
-                          Chưa chọn đối tượng nào trên giao diện
-                        </h3>
-                        <p className="max-w-md text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                          Nhấn nút bên dưới hoặc phím <kbd className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-200">X</kbd> trên bàn phím, sau đó click chuột vào bất kỳ phần tử nào trên website để kiểm tra và sinh prompt AI.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsSelectMode(true);
-                          setIsPanelOpen(false);
-                        }}
-                        className="mt-2 flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-95"
-                      >
-                        <MousePointerClick size={15} />
-                        <span>Chọn đối tượng ngay (Phím X)</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Footer button for Generator Tab */}

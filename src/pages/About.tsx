@@ -29,7 +29,33 @@ import {
   X,
   ExternalLink,
   Sparkle,
+  Mail,
+  Phone,
+  Globe,
+  Home,
+  Building,
+  Calendar,
+  UserCheck,
 } from "lucide-react";
+
+// LinkedIn Lucide-styled Icon
+const LinkedinIcon = (props: { size?: number; className?: string }) => (
+  <svg
+    width={props.size || 16}
+    height={props.size || 16}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={props.className}
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect x="2" y="9" width="4" height="12" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
 import { PageLayout } from "../components/PageLayout";
 import { useLanguage } from "../context/LanguageContext";
 import { cn } from "../lib/utils";
@@ -84,17 +110,48 @@ export function About({ onNavigate }: AboutProps) {
   const isVi = language === "vi";
 
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [activeCardTab, setActiveCardTab] = useState<"intro" | "profile">("intro");
   const [isIntroPlaying, setIsIntroPlaying] = useState<boolean>(false);
   const [isVideoAudioOn, setIsVideoAudioOn] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<"cv" | "projects" | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const tabIntroRef = useRef<HTMLButtonElement | null>(null);
+  const tabProfileRef = useRef<HTMLButtonElement | null>(null);
+
+  const handleKeyDownTabs = (e: React.KeyboardEvent, currentTab: "intro" | "profile") => {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextTab = currentTab === "intro" ? "profile" : "intro";
+      setActiveCardTab(nextTab);
+      playTactileSound("click");
+      if (nextTab === "intro") tabIntroRef.current?.focus();
+      else tabProfileRef.current?.focus();
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevTab = currentTab === "intro" ? "profile" : "intro";
+      setActiveCardTab(prevTab);
+      playTactileSound("click");
+      if (prevTab === "intro") tabIntroRef.current?.focus();
+      else tabProfileRef.current?.focus();
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setActiveCardTab("intro");
+      playTactileSound("click");
+      tabIntroRef.current?.focus();
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setActiveCardTab("profile");
+      playTactileSound("click");
+      tabProfileRef.current?.focus();
+    }
+  };
 
   const videoSets = [
     {
       idle: "https://cdn.scena.ai/project/8606/e48a67884f3a52e8a68cf06b97979f3b22835ec92bf466a058c0d78da97c83b0.mp4",
-      intro: "https://cdn.scena.ai/project/8606/5f84521bf5c51ff234fb0f4029fb9fba29e7e386f13912a56bc7ee25aebcbc10.mp4",
+      intro: "https://cdn.scena.ai/project/8606/e48a67884f3a52e8a68cf06b97979f3b22835ec92bf466a058c0d78da97c83b0.mp4",
     },
   ];
 
@@ -152,41 +209,84 @@ export function About({ onNavigate }: AboutProps) {
     }, 3000);
   };
 
-  const personalInfo = [
+  const profileDetails = [
     {
-      label: isVi ? "Họ và tên" : "Full Name",
-      value: "Nguyễn Hùng Thái",
+      label: isVi ? "Giới tính" : "Gender",
+      value: isVi ? "Nam giới" : "Male",
       icon: User,
-      color: "text-purple-600 dark:text-purple-400",
-      bg: "bg-purple-500/10",
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-500/10 border-blue-500/20",
+    },
+    {
+      label: isVi ? "Dân tộc" : "Ethnicity",
+      value: "Kinh",
+      icon: Users,
+      color: "text-cyan-600 dark:text-cyan-400",
+      bg: "bg-cyan-500/10 border-cyan-500/20",
+    },
+    {
+      label: isVi ? "Tình trạng" : "Marital Status",
+      value: isVi ? "Độc thân" : "Single",
+      icon: Heart,
+      color: "text-rose-600 dark:text-rose-400",
+      bg: "bg-rose-500/10 border-rose-500/20",
     },
     {
       label: isVi ? "Sinh nhật" : "Date of Birth",
       value: "22/06/1984",
       icon: Cake,
       color: "text-amber-600 dark:text-amber-400",
-      bg: "bg-amber-500/10",
+      bg: "bg-amber-500/10 border-amber-500/20",
     },
     {
-      label: isVi ? "Dân tộc" : "Ethnicity",
-      value: isVi ? "Kinh" : "Kinh (Vietnamese)",
-      icon: Users,
-      color: "text-blue-600 dark:text-blue-400",
-      bg: "bg-blue-500/10",
+      label: isVi ? "Tạm trú" : "Temp Residence",
+      value: "Q7, Hồ Chí Minh",
+      icon: Building,
+      color: "text-purple-600 dark:text-purple-400",
+      bg: "bg-purple-500/10 border-purple-500/20",
     },
     {
-      label: isVi ? "Tình trạng" : "Marital Status",
-      value: isVi ? "Đã có gia đình" : "Married",
-      icon: HeartHandshake,
+      label: isVi ? "Cư trú" : "Permanent Residence",
+      value: "Mỹ Tho, Tiền Giang",
+      icon: Home,
       color: "text-emerald-600 dark:text-emerald-400",
-      bg: "bg-emerald-500/10",
+      bg: "bg-emerald-500/10 border-emerald-500/20",
     },
     {
-      label: isVi ? "Địa chỉ" : "Location",
-      value: isVi ? "Phường 15, Quận 10, TP.HCM" : "Ward 15, District 10, HCMC",
-      icon: MapPin,
-      color: "text-slate-600 dark:text-slate-400",
-      bg: "bg-slate-500/10",
+      label: "Email",
+      value: "hungthai84@gmail.com",
+      link: "mailto:hungthai84@gmail.com",
+      icon: Mail,
+      color: "text-violet-600 dark:text-violet-400",
+      bg: "bg-violet-500/10 border-violet-500/20",
+      isLink: true,
+    },
+    {
+      label: isVi ? "Điện thoại Zalo" : "Phone / Zalo",
+      value: "0909097882",
+      link: "https://zalo.me/0909097882",
+      icon: Phone,
+      color: "text-teal-600 dark:text-teal-400",
+      bg: "bg-teal-500/10 border-teal-500/20",
+      isLink: true,
+    },
+    {
+      label: "Website",
+      value: "nguyenhungthai.powerservice.one",
+      link: "https://nguyenhungthai.powerservice.one/",
+      icon: Globe,
+      color: "text-indigo-600 dark:text-indigo-400",
+      bg: "bg-indigo-500/10 border-indigo-500/20",
+      isLink: true,
+    },
+    {
+      label: "LinkedIn",
+      value: "linkedin.com/in/hungthai84",
+      link: "https://www.linkedin.com/in/hungthai84/",
+      icon: LinkedinIcon,
+      color: "text-sky-600 dark:text-sky-400",
+      bg: "bg-sky-500/10 border-sky-500/20",
+      isLink: true,
     },
   ];
 
@@ -226,9 +326,9 @@ export function About({ onNavigate }: AboutProps) {
   ];
 
   const filterOptions = [
-    { id: "all", labelVi: "Tổng Quan", labelEn: "Overview" },
-    { id: "philosophy", labelVi: "Triết Lý CX", labelEn: "Philosophy" },
-    { id: "mission", labelVi: "Sứ Mệnh", labelEn: "Mission" },
+    { id: "all", labelVi: "Tất Cả", labelEn: "All" },
+    { id: "professional", labelVi: "Chuyên Môn", labelEn: "Professional" },
+    { id: "personal", labelVi: "Đời Sống Cá Nhân", labelEn: "Personal Life" },
   ];
 
   const strategicPillars = [
@@ -294,361 +394,469 @@ export function About({ onNavigate }: AboutProps) {
         playTactileSound("click");
         setActiveTab(tabId);
       }}
-      rootClassName="w-full max-w-full relative flex flex-1 flex-col transition-all duration-300 !rounded-[20px]"
+      rootClassName="w-full max-w-full relative flex flex-1 flex-col !bg-transparent !border-none !rounded-none shadow-none transition-all duration-300"
       headerClassName="!py-2 sm:!py-3 !mb-0 transition-all duration-300"
-      className="custom-scrollbar !h-auto !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto border-slate-200/80 dark:border-slate-800 border"
+      className="custom-scrollbar !h-[750px] !min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto !bg-transparent !border-none"
     >
       <div className="w-full max-w-6xl mx-auto pb-8">
-        {/* MASONRY WALL LAYOUT */}
-        <div className="flex flex-col md:flex-row gap-6">
-          {[0, 1, 2].map((colIndex) => (
-            <div key={colIndex} className={cn(
-              "flex-1 flex flex-col gap-6",
-              colIndex === 1 ? "hidden md:flex" : "",
-              colIndex === 2 ? "hidden lg:flex" : ""
-            )}>
-              {(() => {
-                // Define all possible cards
-                const allCards = [
-                  // 1. VISUAL GREETING
-                  {
-                    id: "visual-greeting",
-                    tabs: ["all", "philosophy"],
-                    content: (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="rounded-full px-3 py-1 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 inline-flex items-center gap-1.5 backdrop-blur-sm">
-                            <Play size={12} className="fill-current" />
-                            <span>{isVi ? "Lời Chào Trực Quan" : "Visual Greeting"}</span>
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400">
-                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                            AI Live
-                          </span>
-                        </div>
-                        <div className="relative aspect-[4/5] w-full max-h-[400px] overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center shadow-inner border border-black/10 dark:border-white/10 group/vid">
-                          <video
-                            ref={videoRef}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover/vid:scale-105"
-                            crossOrigin="anonymous"
-                            src="https://cdn.scena.ai/project/8606/e48a67884f3a52e8a68cf06b97979f3b22835ec92bf466a058c0d78da97c83b0.mp4"
-                          />
-                          <div className="absolute inset-x-0 bottom-3 flex justify-center items-center px-3 z-20">
-                            <div className="rounded-full p-1.5 flex items-center gap-2 w-full max-w-[270px] bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/60 dark:border-white/20 shadow-2xl">
-                              <button
-                                type="button"
-                                onClick={toggleIntro}
-                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
-                              >
-                                {isIntroPlaying ? (
-                                  <Pause size={13} className="fill-current" />
-                                ) : (
-                                  <Play size={13} className="fill-current" />
-                                )}
-                                <span>{isIntroPlaying ? (isVi ? "Tạm dừng" : "Pause") : (isVi ? "Phát Intro" : "Play Intro")}</span>
-                              </button>
-                              <div className="h-4 w-px bg-slate-400/30 dark:bg-white/20" />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  playTactileSound("click");
-                                  const video = videoRef.current;
-                                  if (video) {
-                                    video.muted = !video.muted;
-                                    setIsVideoAudioOn(!video.muted);
-                                  }
-                                }}
-                                className={cn(
-                                  "p-2 rounded-full transition-all text-white shadow-xs cursor-pointer",
-                                  isVideoAudioOn ? "bg-emerald-600 hover:bg-emerald-500" : "bg-rose-600 hover:bg-rose-500"
-                                )}
-                              >
-                                {isVideoAudioOn ? <Volume2 size={13} /> : <VolumeX size={13} />}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ),
-                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-[10px] shadow-sm backdrop-blur-md"
-                  },
-                  // 2. PERSONAL PROFILE
-                  {
-                    id: "personal-profile",
-                    tabs: ["all", "philosophy"],
-                    content: (
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400 px-2.5 py-0.5 rounded-full border border-purple-500/20 bg-purple-500/10 inline-flex items-center gap-1.5">
-                            <User size={12} />
-                            {isVi ? "Hồ Sơ Cá Nhân" : "Personal Profile"}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-1 gap-1.5">
-                          {personalInfo.map((item, idx) => {
-                            const ItemIcon = item.icon;
-                            return (
-                              <div key={idx} className="flex items-center justify-between gap-2 p-2.5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-800/40 transition-colors">
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                  <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-xl", item.bg, item.color)}>
-                                    <ItemIcon size={14} />
-                                  </div>
-                                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400 truncate">{item.label}</span>
-                                </div>
-                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 text-right truncate">{item.value}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ),
-                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm backdrop-blur-md"
-                  },
-                  // 3. CX PHILOSOPHY
-                  {
-                    id: "cx-philosophy",
-                    tabs: ["all", "philosophy"],
-                    content: (
-                      <div className="space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="rounded-full px-3.5 py-1 text-xs font-black tracking-wide text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 border border-cyan-500/20 inline-flex items-center gap-1.5">
-                            <Zap size={13} />
-                            <span>{isVi ? "Triết Lý & Tầm Nhìn CX" : "Philosophy & CX Vision"}</span>
-                          </div>
-                        </div>
-                        <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-                          {isVi ? "Tận Tâm & Đồng Hành Cùng Trải Nghiệm Khách Hàng" : "Dedication & Partnership in CX"}
-                        </h2>
-                        <div className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-300 space-y-3">
-                          <p>
-                            {isVi ? (
-                              <>Chuyên gia CX với <strong className="text-cyan-600 dark:text-cyan-400">22 năm thực chiến</strong>. Với tôi, CSKH là <strong className="text-slate-900 dark:text-white">sự đồng hành và thấu cảm sâu sắc</strong>.</>
-                            ) : (
-                              <>CX specialist with <strong className="text-cyan-600 dark:text-cyan-400">22 years experience</strong>. To me, Customer Care is <strong className="text-slate-900 dark:text-white">deep empathy</strong>.</>
-                            )}
-                          </p>
-                          <p>{isVi ? "Mỗi cuộc trò chuyện là cơ hội để lắng nghe và kiến tạo trải nghiệm vượt mong đợi." : "Every talk is a chance to listen and exceed expectations."}</p>
-                        </div>
-                      </div>
-                    ),
-                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-6 shadow-sm backdrop-blur-md"
-                  },
-                  // 4. MISSION STATEMENT
-                  {
-                    id: "mission-statement",
-                    tabs: ["all", "mission"],
-                    content: (
-                      <div className="flex flex-col items-center text-center space-y-4">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-1 text-xs font-black uppercase tracking-wider text-rose-700 dark:text-rose-300">
-                          <Sparkles size={14} className="text-rose-500" />
-                          <span>{isVi ? "Tuyên Ngôn Sứ Mệnh" : "Mission Statement"}</span>
-                        </div>
-                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 leading-relaxed">
-                          {isVi ? "Nỗ lực kiến tạo dịch vụ chuẩn mực và tối ưu vận hành." : "Striving for benchmark service and optimized operations."}
-                        </p>
-                        <div onClick={() => { playTactileSound("sparkle"); showToast(isVi ? "✨ Cam kết thấu cảm!" : "✨ Empathy commitment!"); }} className="relative cursor-pointer group w-full">
-                          <div className="relative rounded-2xl border-2 border-rose-500/40 bg-gradient-to-r from-rose-500/10 to-amber-500/10 px-4 py-4 shadow-lg">
-                            <span className="bg-gradient-to-r from-rose-600 to-amber-600 bg-clip-text text-lg font-black tracking-tight text-transparent">
-                              {isVi ? "“ Họ luôn được lắng nghe. ”" : "“ They are always heard. ”"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ),
-                    className: "rounded-3xl border border-rose-500/30 bg-white/90 dark:bg-slate-900/90 p-5 shadow-md backdrop-blur-md"
-                  },
-                  // 5. IMPACT METRICS
-                  {
-                    id: "impact-metrics",
-                    tabs: ["all", "philosophy"],
-                    content: (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                            <Award size={14} className="text-blue-500" />
-                            {isVi ? "Chỉ Số Vận Hành" : "Ops Metrics"}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          {quickMetrics.map((metric, idx) => (
-                            <div key={idx} className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40 p-3 flex flex-col justify-center">
-                              <div className={cn("text-lg font-black bg-gradient-to-r bg-clip-text text-transparent", metric.color)}>{metric.num}</div>
-                              <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">{metric.unit}</div>
-                              <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 leading-tight mt-1">{metric.label}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ),
-                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm backdrop-blur-md"
-                  },
-                  // 6. STRATEGIC PILLARS
-                  {
-                    id: "strategic-pillars",
-                    tabs: ["all", "philosophy"],
-                    content: (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                            <Sparkles size={14} className="text-amber-500" />
-                            {isVi ? "Hệ Giá Trị Cốt Lõi" : "Core Value Pillars"}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          {strategicPillars.map((pillar, idx) => {
-                            const PillarIcon = pillar.icon;
-                            return (
-                              <div
-                                key={idx}
-                                className={cn("group w-full rounded-xl p-4 transition-all relative duration-300 cursor-pointer border-none overflow-hidden hover:translate-x-1", pillar.bg)}
-                                onMouseEnter={() => playTactileSound("click")}
-                              >
-                                <div className="relative z-10">
-                                  <p className="text-white text-lg font-black tracking-tight">{pillar.title}</p>
-                                  <p className="text-white/80 text-[11px] font-bold">{pillar.desc}</p>
-                                </div>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-20 text-white">
-                                  <PillarIcon size={24} />
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ),
-                    className: "rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm backdrop-blur-md"
-                  }
-                ];
+        {/* TOP SECTION: 2-COLUMN CARDS GRID (Lời Chào Trực Quan & Giới thiệu) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch w-full mb-8">
+          {/* 1. LỜI CHÀO TRỰC QUAN (VISUAL GREETING) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col justify-between rounded-3xl border border-white/30 dark:border-white/10 bg-white/20 dark:bg-slate-900/20 p-5 sm:p-7 shadow-xl backdrop-blur-md transition-all duration-300 h-full"
+          >
+            <div className="flex flex-col flex-1 h-full space-y-3">
+              <div className="flex items-center justify-between gap-2 shrink-0">
+                <span className="rounded-full px-3 py-1 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 inline-flex items-center gap-1.5 backdrop-blur-sm">
+                  <Play size={12} className="fill-current" />
+                  <span>{isVi ? "Lời Chào Trực Quan" : "Visual Greeting"}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  AI Live Avatar
+                </span>
+              </div>
+              <div className="relative flex-1 w-full min-h-[420px] sm:min-h-[480px] h-full overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center shadow-inner border border-black/10 dark:border-white/10 group/vid">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover/vid:scale-105"
+                  crossOrigin="anonymous"
+                  src="https://cdn.scena.ai/project/8606/e48a67884f3a52e8a68cf06b97979f3b22835ec92bf466a058c0d78da97c83b0.mp4"
+                />
 
-                // Filter cards based on active tab
-                const filteredCards = allCards.filter(card => card.tabs.includes(activeTab));
-
-                // Determine column count (dynamic based on viewport)
-                // In server-side, we assume 3 columns for desktop
-                const numCols = 3;
-                const columns: any[][] = Array.from({ length: numCols }, () => []);
-
-                // Simplified Masonry: Distribute items round-robin (simulates joining shortest column)
-                filteredCards.forEach((card, index) => {
-                  columns[index % numCols].push(card);
-                });
-
-                // Get current column's cards
-                const columnCards = columns[colIndex];
-                
-                return columnCards.map(card => (
-                  <motion.div
-                    key={card.id}
-                    layout
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={card.className}
+                {/* UNIFIED HOMEPAGE-STYLE VIDEO PLAY/PAUSE BUTTON */}
+                <div className="absolute inset-x-0 bottom-3 flex justify-center items-center px-2 z-20">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.95 }}
+                    id="about-play-intro-btn"
+                    type="button"
+                    onClick={toggleIntro}
+                    className="flex w-[270px] sm:w-[281px] h-[51px] mx-auto cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-white/60 dark:border-white/20 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_4px_25px_rgba(99,102,241,0.5)] backdrop-blur-xl transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
+                    title={
+                      isIntroPlaying
+                        ? isVi
+                          ? "Dừng video tự giới thiệu"
+                          : "Stop Intro Video"
+                        : isVi
+                          ? "Xem video giới thiệu"
+                          : "Watch Intro Video"
+                    }
                   >
-                    {card.content}
-                  </motion.div>
-                ));
-              })()}
+                    <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-white text-indigo-600 shadow-md">
+                      {isIntroPlaying ? (
+                        <Pause size={14} className="fill-indigo-600" />
+                      ) : (
+                        <Play size={14} className="translate-x-0.5 fill-indigo-600" />
+                      )}
+                    </div>
+                    <span>
+                      {isIntroPlaying
+                        ? isVi
+                          ? "Dừng video giới thiệu"
+                          : "Stop Intro"
+                        : isVi
+                          ? "Xem video giới thiệu"
+                          : "Watch Intro"}
+                    </span>
+                    {!isIntroPlaying && (
+                      <Sparkles
+                        size={14}
+                        className="shrink-0 animate-bounce text-amber-300"
+                      />
+                    )}
+
+                    {/* Integrated Divider and Audio Toggle */}
+                    <div className="mx-1 h-4 w-px shrink-0 bg-white/20" />
+
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playTactileSound("click");
+                        const video = videoRef.current;
+                        if (video) {
+                          video.muted = !video.muted;
+                          setIsVideoAudioOn(!video.muted);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.stopPropagation();
+                          playTactileSound("click");
+                          const video = videoRef.current;
+                          if (video) {
+                            video.muted = !video.muted;
+                            setIsVideoAudioOn(!video.muted);
+                          }
+                        }
+                      }}
+                      className={cn(
+                        "p-1.5 rounded-full transition-all text-white cursor-pointer hover:scale-110",
+                        isVideoAudioOn ? "bg-emerald-500/80" : "bg-white/20"
+                      )}
+                      title={
+                        isVideoAudioOn
+                          ? isVi
+                            ? "Tắt âm thanh"
+                            : "Mute"
+                          : isVi
+                            ? "Bật âm thanh"
+                            : "Unmute"
+                      }
+                    >
+                      {isVideoAudioOn ? <Volume2 size={13} /> : <VolumeX size={13} />}
+                    </div>
+                  </motion.button>
+                </div>
+              </div>
             </div>
-          ))}
+          </motion.div>
+
+          {/* 2 & 3. TABBED CARD CONTAINER: THẺ GIỚI THIỆU & THẺ THÔNG TIN */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex flex-col justify-between rounded-3xl border border-white/30 dark:border-white/10 bg-white/20 dark:bg-slate-900/20 p-5 sm:p-7 shadow-xl backdrop-blur-md transition-all duration-300 min-h-[480px]"
+          >
+            {/* ACCESSIBLE TABLIST HEADER */}
+            <div
+              role="tablist"
+              aria-label={isVi ? "Các thẻ thông tin về Nguyễn Hùng Thái" : "Profile and Introduction Tabs"}
+              className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900/10 dark:bg-black/30 border border-black/10 dark:border-white/10 mb-5 backdrop-blur-md shrink-0"
+            >
+              <button
+                ref={tabIntroRef}
+                id="tab-intro"
+                type="button"
+                role="tab"
+                aria-selected={activeCardTab === "intro"}
+                aria-controls="panel-intro"
+                tabIndex={activeCardTab === "intro" ? 0 : -1}
+                onClick={() => {
+                  playTactileSound("click");
+                  setActiveCardTab("intro");
+                }}
+                onKeyDown={(e) => handleKeyDownTabs(e, "intro")}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-amber-500 cursor-pointer",
+                  activeCardTab === "intro"
+                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/20"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-white/30 dark:hover:bg-white/10"
+                )}
+              >
+                <Sparkles size={15} className={activeCardTab === "intro" ? "text-amber-100" : "text-amber-500"} />
+                <span>{isVi ? "Thẻ Giới thiệu" : "Introduction Card"}</span>
+              </button>
+
+              <button
+                ref={tabProfileRef}
+                id="tab-profile"
+                type="button"
+                role="tab"
+                aria-selected={activeCardTab === "profile"}
+                aria-controls="panel-profile"
+                tabIndex={activeCardTab === "profile" ? 0 : -1}
+                onClick={() => {
+                  playTactileSound("click");
+                  setActiveCardTab("profile");
+                }}
+                onKeyDown={(e) => handleKeyDownTabs(e, "profile")}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 cursor-pointer",
+                  activeCardTab === "profile"
+                    ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-500/20"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-white/30 dark:hover:bg-white/10"
+                )}
+              >
+                <UserCheck size={15} className={activeCardTab === "profile" ? "text-indigo-100" : "text-indigo-500"} />
+                <span>{isVi ? "Thẻ Thông Tin" : "Personal Profile Card"}</span>
+              </button>
+            </div>
+
+            {/* SHARED TABPANELS CONTAINER */}
+            <div className="flex-1 flex flex-col justify-between min-h-0">
+              <AnimatePresence mode="wait">
+                {activeCardTab === "intro" && (
+                  <motion.div
+                    key="panel-intro"
+                    id="panel-intro"
+                    role="tabpanel"
+                    aria-labelledby="tab-intro"
+                    tabIndex={0}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex flex-col justify-between h-full space-y-4 focus:outline-hidden focus:ring-1 focus:ring-amber-500/30 rounded-2xl"
+                  >
+                    <div className="space-y-4">
+                      {/* Header Badge */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="rounded-full px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 inline-flex items-center gap-1.5 backdrop-blur-sm">
+                          <Sparkles size={13} className="text-amber-500" />
+                          <span>{isVi ? "Giới thiệu" : "Introduction"}</span>
+                        </span>
+                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                          22+ {isVi ? "Năm Thực Chiến" : "Years Experience"}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+                        {isVi ? "Nguyễn Hùng Thái — Chuyên Gia Dịch Vụ Khách Hàng" : "Nguyễn Hùng Thái — Customer Experience Specialist"}
+                      </h2>
+
+                      {/* Text Body */}
+                      <div className="space-y-3.5 text-xs sm:text-sm leading-relaxed text-slate-700 dark:text-slate-200 font-medium">
+                        <p>
+                          {isVi
+                            ? "Một chuyên gia dịch vụ khách hàng với hơn 22 năm kinh nghiệm thực chiến. Với tôi, Chăm Sóc Khách Hàng không chỉ là phục vụ, mà là sự đồng hành. Mỗi cuộc trò chuyện, mỗi khoảnh khắc, dù là nhỏ nhất, đều là một cơ hội quý giá: để lắng nghe, để thấu hiểu, và để tạo ra những trải nghiệm vượt trên cả sự mong đợi."
+                            : "A customer service expert with over 22 years of hands-on experience. To me, Customer Care is not just service, but partnership. Every conversation, every moment, no matter how small, is a valuable opportunity: to listen, to understand, and to create experiences that exceed expectations."}
+                        </p>
+
+                        <p>
+                          {isVi
+                            ? "Tôi tin rằng sự hài lòng không đến từ sự hoàn hảo tuyệt đối, mà đến từ sự tận tâm kịp thời và đồng cảm chân thành. Trong suốt sự nghiệp, tôi đã trực tiếp thiết kế và tối ưu hóa hàng chục quy trình, hệ thống Chăm Sóc Khách Hàng, luôn đặt trên nền tảng ba giá trị cốt lõi:"
+                            : "I believe satisfaction does not come from absolute perfection, but from timely dedication and genuine empathy. Throughout my career, I have directly designed and optimized dozens of Customer Care processes and systems, always built on three core values:"}
+                        </p>
+
+                        {/* 3 Core Value Pills */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 py-1">
+                          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl border border-blue-500/30 bg-blue-500/10 dark:bg-blue-500/20 text-blue-900 dark:text-blue-100 font-black text-xs shadow-xs">
+                            <Zap size={15} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                            <span>{isVi ? "Hiệu quả" : "Efficiency"}</span>
+                          </div>
+                          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 dark:bg-rose-500/20 text-rose-900 dark:text-rose-100 font-black text-xs shadow-xs">
+                            <Heart size={15} className="text-rose-600 dark:text-rose-400 shrink-0" />
+                            <span>{isVi ? "Nhân văn" : "Humanity"}</span>
+                          </div>
+                          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-900 dark:text-emerald-100 font-black text-xs shadow-xs">
+                            <ShieldCheck size={15} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <span>{isVi ? "Bền vững" : "Sustainability"}</span>
+                          </div>
+                        </div>
+
+                        <p>
+                          {isVi
+                            ? "Tôi luôn nỗ lực để mang lại sản phẩm, dịch vụ chất lượng cao với chi phí hợp lý. Và trên hết, để mỗi khách hàng cảm nhận được một điều đơn giản mà cốt lõi: Họ luôn được lắng nghe."
+                            : "I constantly strive to deliver high-quality products and services at a reasonable cost. Above all, so that every customer feels one simple yet core truth: They are always heard."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Highlight Quote Box */}
+                    <div
+                      onClick={() => {
+                        playTactileSound("sparkle");
+                        showToast(isVi ? "✨ Cam kết thấu cảm: Họ luôn được lắng nghe!" : "✨ Empathy commitment: They are always heard!");
+                      }}
+                      className="mt-4 cursor-pointer group rounded-2xl border-2 border-rose-500/40 bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-indigo-500/10 p-3.5 text-center shadow-md transition-transform hover:scale-[1.01]"
+                    >
+                      <span className="bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 dark:from-rose-300 dark:via-purple-300 dark:to-indigo-300 bg-clip-text text-base sm:text-lg font-black tracking-tight text-transparent">
+                        {isVi ? "“ Họ luôn được lắng nghe. ”" : "“ They are always heard. ”"}
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeCardTab === "profile" && (
+                  <motion.div
+                    key="panel-profile"
+                    id="panel-profile"
+                    role="tabpanel"
+                    aria-labelledby="tab-profile"
+                    tabIndex={0}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex flex-col justify-between h-full space-y-4 focus:outline-hidden focus:ring-1 focus:ring-indigo-500/30 rounded-2xl"
+                  >
+                    <div className="space-y-3.5">
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-black/10 dark:border-white/10">
+                        <div className="flex items-center gap-2.5">
+                          <span className="rounded-full px-3 py-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 inline-flex items-center gap-1.5 backdrop-blur-sm">
+                            <UserCheck size={13} className="text-indigo-500" />
+                            <span>{isVi ? "Thẻ Thông Tin" : "Personal Profile Card"}</span>
+                          </span>
+                          <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                            {isVi ? "Thông Tin Cá Nhân & Liên Hệ" : "Personal Info & Contact"}
+                          </h3>
+                        </div>
+                        <span className="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 bg-white/40 dark:bg-slate-800/40 px-3 py-1 rounded-full border border-black/5 dark:border-white/5">
+                          10 {isVi ? "Mục chi tiết" : "Profile Details"}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        {profileDetails.map((item, idx) => {
+                          const ItemIcon = item.icon;
+                          const content = (
+                            <div className="flex items-center gap-3 p-3 rounded-2xl border border-white/20 dark:border-white/10 bg-white/30 dark:bg-slate-800/30 transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 h-full">
+                              <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border shadow-xs", item.bg, item.color)}>
+                                <ItemIcon size={16} />
+                              </div>
+                              <div className="flex flex-col min-w-0 flex-1">
+                                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{item.label}</span>
+                                <span className={cn(
+                                  "text-xs font-black truncate mt-0.5",
+                                  item.isLink ? "text-blue-600 dark:text-blue-400 underline-offset-2 hover:underline" : "text-slate-900 dark:text-slate-100"
+                                )}>
+                                  {item.value}
+                                </span>
+                              </div>
+                              {item.isLink && <ExternalLink size={12} className="text-slate-400 shrink-0 opacity-70" />}
+                            </div>
+                          );
+
+                          if (item.isLink && item.link) {
+                            return (
+                              <a
+                                key={idx}
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => playTactileSound("click")}
+                                className="block h-full group"
+                              >
+                                {content}
+                              </a>
+                            );
+                          }
+
+                          return <div key={idx} className="h-full">{content}</div>;
+                        })}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
         </div>
 
 
-        {/* CALL TO ACTION FLOATING BAR */}
+
+        {/* CALL TO ACTION BANNER: CÙNG TẠO RA TRẢI NGHIỆM KHÁCH HÀNG TỐT HƠN */}
         <motion.div
-          layout
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-6 shadow-md flex flex-col lg:flex-row items-center justify-between gap-6 backdrop-blur-md"
+          transition={{ duration: 0.5 }}
+          className="relative mt-10 overflow-hidden rounded-3xl border border-indigo-400/40 dark:border-indigo-500/30 bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-700 p-6 sm:p-8 lg:p-10 shadow-2xl backdrop-blur-xl text-white"
         >
-          <div className="flex items-center gap-4 w-full lg:w-auto">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-              <Send size={22} className="translate-x-0.5" />
-            </div>
-            <div>
-              <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                {isVi
-                  ? "CÙNG TẠO RA TRẢI NGHIỆM KHÁCH HÀNG TỐT HƠN"
-                  : "CREATE BETTER CUSTOMER EXPERIENCES TOGETHER"}
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                {isVi
-                  ? "Tôi luôn sẵn sàng kết nối để cùng doanh nghiệp xây dựng hệ thống Customer Experience hiệu quả, nhân văn và bền vững."
-                  : "I am always ready to connect to help businesses build effective, human-centric, and sustainable Customer Experience systems."}
-              </p>
-            </div>
+          {/* Decorative Glow & Watermark Effects */}
+          <div className="absolute -right-12 -bottom-12 opacity-20 pointer-events-none text-indigo-300">
+            <Sparkles size={240} />
           </div>
+          <div className="absolute -left-12 -top-12 opacity-15 pointer-events-none text-purple-300">
+            <Heart size={200} />
+          </div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_70%)] pointer-events-none" />
 
-          {/* Action Capsule Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full lg:w-auto shrink-0">
-            <a
-              href="mailto:trinhan.virtual@gmail.com?subject=Liên%20hệ%20hợp%20tác%20Nguyễn%20Hùng%20Thái"
-              onClick={() => playTactileSound("click")}
-              className="group flex items-center gap-3 p-3.5 rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 text-slate-800 dark:text-white transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 font-black text-xs cursor-pointer"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white shadow-xs group-hover:bg-white group-hover:text-blue-600 transition-colors">
-                <Send size={15} />
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-5 w-full lg:w-auto text-center sm:text-left">
+              <div className="flex h-16 w-16 sm:h-20 sm:w-20 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-white border border-white/40 shadow-xl backdrop-blur-md">
+                <HeartHandshake size={36} className="animate-pulse text-amber-300" />
               </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-black uppercase tracking-wider">
-                  {isVi ? "KẾT NỐI VỚI TÔI" : "CONNECT"}
-                </span>
-                <span className="text-[10px] opacity-75 font-normal">
-                  {isVi ? "Trao đổi hợp tác" : "Collaborate"}
-                </span>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-[11px] font-black tracking-wider uppercase border border-white/30 backdrop-blur-md shadow-xs">
+                    <Sparkles size={12} className="text-amber-300" />
+                    {isVi ? "Hợp tác & Đồng hành" : "Partnership & Collaboration"}
+                  </span>
+                  <span className="text-[10px] font-bold text-indigo-200 uppercase tracking-widest hidden sm:inline-block">
+                    • CX STRATEGY
+                  </span>
+                </div>
+                <h3 className="text-lg sm:text-2xl lg:text-3xl font-black text-white uppercase tracking-tight leading-tight drop-shadow-sm">
+                  {isVi
+                    ? "CÙNG TẠO RA TRẢI NGHIỆM KHÁCH HÀNG TỐT HƠN"
+                    : "CREATE BETTER CUSTOMER EXPERIENCES TOGETHER"}
+                </h3>
+                <p className="text-xs sm:text-sm text-indigo-100/90 font-medium max-w-2xl leading-relaxed">
+                  {isVi
+                    ? "Tôi luôn sẵn sàng kết nối để cùng doanh nghiệp xây dựng hệ thống Customer Experience hiệu quả, nhân văn và bền vững."
+                    : "I am always ready to connect to help businesses build effective, human-centric, and sustainable Customer Experience systems."}
+                </p>
               </div>
-            </a>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                playTactileSound("click");
-                setActiveModal("cv");
-              }}
-              className="group flex items-center gap-3 p-3.5 rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 text-slate-800 dark:text-white transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 font-black text-xs cursor-pointer"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-600 text-white shadow-xs group-hover:bg-white group-hover:text-purple-600 transition-colors">
-                <FileText size={15} />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-black uppercase tracking-wider">
-                  {isVi ? "XEM CV" : "VIEW CV"}
-                </span>
-                <span className="text-[10px] opacity-75 font-normal">
-                  {isVi ? "Tải xuống CV" : "Download CV"}
-                </span>
-              </div>
-            </button>
+            {/* Action Capsule Buttons */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 w-full lg:w-auto shrink-0">
+              <a
+                href="mailto:trinhan.virtual@gmail.com?subject=Liên%20hệ%20hợp%20tác%20Nguyễn%20Hùng%20Thái"
+                onClick={() => playTactileSound("click")}
+                className="group flex items-center gap-3 p-3.5 rounded-2xl bg-white/15 hover:bg-white text-white hover:text-indigo-950 transition-all duration-300 shadow-lg border border-white/30 active:scale-95 font-black text-xs cursor-pointer backdrop-blur-md"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                  <Send size={16} />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-black uppercase tracking-wider">
+                    {isVi ? "KẾT NỐI VỚI TÔI" : "CONNECT"}
+                  </span>
+                  <span className="text-[10px] opacity-80 font-normal">
+                    {isVi ? "Trao đổi hợp tác" : "Collaborate"}
+                  </span>
+                </div>
+              </a>
 
-            <button
-              type="button"
-              onClick={() => {
-                playTactileSound("click");
-                if (onNavigate) {
-                  onNavigate("projects");
-                } else {
-                  setActiveModal("projects");
-                }
-              }}
-              className="group flex items-center gap-3 p-3.5 rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-amber-600 hover:text-white dark:hover:bg-amber-600 text-slate-800 dark:text-white transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 active:scale-95 font-black text-xs cursor-pointer"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white shadow-xs group-hover:bg-white group-hover:text-amber-600 transition-colors">
-                <Briefcase size={15} />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-black uppercase tracking-wider">
-                  {isVi ? "XEM DỰ ÁN" : "PROJECTS"}
-                </span>
-                <span className="text-[10px] opacity-75 font-normal">
-                  {isVi ? "Dự án nổi bật" : "Featured Work"}
-                </span>
-              </div>
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playTactileSound("click");
+                  setActiveModal("cv");
+                }}
+                className="group flex items-center gap-3 p-3.5 rounded-2xl bg-white/15 hover:bg-white text-white hover:text-purple-950 transition-all duration-300 shadow-lg border border-white/30 active:scale-95 font-black text-xs cursor-pointer backdrop-blur-md"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-purple-600 shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                  <FileText size={16} />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-black uppercase tracking-wider">
+                    {isVi ? "XEM CV" : "VIEW CV"}
+                  </span>
+                  <span className="text-[10px] opacity-80 font-normal">
+                    {isVi ? "Tải xuống CV" : "Download CV"}
+                  </span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  playTactileSound("click");
+                  if (onNavigate) {
+                    onNavigate("projects");
+                  } else {
+                    setActiveModal("projects");
+                  }
+                }}
+                className="group flex items-center gap-3 p-3.5 rounded-2xl bg-white/15 hover:bg-white text-white hover:text-amber-950 transition-all duration-300 shadow-lg border border-white/30 active:scale-95 font-black text-xs cursor-pointer backdrop-blur-md"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-amber-600 shadow-sm group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                  <Briefcase size={16} />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-black uppercase tracking-wider">
+                    {isVi ? "XEM DỰ ÁN" : "PROJECTS"}
+                  </span>
+                  <span className="text-[10px] opacity-80 font-normal">
+                    {isVi ? "Dự án nổi bật" : "Featured Work"}
+                  </span>
+                </div>
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>

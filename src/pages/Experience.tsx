@@ -2,6 +2,7 @@ import {
   Briefcase,
   Users,
   Trophy,
+  Check,
   ListChecks,
   CheckCircle2,
   Image as ImageIcon,
@@ -219,17 +220,13 @@ function Video2026Card({ isVi }: { isVi: boolean }) {
 
 
 const getBentoClass = (index: number, is2026: boolean) => {
-  if (is2026) return "sm:col-span-2 sm:row-span-2 md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2";
+  if (is2026) return "col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2";
   
-  const patterns = [
-    "sm:col-span-1 sm:row-span-1 md:col-span-1 md:row-span-2 lg:col-span-1 lg:row-span-2",
-    "sm:col-span-1 sm:row-span-1 md:col-span-2 md:row-span-1 lg:col-span-2 lg:row-span-1",
-    "sm:col-span-2 sm:row-span-1 md:col-span-1 md:row-span-1 lg:col-span-1 lg:row-span-1",
-    "sm:col-span-1 sm:row-span-2 md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2",
-    "sm:col-span-1 sm:row-span-1 md:col-span-1 md:row-span-1 lg:col-span-1 lg:row-span-1",
-    "sm:col-span-2 sm:row-span-1 md:col-span-1 md:row-span-2 lg:col-span-1 lg:row-span-2",
-  ];
-  return patterns[index % patterns.length];
+  // Smart dynamic pattern based on content importance
+  if (index === 1 || index === 4 || index === 7) {
+    return "col-span-1 sm:col-span-2 md:col-span-2 lg:col-span-2";
+  }
+  return "col-span-1";
 };
 
 export function Experience() {
@@ -406,56 +403,70 @@ export function Experience() {
       }
       icon={Briefcase}
       headerContainerClassName="!px-0"
-      headerActions={
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 shrink-0 items-center gap-1 rounded-full border border-slate-200/60 bg-white/60 dark:border-white/10 dark:bg-slate-900/60 p-1 text-left backdrop-blur-xl shadow-xs">
-            <button
-              type="button"
-              onClick={() => {
-                playUiSound("click");
-                setViewMode("timeline");
-              }}
-              className={cn(
-                "flex h-full cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-xs font-black transition-all duration-300",
-                viewMode === "timeline"
-                  ? "bg-blue-600 text-white shadow-xs dark:bg-blue-500"
-                  : "bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/50 dark:hover:bg-white/10",
-              )}
-              title={isVi ? "Dạng thời gian" : "Timeline view"}
-            >
-              <Calendar size={13} />
-              <span className="hidden sm:inline">
-                {isVi ? "Thời gian" : "Timeline"}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                playUiSound("click");
-                setViewMode("masonry");
-              }}
-              className={cn(
-                "flex h-full cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-xs font-black transition-all duration-300",
-                viewMode === "masonry"
-                  ? "bg-blue-600 text-white shadow-xs dark:bg-blue-500"
-                  : "bg-transparent text-[var(--muted)] hover:text-[var(--text-primary)] hover:bg-white/50 dark:hover:bg-white/10",
-              )}
-              title={isVi ? "Dạng thẻ" : "Card view"}
-            >
-              <LayoutGrid size={13} />
-              <span className="hidden sm:inline">
-                {isVi ? "Dạng thẻ" : "Cards"}
-              </span>
-            </button>
-          </div>
-        </div>
+      searchQuery={searchTerm}
+      onSearchChange={setSearchTerm}
+      searchPlaceholder={
+        isVi ? "Tìm công ty, vị trí, nhiệm vụ..." : "Search company, role..."
       }
+      groupOptions={years.map((y) => ({
+        id: y,
+        labelVi: `Năm ${y}`,
+        labelEn: `Year ${y}`,
+      }))}
+      activeGroup={selectedYear}
+      onGroupChange={setSelectedYear}
+      groupLabel={{ vi: "Năm:", en: "Year:" }}
+      viewModeOptions={[
+        {
+          id: "timeline",
+          labelVi: "Thời gian",
+          labelEn: "Timeline",
+          icon: Calendar,
+        },
+        {
+          id: "masonry",
+          labelVi: "Dạng thẻ",
+          labelEn: "Cards",
+          icon: LayoutGrid,
+        },
+      ]}
+      activeViewMode={viewMode}
+      onViewModeChange={(m) => setViewMode(m as any)}
+      toolbarActions={
+        <button
+          type="button"
+          onClick={handleCopySummary}
+          className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2.5 py-1.5 text-xs font-black text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 shadow-2xs transition-all"
+          title={isVi ? "Sao chép tóm tắt hồ sơ kinh nghiệm" : "Copy executive summary"}
+        >
+          {isCopied ? (
+            <Check size={13} className="text-emerald-500" />
+          ) : (
+            <Sparkles size={13} className="text-sky-500" />
+          )}
+          <span className="hidden sm:inline">
+            {isCopied
+              ? isVi
+                ? "Đã chép"
+                : "Copied"
+              : isVi
+              ? "Tóm tắt"
+              : "Summary"}
+          </span>
+        </button>
+      }
+      onReset={() => {
+        setSearchTerm("");
+        setSelectedYear("2003");
+        setViewMode("timeline");
+      }}
+      totalCount={contentData.experience.length}
+      filteredCount={filteredExperiences.length}
     >
       <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6">
         {/* View Mode 1: Masonry Grid View - Mobile & Desktop */}
         {viewMode === "masonry" ? (
-          <section className="flex h-auto min-h-0 w-full flex-col items-center gap-6 rounded-2xl border border-slate-200/85 bg-[var(--card)]/60 p-5 md:p-6 backdrop-blur-xl sub-card with-ripple shadow-sm">
+          <section className="flex h-auto min-h-0 w-full flex-col items-center gap-6 rounded-2xl border border-slate-200/85 bg-[var(--card)]/60 p-4 sm:p-5 md:p-6 backdrop-blur-xl sub-card with-ripple shadow-sm">
             {filteredExperiences.length === 0 ? (
               <div className="space-y-3 py-12 text-center">
                 <Search size={40} className="mx-auto text-[var(--muted)]/50" />
@@ -464,17 +475,17 @@ export function Experience() {
                 </p>
               </div>
             ) : (
-              /* Pinterest / Masonry 2-Column Grid View */
-              <div className="columns-1 md:columns-2 gap-6 w-full transition-all duration-300">
+              /* Pinterest-Style Masonry Grid View */
+              <div className="experience-masonry-grid w-full transition-all duration-300">
                 {gridExperiences.map((exp, idx) => {
                   const cardBrand = getBrandColorConfig(exp.company || exp.yearStart);
-                  
                   const is2026 = exp.yearStart === "2026";
+                  const bentoSpan = getBentoClass(idx, is2026);
 
                   return exp.yearStart === "2026" ? (
                     <div
                       key={exp.company + idx}
-                      className="break-inside-avoid inline-block w-full h-auto align-top mb-4 sm:mb-5"
+                      className={cn("experience-masonry-item w-full flex flex-col", bentoSpan)}
                     >
                       <Video2026Card isVi={isVi} />
                     </div>
@@ -484,12 +495,15 @@ export function Experience() {
                       layout
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
+                      transition={{ delay: idx * 0.04 }}
                       onClick={() => {
                         playUiSound("click");
                         setDetailModalExp(exp);
                       }}
-                      className="break-inside-avoid inline-block w-full h-auto align-top mb-4 sm:mb-5 group relative cursor-pointer overflow-hidden rounded-[20px] p-4 text-left transition-all duration-300 bg-white/95 backdrop-blur-2xl dark:bg-slate-900/90 hover:shadow-xl border border-slate-200/90 dark:border-white/10 shadow-sm"
+                      className={cn(
+                        "experience-masonry-item group relative cursor-pointer overflow-hidden rounded-[20px] p-4 text-left transition-all duration-300 bg-white/95 backdrop-blur-2xl dark:bg-slate-900/90 hover:shadow-xl border border-slate-200/90 dark:border-white/10 shadow-sm flex flex-col justify-between",
+                        bentoSpan
+                      )}
                       style={{
                         borderColor: cardBrand.hex,
                         borderWidth: "1.5px",
@@ -992,8 +1006,8 @@ export function Experience() {
                         </div>
 
                         {/* Bento Box Grid */}
-                        <div className="grid grid-cols-12 gap-4">
-                          <div className="col-span-12 lg:col-span-5 grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-12 gap-[10px]">
+                          <div className="col-span-12 lg:col-span-5 grid grid-cols-2 gap-[10px]">
                             <div className="flex flex-col justify-center rounded-[20px] border border-slate-200/60 bg-white/60 p-4 backdrop-blur-md dark:border-white/5 dark:bg-[#151921]/60">
                               <span className="flex items-center gap-1.5 text-[11px] font-extrabold text-slate-500 dark:text-slate-400">
                                 <Users size={14} className="text-blue-500" /> QUY MÔ
@@ -1513,7 +1527,7 @@ export function Experience() {
                     <Video2026Card isVi={isVi} />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-12 gap-4">
+                  <div className="grid grid-cols-12 gap-[10px]">
                     {/* Bento Box 1: Tổng quan (Span 12 or 8) */}
                     <div className="col-span-12 lg:col-span-8 flex flex-col gap-3 rounded-[20px] border border-slate-200/60 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 p-5 dark:border-white/5 dark:from-slate-800/40 dark:to-indigo-900/10 backdrop-blur-md">
                       <h3 className="flex items-center gap-2 text-sm font-black tracking-wider text-blue-600 dark:text-blue-400">
@@ -1525,7 +1539,7 @@ export function Experience() {
                     </div>
 
                     {/* Bento Box 2: Quy mô & SOP (Span 12 or 4) */}
-                    <div className="col-span-12 lg:col-span-4 flex flex-col gap-3">
+                    <div className="col-span-12 lg:col-span-4 flex flex-col gap-[10px]">
                       <div className="flex-1 flex flex-col justify-center rounded-[20px] border border-slate-200/60 bg-white/80 p-4 dark:border-white/5 dark:bg-[#151921]/80 backdrop-blur-md shadow-xs">
                         <span className="flex items-center gap-1.5 text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           <Users size={14} className="text-blue-500" /> {isVi ? "Quy mô nhân sự" : "Staff Scale"}
@@ -1545,7 +1559,7 @@ export function Experience() {
                     </div>
 
                     {/* Bento Box 3: Tasks SOP List (Span 12 or 6) */}
-                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-4 rounded-[20px] border border-slate-200/60 bg-white/80 p-5 dark:border-white/5 dark:bg-[#151921]/80 backdrop-blur-md shadow-xs">
+                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-[10px] rounded-[20px] border border-slate-200/60 bg-white/80 p-5 dark:border-white/5 dark:bg-[#151921]/80 backdrop-blur-md shadow-xs">
                       <h3 className="flex items-center gap-2 text-sm font-black text-purple-600 dark:text-purple-400">
                         <ListChecks size={16} /> {isVi ? "Nhiệm vụ & Công việc" : "Tasks & Responsibilities"}
                       </h3>
@@ -1560,7 +1574,7 @@ export function Experience() {
                     </div>
 
                     {/* Bento Box 4: Achievements & CSAT (Span 12 or 6) */}
-                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-[10px]">
                       {detailModalExp.achievements && detailModalExp.achievements.length > 0 && (
                         <div className="flex-1 rounded-[20px] border border-slate-200/60 bg-white/80 p-5 dark:border-white/5 dark:bg-[#151921]/80 backdrop-blur-md shadow-xs">
                           <h3 className="flex items-center gap-2 mb-4 text-sm font-black text-amber-600 dark:text-amber-400">
@@ -1582,7 +1596,7 @@ export function Experience() {
                         </div>
                       )}
                       
-                      <div className="flex gap-4">
+                      <div className="flex gap-[10px]">
                         <div className="flex-1 flex flex-col justify-center rounded-[20px] border border-slate-200/60 bg-white/80 p-4 dark:border-white/5 dark:bg-[#151921]/80 backdrop-blur-md shadow-xs">
                           <span className="flex items-center gap-1.5 text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                             <FolderGit2 size={14} className="text-indigo-500" /> {isVi ? "Dự án" : "Projects"}
@@ -1775,6 +1789,64 @@ export function Experience() {
         )}
       </AnimatePresence>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .experience-masonry-grid {
+          columns: 1;
+          column-gap: 10px;
+        }
+        @media (min-width: 640px) {
+          .experience-masonry-grid {
+            columns: 2;
+          }
+        }
+        @media (min-width: 1024px) {
+          .experience-masonry-grid {
+            columns: 3;
+          }
+        }
+        @media (min-width: 1280px) {
+          .experience-masonry-grid {
+            columns: 4;
+          }
+        }
+
+        .experience-masonry-item {
+          break-inside: avoid;
+          margin-bottom: 10px;
+          display: inline-block;
+          width: 100%;
+        }
+
+        @supports (grid-template-rows: masonry) {
+          .experience-masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-rows: masonry;
+            gap: 10px;
+          }
+          @media (min-width: 640px) {
+            .experience-masonry-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+          @media (min-width: 1024px) {
+            .experience-masonry-grid {
+              grid-template-columns: repeat(3, 1fr);
+            }
+          }
+          @media (min-width: 1280px) {
+            .experience-masonry-grid {
+              grid-template-columns: repeat(4, 1fr);
+            }
+          }
+
+          .experience-masonry-item {
+            margin-bottom: 0;
+            display: flex;
+          }
+        }
+      `}} />
     </PageLayout>
   );
 }

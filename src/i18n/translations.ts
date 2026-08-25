@@ -7,15 +7,17 @@ export const translations = {
       home: "Trang chủ",
       coverLetter: "Thư ngỏ",
       about: "Giới thiệu",
-      experience: "Kinh nghiệm",
-      skills: "Kỹ năng",
-      industries: "Lĩnh vực",
-      projects: "Dự án",
-      memories: "Kỷ niệm",
-      systems: "Hệ thống năng lực",
-      websiteSystem: "Quản trị Website",
       education: "Học vấn",
+      experience: "Kinh nghiệm",
+      industries: "Lĩnh vực",
+      skills: "Kỹ năng",
+      projects: "Dự án",
       interview: "Phỏng vấn",
+      tuvi: "Tử vi",
+      systems: "Hệ thống",
+      memories: "Kỷ niệm",
+      websiteManagement: "Quản trị",
+      websiteSystem: "Quản trị",
       aiChat: "Trợ lý AI",
       wallpapers: "Hình nền",
       templateTest: "Trang Mẫu (Test)",
@@ -26,21 +28,24 @@ export const translations = {
         "Thư ngỏ ứng tuyển & tuyên ngôn sứ mệnh nâng tầm trải nghiệm khách hàng",
       about:
         "Hồ sơ năng lực, triết lý quản trị CX & định hướng hợp tác phát triển",
-      experience:
-        "22+ năm lịch sử công tác thực chiến tại Ví MoMo, Prudential, Mobifone, Garena...",
-      skills:
-        "Bản đồ kỹ năng quản trị Contact Center, CRM Omnichannel, AI Chatbot & lãnh đạo",
-      industries:
-        "6+ Lĩnh vực hoạt động: FinTech, Bảo hiểm, Bưu chính, Game, Viễn thông...",
-      projects:
-        "Các dự án trọng điểm: Xây dựng Tổng đài, Chuyển đổi số & AI Automation",
-      memories: "Kho lưu trữ hình ảnh kỷ niệm, sự kiện & dấu ấn hành trình 22 năm làm việc",
-      systems:
-        "Bản đồ kiến trúc năng lực cốt lõi: Chuyên môn CRM, Lãnh đạo, Đổi mới & Trải nghiệm khách hàng",
       education:
         "Hành trình học tập & phát triển chuyên môn: Cử nhân CNTT, Quản trị mạng, Quản lý cấp cao...",
+      experience:
+        "22+ năm lịch sử công tác thực chiến tại Ví MoMo, Prudential, Mobifone, Garena...",
+      industries:
+        "6+ Lĩnh vực hoạt động: FinTech, Bảo hiểm, Bưu chính, Game, Viễn thông...",
+      skills:
+        "Bản đồ kỹ năng quản trị Contact Center, CRM Omnichannel, AI Chatbot & lãnh đạo",
+      projects:
+        "Các dự án trọng điểm: Xây dựng Tổng đài, Chuyển đổi số & AI Automation",
       interview:
         "Mô phỏng phỏng vấn trực tiếp cùng trợ lý AI chuyên sâu về CX/CS",
+      tuvi: "Bản mệnh Giáp Tý 1984, luận giải tử vi đẩu số & triết lý quản trị ngũ hành",
+      systems:
+        "Bản đồ kiến trúc năng lực cốt lõi: Chuyên môn CRM, Lãnh đạo, Đổi mới & Trải nghiệm khách hàng",
+      memories: "Kho lưu trữ hình ảnh kỷ niệm, sự kiện & dấu ấn hành trình 22 năm làm việc",
+      websiteManagement: "Bảng điều khiển quản trị hệ thống, dữ liệu & cấu hình",
+      websiteSystem: "Bảng điều khiển quản trị hệ thống, dữ liệu & cấu hình",
       aiChat: "Trợ lý AI thông minh sẵn sàng tư vấn & giải đáp thông tin 24/7",
       wallpapers:
         "Bộ sưu tập hình nền 4K, tùy chỉnh tải ảnh lên & quản lý không gian làm việc",
@@ -201,15 +206,17 @@ export const translations = {
       home: "Home",
       coverLetter: "Cover Letter",
       about: "About Me",
-      experience: "Career Experience",
-      skills: "Skills",
-      industries: "Industries",
-      projects: "Projects",
-      memories: "Memories",
-      systems: "Capability Systems",
-      websiteSystem: "Website Management",
       education: "Education",
+      experience: "Career Experience",
+      industries: "Industries",
+      skills: "Skills",
+      projects: "Projects",
       interview: "AI Interview",
+      tuvi: "Horoscope",
+      systems: "Systems",
+      memories: "Memories",
+      websiteManagement: "Admin",
+      websiteSystem: "Admin",
       aiChat: "AI Assistant",
       wallpapers: "Wallpapers",
       templateTest: "Template Test",
@@ -218,19 +225,22 @@ export const translations = {
       home: "Executive overview, key achievements & management metrics",
       coverLetter: "Application letter & CX elevation mission statement",
       about: "Executive background, CX leadership philosophy & strategic collaboration",
-      experience:
-        "22+ years hands-on track record at MoMo, Prudential, Mobifone, Garena...",
-      skills: "Competency map in Contact Center, CRM, AI Chatbot & Leadership",
-      industries:
-        "6+ Industry domains: FinTech, Insurance, Telecom, Gaming, Logistics...",
-      projects:
-        "Key initiatives: Call center setup, Digital transformation & AI Automation",
-      memories: "Gallery of memories, events & milestones from 22 years of career journey",
-      systems:
-        "Core competency architecture: CRM expertise, Leadership, Innovation & Customer Experience",
       education:
         "Educational journey & professional development: Bachelor of IT, Networking, Executive Management...",
+      experience:
+        "22+ years hands-on track record at MoMo, Prudential, Mobifone, Garena...",
+      industries:
+        "6+ Industry domains: FinTech, Insurance, Telecom, Gaming, Logistics...",
+      skills: "Competency map in Contact Center, CRM, AI Chatbot & Leadership",
+      projects:
+        "Key initiatives: Call center setup, Digital transformation & AI Automation",
       interview: "AI-powered mock interview simulator for CX/CS leadership",
+      tuvi: "Giáp Tý 1984 horoscope, destiny analysis & five-elements leadership insights",
+      systems:
+        "Core competency architecture: CRM expertise, Leadership, Innovation & Customer Experience",
+      memories: "Gallery of memories, events & milestones from 22 years of career journey",
+      websiteManagement: "Administration control center, data & system settings",
+      websiteSystem: "Administration control center, data & system settings",
       aiChat:
         "Smart 24/7 AI Assistant ready to answer questions about Hung Thai",
       wallpapers:

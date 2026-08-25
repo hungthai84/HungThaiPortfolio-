@@ -15,7 +15,10 @@ import {
   Plus,
   MessageCircle,
   Monitor,
+  MonitorSmartphone,
   Smartphone,
+  Tablet,
+  Laptop,
   Sun,
   Moon,
   CloudSun,
@@ -52,9 +55,10 @@ import {
   Languages,
   HelpCircle,
   Search,
-MoreHorizontal,
+  MoreHorizontal,
+  Settings,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn, pageSequence } from "../lib/utils";
 import { PageId } from "../types";
@@ -62,6 +66,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { playUiSound } from "../lib/sound";
 import { LIGHT_WALLPAPERS, WallpaperOption } from "../App";
 import { aiCategories } from "../data/aiQuestions";
+import { HamburgerCollapseButton } from "./HamburgerCollapseButton";
 
 
 export const GLASS_PRESETS: any[] = [];
@@ -427,6 +432,63 @@ export function RightSidebar({
     };
   } | null>(null);
   const [showWeatherModal, setShowWeatherModal] = useState(false);
+
+  // Device Preview state & listeners
+  const [isDevicePreviewActive, setIsDevicePreviewActive] = useState(false);
+  const [showDisplaySimDropdown, setShowDisplaySimDropdown] = useState(false);
+  const [viewportMode, setViewportMode] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("app_viewport_mode") || "desktop";
+    }
+    return "desktop";
+  });
+
+  useEffect(() => {
+    const handleSetVp = (e: any) => {
+      if (e.detail?.mode) setViewportMode(e.detail.mode);
+    };
+    window.addEventListener("app-set-viewport-mode", handleSetVp);
+    return () => window.removeEventListener("app-set-viewport-mode", handleSetVp);
+  }, []);
+
+  const [internalIsResponsive, setInternalIsResponsive] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("app_is_responsive");
+      if (saved !== null) return saved !== "false";
+    }
+    return Boolean(isResponsive);
+  });
+
+  useEffect(() => {
+    setInternalIsResponsive(Boolean(isResponsive));
+  }, [isResponsive]);
+
+  useEffect(() => {
+    const handleSetResp = (e: any) => {
+      if (e.detail && typeof e.detail.isResponsive === "boolean") {
+        setInternalIsResponsive(e.detail.isResponsive);
+      }
+    };
+    const handleToggleResp = () => {
+      setInternalIsResponsive((prev) => !prev);
+    };
+    window.addEventListener("app-set-responsive", handleSetResp);
+    window.addEventListener("app-toggle-responsive", handleToggleResp);
+    return () => {
+      window.removeEventListener("app-set-responsive", handleSetResp);
+      window.removeEventListener("app-toggle-responsive", handleToggleResp);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleStateChange = (e: any) => {
+      if (e.detail && typeof e.detail.isOpen === "boolean") {
+        setIsDevicePreviewActive(e.detail.isOpen);
+      }
+    };
+    window.addEventListener("app-device-preview-state-changed", handleStateChange);
+    return () => window.removeEventListener("app-device-preview-state-changed", handleStateChange);
+  }, []);
 
   // Page curl / wallpaper background modal state
   const [isDraggingCurl, setIsDraggingCurl] = useState(false);
@@ -1355,7 +1417,7 @@ export function RightSidebar({
     const deltaY = Math.max(0, Math.min(180, e.clientY));
     setCurlDrag({ x: deltaX, y: deltaY });
     if (deltaX > 80 || deltaY > 80) {
-      window.dispatchEvent(new CustomEvent("app-open-wallpaper-modal"));
+      if (onNavigate) { onNavigate("wallpapers"); } else { window.dispatchEvent(new CustomEvent("app-open-wallpaper-modal")); }
       setIsDraggingCurl(false);
       setCurlDrag({ x: 0, y: 0 });
     }
@@ -1488,43 +1550,22 @@ export function RightSidebar({
 
   return (
     <>
+      {/* Desktop Vertical Right Sidebar (>= lg) */}
       <motion.aside
+        id="desktop-right-sidebar"
         style={{ borderRadius: 0, boxShadow: "none" }}
-        animate={{ width: isExpanded ? 200 : 100 }}
+        animate={{ width: isExpanded ? 180 : 100 }}
         className={cn(
-          "!bg-transparent relative z-[90] hidden h-full flex-shrink-0 flex-col items-center overflow-visible rounded-none border-none px-2 py-4 !shadow-none shadow-none backdrop-blur-none transition-all duration-300 lg:flex",
-          isExpanded ? "w-[200px] justify-between" : "w-[100px] justify-center gap-4",
+          "!bg-transparent relative z-[90] hidden h-full max-h-full flex-shrink-0 flex-col justify-between overflow-visible rounded-none border-l border-black/5 dark:border-white/5 px-2 py-4 !shadow-none shadow-none backdrop-blur-none transition-all duration-300 lg:flex",
+          isExpanded ? "w-[180px]" : "w-[100px]",
         )}
       >
         {/* TOP SECTION: Thẻ Đồng Hồ & Thời Tiết Dạng Dọc (Vertical Clock & Weather Card) */}
         <div
-          style={{
-            paddingTop: 0,
-            paddingBottom: 0,
-            paddingLeft: 0,
-            paddingRight: 0,
-          }}
-          className={cn(
-            "flex w-full shrink-0 flex-col gap-1.5 px-1 py-1 text-center",
-            isExpanded ? "items-end pr-4" : "items-center",
-          )}
+          className="flex w-full shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-1 text-center"
         >
           <div
-            style={{
-              paddingTop: 0,
-              paddingBottom: 0,
-              paddingLeft: 0,
-              paddingRight: 0,
-              borderRadius: 0,
-              borderWidth: 0,
-              borderStyle: "none",
-              background: "transparent",
-              backgroundColor: "transparent",
-            }}
-            className={cn(
-              "group relative flex w-full flex-col space-y-2 rounded-2xl border-none bg-transparent p-3 shadow-none transition-all duration-300",
-              isExpanded ? "items-end text-right" : "items-center text-center",
-            )}
+            className="group relative flex w-full flex-col items-center justify-center space-y-1 rounded-2xl border-none bg-transparent p-1 shadow-none transition-all duration-300"
           >
             {/* 1. Giờ (Clock HH:MM) */}
             <div className="flex w-full flex-col items-center justify-center pt-0.5">
@@ -1543,7 +1584,7 @@ export function RightSidebar({
 
             {/* 2. Ngày (Day & Date) */}
             <div className="flex w-full flex-col items-center gap-0.5">
-              <span className="text-xs font-extrabold text-[var(--text-primary)]">
+              <span className="text-[11px] font-extrabold tracking-tight text-[var(--text-primary)] leading-tight">
                 {time.getDay() === 0
                   ? "Chủ Nhật"
                   : [
@@ -1556,7 +1597,7 @@ export function RightSidebar({
                       "Thứ Bảy",
                     ][time.getDay()]}
               </span>
-              <span className="font-sans text-[10px] font-bold text-[var(--muted)]">
+              <span className="font-sans text-[10px] font-semibold text-[var(--muted)] leading-tight">
                 {time.toLocaleDateString("vi-VN", {
                   day: "2-digit",
                   month: "2-digit",
@@ -1565,22 +1606,24 @@ export function RightSidebar({
               </span>
             </div>
 
-            <div className="h-px w-4/5 bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
+            <div className="my-0.5 h-px w-2/3 bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
 
-            {/* 3. New Vertical Weather Card Replacement */}
+            {/* 3. Icon Thời tiết & Nhiệt độ (Icon gần ngày tháng, Nhiệt độ nằm dưới Icon, tất cả căn giữa) */}
             <div
-              className={cn(
-                "duration-300 font-mono text-white group cursor-pointer relative overflow-hidden bg-[#DCDFE4] dark:bg-[#22272B] rounded-[10px] p-[5px] m-[5px] h-[90px] w-auto hover:bg-blue-200 hover:dark:bg-[#0C66E4] flex flex-col items-center justify-center transition-all shadow-lg border-0",
-              )}
+              className="group/weather relative flex w-full cursor-pointer flex-col items-center justify-center rounded-xl p-1 text-center transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5"
               onClick={() => setShowWeatherModal(true)}
+              title={language === "vi" ? "Xem chi tiết thời tiết" : "View weather details"}
             >
-              <h3 className="text-lg text-center font-black mb-1 text-slate-800 dark:text-white">Today</h3>
-              <div className="gap-2 relative flex flex-col items-center">
+              {/* Weather Icon */}
+              <div className="flex items-center justify-center">
                 <svg
                   viewBox="0 0 64 64"
                   xmlnsXlink="http://www.w3.org/1999/xlink"
                   xmlns="http://www.w3.org/2000/svg"
-                  className={cn("transition-all duration-300", isExpanded ? "w-20" : "w-16")}
+                  className={cn(
+                    "transition-all duration-300 drop-shadow-sm",
+                    isExpanded ? "h-11 w-11" : "h-9 w-9",
+                  )}
                 >
                   <defs>
                     <linearGradient
@@ -1719,42 +1762,288 @@ export function RightSidebar({
                     ></animateTransform>
                   </path>
                 </svg>
-                <h4
+              </div>
+
+              {/* Nhiệt độ nằm dưới Icon */}
+              <div className="mt-0.5 flex items-center justify-center text-center">
+                <span
                   className={cn(
-                    "font-sans duration-300 absolute left-1/2 -translate-x-1/2 text-center group-hover:translate-x-8 group-hover:-translate-y-12 group-hover:scale-125 font-black text-slate-800 dark:text-white",
-                    isExpanded ? "text-4xl" : "text-2xl"
+                    "font-sans font-black tracking-tight text-slate-800 dark:text-white leading-tight",
+                    isExpanded ? "text-base" : "text-[13px]",
                   )}
                 >
-                  {weather ? weather.temp : 29}°
-                </h4>
+                  {weather ? weather.temp : 29}°C
+                </span>
               </div>
-              <div className="hidden absolute duration-300 -left-40 mt-2 group-hover:left-4 transition-all opacity-0 group-hover:opacity-100 flex flex-col items-start px-2">
-                <p className="text-[10px] font-bold text-slate-800 dark:text-white leading-tight">
-                  {getSmartWeatherAdvice(
-                    weather?.code ?? 0,
-                    weather?.temp ?? 29,
-                    language,
-                  )}
-                </p>
-                <p className="text-[9px] opacity-70 text-slate-700 dark:text-slate-200">50% humidity</p>
-              </div>
+
+              {/* Tên thành phố */}
+              <span className="mt-0.5 text-center font-sans text-[9.5px] font-bold text-slate-500 dark:text-slate-400 tracking-tight leading-tight">
+                {language === "vi" ? "TP. Hồ Chí Minh" : "Ho Chi Minh City"}
+              </span>
             </div>
           </div>
 
-          <div className="my-0.5 hidden h-px w-10 bg-[var(--border)] md:block" />
+          {/* COMBINED SIMULATION & EXPAND/RESPONSIVE BUTTON (Nút Mô phỏng & Co giãn) - Under Weather */}
+          <div className="relative w-full px-1.5 my-1.5 flex flex-col items-center justify-center z-[110]">
+            <motion.button
+              id="right-sidebar-display-sim-btn"
+              data-name="Nút mô phỏng & co giãn (Display & Simulation Button)"
+              onClick={() => {
+                playUiSound("toggle");
+                setShowDisplaySimDropdown((prev) => !prev);
+              }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className={cn(
+                "group relative flex shrink-0 cursor-pointer items-center justify-between rounded-xl border transition-all duration-300 shadow-sm",
+                internalIsResponsive
+                  ? "border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-950 dark:text-emerald-200"
+                  : "border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-950 dark:text-amber-200",
+                isExpanded
+                  ? "w-full px-2.5 py-1.5 gap-2"
+                  : "h-9 w-9 justify-center p-0",
+                showDisplaySimDropdown && "ring-2 ring-emerald-500/60 border-emerald-500"
+              )}
+              title={
+                language === "vi"
+                  ? `Mô phỏng & Co giãn: ${internalIsResponsive ? "Co giãn" : "Cố định"} • ${viewportMode.toUpperCase()}`
+                  : `Preview & Fluid: ${internalIsResponsive ? "Fluid" : "Fixed"} • ${viewportMode.toUpperCase()}`
+              }
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="relative flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                  {viewportMode === "mobile" ? (
+                    <Smartphone size={15} className="group-hover:scale-110 transition-transform" />
+                  ) : viewportMode === "tablet" ? (
+                    <Tablet size={15} className="group-hover:scale-110 transition-transform" />
+                  ) : (
+                    <MonitorSmartphone size={15} className="group-hover:scale-110 transition-transform" />
+                  )}
+                </div>
+
+                {isExpanded && (
+                  <div className="flex flex-col text-left min-w-0 leading-none gap-0.5">
+                    <span className="truncate text-xs font-extrabold tracking-tight text-slate-800 dark:text-slate-100">
+                      {language === "vi" ? "Mô phỏng & Co giãn" : "Preview & Fluid"}
+                    </span>
+                    <span className="text-[9.5px] font-bold opacity-75 truncate">
+                      {internalIsResponsive ? (language === "vi" ? "Co giãn" : "Fluid") : (language === "vi" ? "Cố định" : "Fixed")} • {viewportMode}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {isExpanded && (
+                <ChevronDown
+                  size={13}
+                  className={cn(
+                    "shrink-0 opacity-70 transition-transform duration-200",
+                    showDisplaySimDropdown && "rotate-180"
+                  )}
+                />
+              )}
+            </motion.button>
+
+            {/* FLOATING DROPDOWN POPPER */}
+            <AnimatePresence>
+              {showDisplaySimDropdown && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className={cn(
+                    "absolute z-[130] w-[250px] rounded-2xl border-2 border-[var(--border)] bg-[var(--card)]/95 p-2.5 shadow-2xl backdrop-blur-2xl text-left",
+                    isExpanded ? "right-full mr-2 top-0" : "right-full mr-3 top-0"
+                  )}
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between border-b border-[var(--border)] pb-2 mb-2 px-1">
+                    <div className="flex items-center gap-1.5">
+                      <MonitorSmartphone size={16} className="text-emerald-500 shrink-0" />
+                      <span className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)]">
+                        {language === "vi" ? "MÔ PHỎNG & CO GIÃN" : "PREVIEW & DISPLAY"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDisplaySimDropdown(false);
+                      }}
+                      className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-black/10 dark:hover:bg-white/10"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+
+                  {/* SECTION 1: GIAO DIỆN CO GIÃN / CỐ ĐỊNH */}
+                  <div className="mb-3">
+                    <div className="px-1 mb-1 text-[10px] font-black uppercase tracking-wider text-[var(--muted)]">
+                      {language === "vi" ? "Chế độ khung hình" : "Layout Mode"}
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {/* Co giãn (Fluid) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playUiSound("click");
+                          setInternalIsResponsive(true);
+                          localStorage.setItem("app_is_responsive", "true");
+                          window.dispatchEvent(
+                            new CustomEvent("app-set-responsive", { detail: { isResponsive: true } })
+                          );
+                        }}
+                        className={cn(
+                          "flex flex-col items-start gap-1 p-2 rounded-xl border text-left transition-all cursor-pointer",
+                          internalIsResponsive
+                            ? "border-emerald-500/60 bg-emerald-500/15 text-emerald-950 dark:text-emerald-200 font-bold"
+                            : "border-[var(--border)] bg-transparent hover:bg-[var(--glass-bg-hover)] text-[var(--text-secondary)]"
+                        )}
+                      >
+                        <div className="flex w-full items-center justify-between">
+                          <Maximize2 size={14} className={internalIsResponsive ? "text-emerald-500" : "opacity-60"} />
+                          {internalIsResponsive && <Check size={14} className="text-emerald-500" />}
+                        </div>
+                        <span className="text-xs font-bold leading-tight">{language === "vi" ? "Co giãn" : "Fluid"}</span>
+                        <span className="text-[9px] opacity-70 leading-tight">{language === "vi" ? "Tràn màn hình" : "Full width"}</span>
+                      </button>
+
+                      {/* Cố định (Fixed) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playUiSound("click");
+                          setInternalIsResponsive(false);
+                          localStorage.setItem("app_is_responsive", "false");
+                          window.dispatchEvent(
+                            new CustomEvent("app-set-responsive", { detail: { isResponsive: false } })
+                          );
+                        }}
+                        className={cn(
+                          "flex flex-col items-start gap-1 p-2 rounded-xl border text-left transition-all cursor-pointer",
+                          !internalIsResponsive
+                            ? "border-amber-500/60 bg-amber-500/15 text-amber-950 dark:text-amber-200 font-bold"
+                            : "border-[var(--border)] bg-transparent hover:bg-[var(--glass-bg-hover)] text-[var(--text-secondary)]"
+                        )}
+                      >
+                        <div className="flex w-full items-center justify-between">
+                          <Minimize2 size={14} className={!internalIsResponsive ? "text-amber-500" : "opacity-60"} />
+                          {!internalIsResponsive && <Check size={14} className="text-amber-500" />}
+                        </div>
+                        <span className="text-xs font-bold leading-tight">{language === "vi" ? "Cố định" : "Fixed"}</span>
+                        <span className="text-[9px] opacity-70 leading-tight">1250 × 750px</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* SECTION 2: MÔ PHỎNG THIẾT BỊ */}
+                  <div>
+                    <div className="px-1 mb-1 text-[10px] font-black uppercase tracking-wider text-[var(--muted)] border-t border-[var(--border)] pt-2">
+                      {language === "vi" ? "Mô phỏng thiết bị" : "Device Simulation"}
+                    </div>
+                    <div className="space-y-1">
+                      {/* Desktop */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playUiSound("click");
+                          setViewportMode("desktop");
+                          localStorage.setItem("app_viewport_mode", "desktop");
+                          window.dispatchEvent(
+                            new CustomEvent("app-set-viewport-mode", { detail: { mode: "desktop" } })
+                          );
+                        }}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-all cursor-pointer",
+                          viewportMode === "desktop"
+                            ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-bold"
+                            : "text-[var(--text-secondary)] hover:bg-[var(--glass-bg-hover)]"
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Monitor size={15} className={viewportMode === "desktop" ? "text-emerald-500" : "opacity-60"} />
+                          <div className="flex flex-col text-left leading-none gap-0.5">
+                            <span className="font-bold">Desktop</span>
+                            <span className="text-[9px] opacity-70">1440 × 900</span>
+                          </div>
+                        </div>
+                        {viewportMode === "desktop" && <Check size={14} className="text-emerald-500" />}
+                      </button>
+
+                      {/* Tablet */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playUiSound("click");
+                          setViewportMode("tablet");
+                          localStorage.setItem("app_viewport_mode", "tablet");
+                          window.dispatchEvent(
+                            new CustomEvent("app-set-viewport-mode", { detail: { mode: "tablet" } })
+                          );
+                        }}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-all cursor-pointer",
+                          viewportMode === "tablet"
+                            ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-bold"
+                            : "text-[var(--text-secondary)] hover:bg-[var(--glass-bg-hover)]"
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Tablet size={15} className={viewportMode === "tablet" ? "text-emerald-500" : "opacity-60"} />
+                          <div className="flex flex-col text-left leading-none gap-0.5">
+                            <span className="font-bold">Tablet</span>
+                            <span className="text-[9px] opacity-70">768 × 1024</span>
+                          </div>
+                        </div>
+                        {viewportMode === "tablet" && <Check size={14} className="text-emerald-500" />}
+                      </button>
+
+                      {/* Mobile */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playUiSound("click");
+                          setViewportMode("mobile");
+                          localStorage.setItem("app_viewport_mode", "mobile");
+                          window.dispatchEvent(
+                            new CustomEvent("app-set-viewport-mode", { detail: { mode: "mobile" } })
+                          );
+                        }}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-all cursor-pointer",
+                          viewportMode === "mobile"
+                            ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-bold"
+                            : "text-[var(--text-secondary)] hover:bg-[var(--glass-bg-hover)]"
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Smartphone size={15} className={viewportMode === "mobile" ? "text-emerald-500" : "opacity-60"} />
+                          <div className="flex flex-col text-left leading-none gap-0.5">
+                            <span className="font-bold">Mobile</span>
+                            <span className="text-[9px] opacity-70">390 × 844</span>
+                          </div>
+                        </div>
+                        {viewportMode === "mobile" && <Check size={14} className="text-emerald-500" />}
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* CENTER SECTION: Icons (Actions) */}
         <div
-          style={{
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingLeft: 10,
-            paddingRight: 10,
-          }}
           className={cn(
-            "my-auto flex w-full justify-center gap-2.5 py-1 md:flex-col",
-            isExpanded ? "items-stretch px-2 pr-4" : "items-center px-0",
+            "custom-scrollbar my-auto flex w-full flex-1 min-h-0 flex-col justify-center space-y-1.5 overflow-y-auto overflow-x-hidden py-1",
+            isExpanded ? "items-end px-2" : "items-end pr-2.5",
           )}
         >
           {/* Download CV Button */}
@@ -1765,25 +2054,27 @@ export function RightSidebar({
               playUiSound("click");
               window.dispatchEvent(new CustomEvent("app-trigger-download"));
             }}
-            whileHover={{ scale: 1.08 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              "right-sidebar-item group relative flex h-10 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
+              "right-sidebar-item group relative flex h-10 shrink-0 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
               isExpanded
-                ? "w-full justify-end gap-2.5 px-3"
-                : "mx-auto w-10 justify-center",
+                ? "w-full justify-end gap-2.5 px-2.5"
+                : "w-10 justify-center self-end",
             )}
-            title={language === "vi" ? "Tải CV PDF" : "Download PDF CV"}
+            title={language === "vi" ? "Tải CV" : "Download CV"}
           >
             {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-violet-600 dark:text-violet-400">
+              <span className="truncate text-right text-[12.5px] font-black tracking-tight whitespace-nowrap text-violet-600 dark:text-violet-400">
                 {language === "vi" ? "Tải CV" : "Download CV"}
               </span>
             )}
-            <FileDown
-              size={22}
-              className="shrink-0 text-violet-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-violet-400"
-            />
+            <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+              <FileDown
+                size={19}
+                className="shrink-0 text-violet-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-violet-400"
+              />
+            </div>
           </motion.button>
 
           {/* Chat Zalo (0909097882) Button */}
@@ -1794,25 +2085,28 @@ export function RightSidebar({
               playUiSound("click");
               window.open("https://zalo.me/0909097882", "_blank");
             }}
-            whileHover={{ scale: 1.08 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              "right-sidebar-item group relative flex h-10 cursor-pointer items-center rounded-xl text-sky-500 transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
+              "right-sidebar-item group relative flex h-10 shrink-0 cursor-pointer items-center rounded-xl text-sky-500 transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
               isExpanded
-                ? "w-full justify-end gap-2.5 px-3"
-                : "mx-auto w-10 justify-center",
+                ? "w-full justify-end gap-2.5 px-2.5"
+                : "w-10 justify-center self-end",
             )}
+            title="Chat Zalo"
           >
             {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-sky-500 dark:text-sky-400">
+              <span className="truncate text-right text-[12.5px] font-black tracking-tight whitespace-nowrap text-sky-500 dark:text-sky-400">
                 Chat Zalo
               </span>
             )}
-            <MessageCircle
-              size={22}
-              className="shrink-0 text-sky-500 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-sky-400"
-            />
-            <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-[var(--bg)] bg-sky-500" />
+            <div className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+              <MessageCircle
+                size={19}
+                className="shrink-0 text-sky-500 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-sky-400"
+              />
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 animate-pulse rounded-full border-2 border-[var(--bg)] bg-sky-500" />
+            </div>
           </motion.button>
 
           {/* AI Assistant Button */}
@@ -1823,32 +2117,34 @@ export function RightSidebar({
               playUiSound("click");
               if (onNavigate) onNavigate("aiChat");
             }}
-            whileHover={{ scale: 1.08 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             data-active={activePage === "aiChat"}
             className={cn(
-              "right-sidebar-item group relative flex h-10 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
+              "right-sidebar-item group relative flex h-10 shrink-0 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
               isExpanded
-                ? "w-full justify-end gap-2.5 px-3"
-                : "mx-auto w-10 justify-center",
+                ? "w-full justify-end gap-2.5 px-2.5"
+                : "w-10 justify-center self-end",
               activePage === "aiChat"
                 ? "bg-[var(--glass-xs-bg)] text-purple-600 dark:text-purple-400"
                 : "text-purple-600 dark:text-purple-400",
             )}
-            title={language === "vi" ? "Trợ lý AI" : "AI Support"}
+            title={language === "vi" ? "Trợ Lý" : "AI Support"}
           >
             {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-purple-600 dark:text-purple-400">
-                {language === "vi" ? "Trợ lý AI" : "AI Support"}
+              <span className="truncate text-right text-[12.5px] font-black tracking-tight whitespace-nowrap text-purple-600 dark:text-purple-400">
+                {language === "vi" ? "Trợ Lý" : "AI Support"}
               </span>
             )}
-            <Bot
-              size={22}
-              className="shrink-0 text-purple-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-purple-400"
-            />
-            {activePage === "aiChat" && (
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 animate-ping rounded-full border-2 border-[var(--bg)] bg-emerald-400" />
-            )}
+            <div className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+              <Bot
+                size={19}
+                className="shrink-0 text-purple-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-purple-400"
+              />
+              {activePage === "aiChat" && (
+                <span className="absolute -top-1 -right-1 h-2 w-2 animate-ping rounded-full border-2 border-[var(--bg)] bg-emerald-400" />
+              )}
+            </div>
           </motion.button>
 
           {/* Trang Phong Cách (Style Showcase) Button */}
@@ -1859,230 +2155,238 @@ export function RightSidebar({
               playUiSound("click");
               if (onNavigate) onNavigate("templateTest");
             }}
-            whileHover={{ scale: 1.08 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             data-active={activePage === "templateTest"}
             className={cn(
-              "right-sidebar-item group relative flex h-10 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
+              "right-sidebar-item group relative flex h-10 shrink-0 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
               isExpanded
-                ? "w-full justify-end gap-2.5 px-3"
-                : "mx-auto w-10 justify-center",
+                ? "w-full justify-end gap-2.5 px-2.5"
+                : "w-10 justify-center self-end",
               activePage === "templateTest"
                 ? "bg-[var(--glass-xs-bg)] text-fuchsia-600 dark:text-fuchsia-400"
                 : "text-fuchsia-600 dark:text-fuchsia-400",
             )}
-            title={language === "vi" ? "Trang Phong Cách" : "Style Showcase"}
+            title={language === "vi" ? "Phong Cách" : "Style Showcase"}
           >
             {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-fuchsia-600 dark:text-fuchsia-400">
-                {language === "vi" ? "Trang Phong Cách" : "Style Showcase"}
+              <span className="truncate text-right text-[12.5px] font-black tracking-tight whitespace-nowrap text-fuchsia-600 dark:text-fuchsia-400">
+                {language === "vi" ? "Phong Cách" : "Style Showcase"}
               </span>
             )}
-            <Sparkles
-              size={22}
-              className="shrink-0 text-fuchsia-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-fuchsia-400"
-            />
-            {activePage === "templateTest" && (
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 animate-ping rounded-full border-2 border-[var(--bg)] bg-fuchsia-400" />
-            )}
-          </motion.button>
-
-
-
-          
-          
-
-
-
-          {/* Hide/Show Wallpaper Background Toggle Button */}
-          <motion.button
-            id="toggle-wallpaper-visibility-btn"
-            data-name="Nút ẩn/hiện hình nền không làm mất lựa chọn (Toggle Wallpaper Visibility Button)"
-            onClick={() => {
-              playUiSound("toggle");
-              window.dispatchEvent(
-                new CustomEvent("app-toggle-wallpaper-visibility"),
-              );
-            }}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              "!hidden right-sidebar-item group relative h-10 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
-              isExpanded
-                ? "w-full justify-end gap-2.5 px-3"
-                : "mx-auto w-10 justify-center",
-              isWallpaperHidden
-                ? "text-slate-400 dark:text-slate-500"
-                : "text-emerald-600 dark:text-emerald-400",
-            )}
-            title={
-              language === "vi"
-                ? isWallpaperHidden
-                  ? "Hiện lại hình nền (Giữ nguyên lựa chọn)"
-                  : "Ẩn hình nền (Chế độ Fluent đơn sắc)"
-                : isWallpaperHidden
-                  ? "Show Wallpaper (Keep selection)"
-                  : "Hide Wallpaper (Fluent plain mode)"
-            }
-          >
-            {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap">
-                {language === "vi"
-                  ? isWallpaperHidden
-                    ? "Hiện hình nền"
-                    : "Ẩn hình nền"
-                  : isWallpaperHidden
-                    ? "Show Wall"
-                    : "Hide Wall"}
-              </span>
-            )}
-            {isWallpaperHidden ? (
-              <EyeOff
-                size={22}
-                className="shrink-0 text-slate-400 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-slate-500"
+            <div className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+              <Sparkles
+                size={19}
+                className="shrink-0 text-fuchsia-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-fuchsia-400"
               />
-            ) : (
-              <Eye
-                size={22}
-                className="shrink-0 text-emerald-600 transition-transform group-hover:scale-110 group-hover:rotate-6 dark:text-emerald-400"
-              />
-            )}
+              {activePage === "templateTest" && (
+                <span className="absolute -top-1 -right-1 h-2 w-2 animate-ping rounded-full border-2 border-[var(--bg)] bg-fuchsia-400" />
+              )}
+            </div>
           </motion.button>
 
-          {/* Reset Theme Bookmarks Dialog Trigger Button */}
-          <motion.button
-            id="open-theme-reset-dialog-btn"
-            data-name="Nút mở hộp thoại đặt lại giao diện đã lưu (Reset Theme Bookmarks Button)"
-            onClick={() => {
-              playUiSound("click");
-              window.dispatchEvent(
-                new CustomEvent("app-open-theme-reset-dialog"),
-              );
-            }}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              "!hidden right-sidebar-item group relative h-10 cursor-pointer items-center rounded-xl text-rose-500 transition-colors duration-200 hover:bg-[var(--shadow-color)]/5 dark:text-rose-400",
-              isExpanded
-                ? "w-full justify-end gap-2.5 px-3"
-                : "mx-auto w-10 justify-center",
-            )}
-            title={
-              language === "vi"
-                ? "Đặt lại giao diện đã lưu"
-                : "Reset Theme Bookmarks"
-            }
-          >
-            {isExpanded && (
-              <span className="truncate text-right text-[13px] font-black tracking-tight whitespace-nowrap text-rose-500 dark:text-rose-400">
-                {language === "vi" ? "Reset Theme" : "Reset Theme"}
-              </span>
-            )}
-            <RotateCcw
-              size={22}
-              className="shrink-0 text-rose-500 transition-transform group-hover:scale-110 group-hover:-rotate-45 dark:text-rose-400"
-            />
-          </motion.button>
-        </div>
-
-        {/* BOTTOM SECTION: Navigation */}
-        {/* Page Navigation Buttons (Prev / Next / Scroll to Top) */}
-        <div
-          style={{
-            paddingTop: 18,
-            paddingBottom: 10,
-            paddingLeft: 10,
-            paddingRight: 10,
-          }}
-          className={cn(
-            "flex w-full items-center border-t border-[var(--border)] pt-2",
-            isExpanded ? "flex-row justify-end pr-4 gap-3" : "flex-col justify-center gap-2.5",
-          )}
-        >
-          {!isFirstPage && (
+          {/* Quản trị (Website Management / Admin) - DEV mode only */}
+          {Boolean(
+            import.meta.env.DEV ||
+            (typeof window !== "undefined" &&
+              (window.location.hostname === "localhost" ||
+               window.location.hostname.includes("ais-dev") ||
+               window.location.search.includes("dev=true")))
+          ) && (
             <motion.button
+              id="admin-management-btn"
+              data-name="Nút Quản trị (Admin Management Button - DEV only)"
               onClick={() => {
-                playUiSound("pageSwitch");
-                onPrev();
+                playUiSound("click");
+                if (onNavigate) onNavigate("websiteManagement");
               }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.92 }}
-              className="right-sidebar-item group flex h-10 w-10 shrink-0 animate-[bounce_2s_infinite] cursor-pointer items-center justify-center rounded-full border-2 border-violet-500/80 bg-white/50 dark:bg-slate-900/50 text-violet-600 ring-2 ring-violet-500/30 backdrop-blur-md transition-all duration-300 hover:bg-violet-500/20 dark:border-violet-400/80 dark:text-violet-300 dark:hover:bg-violet-400/20"
-              title={language === "vi" ? "Trang trước (Lùi)" : "Prev"}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              data-active={activePage === "websiteManagement"}
+              className={cn(
+                "right-sidebar-item group relative flex h-10 shrink-0 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
+                isExpanded
+                  ? "w-full justify-end gap-2.5 px-2.5"
+                  : "w-10 justify-center self-end",
+                activePage === "websiteManagement"
+                  ? "bg-[var(--glass-xs-bg)] text-amber-600 dark:text-amber-400"
+                  : "text-amber-600 dark:text-amber-400",
+              )}
+              title={language === "vi" ? "Quản Trị" : "Web Admin"}
             >
-              <ChevronUp
-                size={20}
-                className="shrink-0 text-violet-600 transition-transform group-hover:-translate-y-0.5 dark:text-violet-300"
-              />
+              {isExpanded && (
+                <span className="truncate text-right text-[12.5px] font-black tracking-tight whitespace-nowrap text-amber-600 dark:text-amber-400">
+                  {language === "vi" ? "Quản Trị" : "Web Admin"}
+                </span>
+              )}
+              <div className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+                <Settings
+                  size={19}
+                  className="shrink-0 text-amber-600 transition-transform group-hover:scale-110 group-hover:rotate-45 dark:text-amber-400"
+                />
+                {activePage === "websiteManagement" && (
+                  <span className="absolute -top-1 -right-1 h-2 w-2 animate-ping rounded-full border-2 border-[var(--bg)] bg-amber-400" />
+                )}
+              </div>
             </motion.button>
           )}
 
+          {/* Nút Khôi phục / Chuyển đổi Giao diện Co giãn & Cố định (Fluid / Fixed Layout Toggle) - Hidden as requested */}
           <motion.button
+            id="layout-toggle-btn"
+            data-name="Nút chuyển đổi Giao diện Co giãn và Cố định"
             onClick={() => {
-              playUiSound("pageSwitch");
-              onNext();
+              playUiSound("toggle");
+              window.dispatchEvent(new CustomEvent("app-toggle-responsive"));
             }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.92 }}
-            className="right-sidebar-item group flex h-10 w-10 shrink-0 animate-[bounce_2s_infinite] cursor-pointer items-center justify-center rounded-full border-2 border-violet-500/80 bg-white/50 dark:bg-slate-900/50 text-violet-600 ring-2 ring-violet-500/30 backdrop-blur-md transition-all duration-300 hover:bg-violet-500/20 dark:border-violet-400/80 dark:text-violet-300 dark:hover:bg-violet-400/20"
-            style={{ animationDelay: "0.4s" }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{ display: "none" }}
+            className={cn(
+              "hidden right-sidebar-item group relative h-10 shrink-0 cursor-pointer items-center rounded-xl transition-colors duration-200 hover:bg-[var(--shadow-color)]/5",
+              isExpanded
+                ? "w-full justify-end gap-2.5 px-2.5"
+                : "mx-auto w-10 justify-center",
+              internalIsResponsive
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-amber-600 dark:text-amber-400",
+            )}
             title={
-              isLastPage
-                ? language === "vi"
-                  ? "Về đầu trang"
-                  : "Scroll to top"
-                : language === "vi"
-                  ? "Trang sau (Tới)"
-                  : "Next"
+              language === "vi"
+                ? internalIsResponsive
+                  ? "Giao diện: Co giãn (Bấm để chuyển Cố định)"
+                  : "Giao diện: Cố định (Bấm để chuyển Co giãn)"
+                : internalIsResponsive
+                  ? "Layout: Fluid (Click for Fixed)"
+                  : "Layout: Fixed (Click for Fluid)"
             }
           >
-            {isLastPage ? (
-              <ChevronsUp
-                size={20}
-                className="shrink-0 text-violet-600 transition-transform group-hover:-translate-y-0.5 dark:text-violet-300"
-              />
-            ) : (
-              <ChevronDown
-                size={20}
-                className="shrink-0 text-violet-600 transition-transform group-hover:translate-y-0.5 dark:text-violet-300"
-              />
+            {isExpanded && (
+              <span className="truncate text-right text-[12.5px] font-black tracking-tight whitespace-nowrap">
+                {language === "vi"
+                  ? internalIsResponsive
+                    ? "Khung Co giãn"
+                    : "Khung Cố định"
+                  : internalIsResponsive
+                    ? "Fluid Layout"
+                    : "Fixed Layout"}
+              </span>
             )}
+            <div className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+              {internalIsResponsive ? (
+                <Maximize2
+                  size={19}
+                  className="shrink-0 text-blue-600 transition-transform group-hover:scale-110 dark:text-blue-400"
+                />
+              ) : (
+                <Minimize2
+                  size={19}
+                  className="shrink-0 text-amber-600 transition-transform group-hover:scale-110 dark:text-amber-400"
+                />
+              )}
+            </div>
           </motion.button>
         </div>
 
-        {/* Toggle Collapse/Expand Button */}
-        <div
-          style={{
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingLeft: 10,
-            paddingRight: 10,
-          }}
-          className={cn(
-            "flex w-full shrink-0 items-center border-t border-[var(--border)] px-0 pt-3",
-            isExpanded ? "justify-end pr-4" : "justify-center",
-          )}
-        >
-          <motion.button
-            onClick={onToggleExpand}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={cn(
-              "group flex cursor-pointer items-center rounded-lg border-0 bg-transparent p-2 text-[var(--muted)] shadow-none transition-colors hover:bg-[var(--shadow-color)]/5 hover:text-[var(--text-primary)]",
-              isExpanded ? "justify-end" : "justify-center",
-            )}
-            title={
-              isExpanded
-                ? language === "vi"
-                  ? "Thu gọn thanh menu"
-                  : "Collapse Sidebar"
-                : language === "vi"
-                  ? "Mở rộng thanh menu"
-                  : "Expand Sidebar"
-            }
+        {/* BOTTOM SECTION: Navigation & Collapse Toggle */}
+        <div className="relative z-20 flex w-full shrink-0 flex-col items-center justify-center">
+          {/* Page Navigation Buttons (Prev / Next) - Strictly Centered & Vertical stacking to comfortably fit 2 buttons */}
+          <div
+            className="flex min-h-[96px] w-full flex-col items-center justify-center border-t border-[var(--border)] py-2.5 gap-2"
           >
-            <MoreHorizontal size={20} className="shrink-0 transition-transform group-hover:scale-110" />
-          </motion.button>
+            {!isFirstPage && (
+              <motion.button
+                id="sidebar-prev-page-btn"
+                data-name="Nút lùi trang trước (Sidebar Previous Page Button)"
+                onClick={() => {
+                  playUiSound("pageSwitch");
+                  onPrev();
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.92 }}
+                className="right-sidebar-item group flex h-9 w-9 shrink-0 animate-[bounce_2s_infinite] cursor-pointer items-center justify-center rounded-full border-2 border-violet-500/80 bg-white/60 dark:bg-slate-900/60 text-violet-600 ring-2 ring-violet-500/30 backdrop-blur-md shadow-md shadow-violet-500/20 transition-all duration-300 hover:bg-violet-500/20 dark:border-violet-400/80 dark:text-violet-300 dark:hover:bg-violet-400/20"
+                title={language === "vi" ? "Trang trước (Lùi)" : "Prev"}
+              >
+                <ChevronUp
+                  size={18}
+                  className="shrink-0 text-violet-600 transition-transform group-hover:-translate-y-0.5 dark:text-violet-300"
+                />
+              </motion.button>
+            )}
+
+            <motion.button
+              id="sidebar-next-page-btn"
+              data-name="Nút tới trang sau (Sidebar Next Page Button)"
+              onClick={() => {
+                playUiSound("pageSwitch");
+                onNext();
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.92 }}
+              className="right-sidebar-item group flex h-9 w-9 shrink-0 animate-[bounce_2s_infinite] cursor-pointer items-center justify-center rounded-full border-2 border-violet-500/80 bg-white/60 dark:bg-slate-900/60 text-violet-600 ring-2 ring-violet-500/30 backdrop-blur-md shadow-md shadow-violet-500/20 transition-all duration-300 hover:bg-violet-500/20 dark:border-violet-400/80 dark:text-violet-300 dark:hover:bg-violet-400/20"
+              style={{ animationDelay: "0.4s" }}
+              title={
+                isLastPage
+                  ? language === "vi"
+                    ? "Về đầu trang"
+                    : "Scroll to top"
+                  : language === "vi"
+                    ? "Trang sau (Tới)"
+                    : "Next"
+              }
+            >
+              {isLastPage ? (
+                <ChevronsUp
+                  size={18}
+                  className="shrink-0 text-violet-600 transition-transform group-hover:-translate-y-0.5 dark:text-violet-300"
+                />
+              ) : (
+                <ChevronDown
+                  size={18}
+                  className="shrink-0 text-violet-600 transition-transform group-hover:translate-y-0.5 dark:text-violet-300"
+                />
+              )}
+            </motion.button>
+          </div>
+
+          {/* Toggle Collapse/Expand Button - Strictly Centered & Matching Left Sidebar */}
+          <div
+            className="flex h-11 w-full shrink-0 items-center justify-center border-t border-[var(--border)] px-0 pt-1"
+          >
+            <div
+              className="flex items-center justify-center p-1 rounded-xl transition-colors hover:bg-[var(--shadow-color)]/5"
+              title={
+                isExpanded
+                  ? language === "vi"
+                    ? "Thu gọn thanh menu"
+                    : "Collapse Sidebar"
+                  : language === "vi"
+                    ? "Mở rộng thanh menu"
+                    : "Expand Sidebar"
+              }
+            >
+              <HamburgerCollapseButton
+                id="right-sidebar-collapse-toggle"
+                checked={isExpanded}
+                direction="right-left"
+                onClick={() => {
+                  playUiSound("click");
+                  if (onToggleExpand) onToggleExpand();
+                }}
+                scale={0.30}
+                title={
+                  isExpanded
+                    ? language === "vi"
+                      ? "Thu gọn thanh menu"
+                      : "Collapse Sidebar"
+                    : language === "vi"
+                      ? "Mở rộng thanh menu"
+                      : "Expand Sidebar"
+                }
+                aria-label="Toggle Right Sidebar"
+              />
+            </div>
+          </div>
         </div>
       </motion.aside>
 

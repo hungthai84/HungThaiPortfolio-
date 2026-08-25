@@ -31,6 +31,7 @@ import { playUiSound } from "../lib/sound";
 import { logBubbleInteraction } from "../lib/bubbleLogging";
 import { PageLayout } from "../components/PageLayout";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { TopNavActionStack } from "../components/TopNavActionStack";
 import {
   getDefaultVietnameseVoice,
   getDefaultEnglishVoice,
@@ -235,7 +236,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
   };
 
   const handleToggleThemeMode = () => {
-    const modes: ("system" | "light" | "dark")[] = ["system", "light", "dark"];
+    const modes: ("light" | "dark" | "system")[] = ["light", "dark", "system"];
     const nextIndex = (modes.indexOf(currentThemeMode) + 1) % modes.length;
     handleSelectThemeMode(modes[nextIndex]);
   };
@@ -324,26 +325,26 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
         data-name="Nội dung giới thiệu Nguyễn Hùng Thái"
         style={{ width: "350px", height: "200px" }}
         className={cn(
-          "group magic-card glass-card relative z-30 flex w-[350px] h-[200px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border-2 border-solid border-[var(--border)] bg-[var(--card)] !p-[15px] !m-0 text-[var(--text-primary)] shadow-xl backdrop-blur-none transition-all duration-300 hover:border-indigo-500/40 hover:shadow-2xl",
+          "group magic-card glass-glow-card relative z-30 flex w-[350px] h-[200px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-white/70 dark:border-white/20 bg-white/50 dark:bg-slate-900/50 !p-[15px] !m-0 text-[var(--text-primary)] shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:border-indigo-400/80 hover:shadow-[0_20px_45px_rgba(99,102,241,0.25)]",
           isMobilePos ? "max-w-[calc(100vw-32px)]" : ""
         )}
       >
-        {/* Soft background glow & watermark */}
-        <div className="pointer-events-none absolute -inset-1 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-100" />
+        {/* Soft multi-chromatic background glow & watermark */}
+        <div className="pointer-events-none absolute -inset-1 bg-gradient-to-r from-violet-500/20 via-cyan-500/20 to-pink-500/20 opacity-40 blur-xl transition-opacity duration-700 group-hover:opacity-100" />
         <div className="pointer-events-none absolute -right-4 -bottom-4 text-indigo-500/10 dark:text-indigo-400/15 transition-transform duration-500 group-hover:scale-110">
           <Sparkles size={100} />
         </div>
 
-        <div className="relative flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2.5">
+        <div className="relative flex items-center justify-between gap-2 border-b border-white/30 dark:border-white/10 pb-2.5">
           <div className="flex min-w-0 items-center gap-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-200/80 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-md dark:border-white/20">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/60 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-md dark:border-white/20">
               <Sparkles size={18} className="animate-pulse" />
             </div>
             <div className="flex min-w-0 flex-col">
               <span className="text-[10px] font-black tracking-widest text-[var(--muted)] uppercase">
                 {language === "vi" ? "Xin chào! Tôi là" : "Hello! I am"}
               </span>
-              <span className="truncate bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-[25px] font-black leading-tight text-transparent dark:from-indigo-400 dark:to-purple-400">
+              <span className="truncate bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-[25px] font-black leading-tight text-transparent dark:from-indigo-300 dark:via-purple-300 dark:to-pink-300">
                 Nguyễn Hùng Thái
               </span>
             </div>
@@ -351,12 +352,12 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
         </div>
 
         <div className="relative space-y-1 py-1 text-left">
-          <p className="text-[13px] leading-snug font-bold text-[var(--text-primary)]">
+          <p className="text-[13px] leading-snug font-bold text-slate-800 dark:text-slate-100">
             {language === "vi"
               ? "Chào mừng bạn đến với Portfolio của tôi ! 👋"
               : "Welcome to my Portfolio ! 👋"}
           </p>
-          <p className="text-[12px] leading-snug font-medium text-[var(--text-secondary)]">
+          <p className="text-[12px] leading-snug font-medium text-slate-600 dark:text-slate-300">
             {language === "vi"
               ? "Chúc bạn một ngày làm việc tràn đầy năng lượng !"
               : "Wishing you an energetic and productive day !"}
@@ -364,8 +365,8 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
         </div>
 
         {/* ACTION BUTTONS */}
-        <div className="relative flex flex-col gap-2 border-t border-[var(--border)] pt-2.5">
-          <nav className="flex w-full items-center justify-center gap-2">
+        <div className="relative flex flex-col gap-2 border-t border-white/30 dark:border-white/10 pt-2.5">
+          <nav className="custom-scrollbar flex w-full items-center justify-center gap-2">
             {/* Unified Premium Play/Pause Video Button matching Interview style */}
             <motion.button
               whileHover={{ scale: 1.03 }}
@@ -386,7 +387,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                   handlePlayIntroVideo();
                 }
               }}
-              className="flex w-[281px] h-[51px] mx-auto cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-indigo-400/80 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_0_25px_rgba(99,102,241,0.6)] backdrop-blur-none transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
+              className="flex w-[281px] h-[51px] mx-auto cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-white/60 dark:border-white/20 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_4px_25px_rgba(99,102,241,0.5)] backdrop-blur-xl transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
               style={{ width: '281px', height: '51px' }}
               title={
                 isIntro
@@ -570,7 +571,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
       }
       icon={User}
       background={
-        <div>
+        <div className="h-full w-full overflow-hidden rounded-2xl">
           <video
             ref={videoRef}
             autoPlay
@@ -579,163 +580,20 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
             loop={videoState.startsWith("idle_")}
             src={getVideoUrl(videoState)}
             onEnded={handleVideoEnded}
-            className="h-full w-full rounded-none object-cover transition-all duration-700"
+            className="h-full w-full rounded-2xl object-cover transition-all duration-700"
           />
-          <div className="pointer-events-none absolute inset-0 rounded-none bg-gradient-to-t from-transparent via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-transparent via-transparent to-transparent" />
         </div>
       }
     >
       <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 h-[705px] p-0">
-      {/* FLOATING DRAGGABLE RESPONSIVE TOGGLE BUTTON (CIRCULAR GLASS) - ON TOP OF ALL LAYERS */}
-      <motion.div
-        drag
-        dragMomentum={false}
-        dragElastic={0.08}
-        whileDrag={{ scale: 1.1, cursor: "grabbing" }}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.94 }}
-        className="fixed top-6 left-6 z-[999999] flex h-12 w-12 cursor-grab items-center justify-center rounded-full border border-white/40 bg-white/75 p-0 text-slate-800 shadow-[0_8px_30px_rgba(0,0,0,0.22)] backdrop-blur-none transition-shadow select-none hover:shadow-amber-500/30 active:cursor-grabbing dark:border-white/15 dark:bg-slate-900/75 dark:text-slate-100"
-        title={
-          language === "vi"
-            ? isResponsive
-              ? "Giao diện: Co giãn (Fluid) - Nhấn để chuyển Cố định, Kéo để di chuyển"
-              : "Giao diện: Cố định (Fixed) - Nhấn để chuyển Co giãn, Kéo để di chuyển"
-            : isResponsive
-              ? "Layout: Fluid - Click to toggle, Drag to move"
-              : "Layout: Fixed - Click to toggle, Drag to move"
-        }
-      >
-        <button
-          id="sidebar-toggle-responsive-btn"
-          data-name="Nút co giãn thiết bị nổi (Floating Toggle Responsive Button)"
-          onClick={(e) => {
-            e.stopPropagation();
-            playUiSound("toggle");
-            window.dispatchEvent(new CustomEvent("app-toggle-responsive"));
-          }}
-          className="flex h-full w-full cursor-pointer items-center justify-center rounded-full text-amber-600 transition-colors hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300"
-        >
-          {isResponsive ? (
-            <Smartphone size={20} className="shrink-0 transition-transform hover:scale-110" />
-          ) : (
-            <Monitor size={20} className="shrink-0 transition-transform hover:scale-110" />
-          )}
-        </button>
-      </motion.div>
-      {/* Top Right Unified Minimalist Menu Cluster */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
-        className="pointer-events-auto absolute top-4 right-4 sm:top-6 sm:right-6 z-[60] flex items-center gap-1.5 p-1.5 rounded-2xl border-2 border-solid border-[var(--border)] bg-[var(--card)] shadow-2xl backdrop-blur-none"
-      >
-        {/* Nút hình nền (Wallpapers) */}
-        <motion.button
-          onClick={() => {
-            playUiSound("click");
-            onNavigate?.("wallpapers");
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={cn(
-            "group relative flex cursor-pointer items-center justify-center rounded-xl transition-all duration-300",
-            "p-2.5 text-[var(--text-primary)] hover:bg-[var(--glass-bg-hover)]",
-            "focus-visible:ring-2 focus-visible:ring-violet-500/80 focus-visible:outline-hidden"
-          )}
-          title={language === "vi" ? "Thay đổi hình nền" : "Change Wallpaper"}
-        >
-          <Palette
-            size={16}
-            className="text-cyan-600 transition-colors group-hover:text-cyan-700 dark:text-cyan-400 dark:group-hover:text-cyan-300"
-          />
-        </motion.button>
-
-        {/* Bộ chuyển đổi Giao diện Sáng / Tối (Light & Dark Theme Switcher) */}
-        <div
-          id="home-theme-segmented-control"
-          data-name="Bộ chọn Giao diện Sáng Tối Trang Chủ"
-          className="flex items-center gap-0.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-100/80 dark:bg-black/40 p-1 backdrop-blur-none"
-        >
-          {/* Nút Giao diện Sáng */}
-          <button
-            type="button"
-            id="home-theme-light-btn"
-            onClick={() => handleSelectThemeMode("light")}
-            className={cn(
-              "relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer select-none",
-              currentThemeMode === "light"
-                ? "bg-amber-400 text-slate-950 shadow-sm shadow-amber-500/20 font-black"
-                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
-            )}
-            title={language === "vi" ? "Chuyển sang Giao diện Sáng" : "Switch to Light Theme"}
-          >
-            <Sun
-              size={15}
-              className={cn(
-                "transition-transform",
-                currentThemeMode === "light"
-                  ? "text-slate-950 fill-amber-200 animate-[spin_12s_linear_infinite]"
-                  : "text-amber-500"
-              )}
-            />
-            <span className="hidden md:inline">{language === "vi" ? "Sáng" : "Light"}</span>
-          </button>
-
-          {/* Nút Giao diện Tối */}
-          <button
-            type="button"
-            id="home-theme-dark-btn"
-            onClick={() => handleSelectThemeMode("dark")}
-            className={cn(
-              "relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer select-none",
-              currentThemeMode === "dark"
-                ? "bg-indigo-600 text-white shadow-sm shadow-indigo-500/30 font-black"
-                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
-            )}
-            title={language === "vi" ? "Chuyển sang Giao diện Tối" : "Switch to Dark Theme"}
-          >
-            <Moon
-              size={15}
-              className={cn(
-                "transition-transform",
-                currentThemeMode === "dark"
-                  ? "text-white fill-indigo-200 animate-pulse"
-                  : "text-indigo-400"
-              )}
-            />
-            <span className="hidden md:inline">{language === "vi" ? "Tối" : "Dark"}</span>
-          </button>
-
-          {/* Nút Đồng bộ Hệ thống (Tự động) */}
-          <button
-            type="button"
-            id="home-theme-system-btn"
-            onClick={() => handleSelectThemeMode("system")}
-            className={cn(
-              "flex items-center justify-center p-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer select-none",
-              currentThemeMode === "system"
-                ? "bg-violet-600 text-white shadow-sm shadow-violet-500/30"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
-            )}
-            title={language === "vi" ? "Tự động đồng bộ theo Hệ thống" : "Auto-sync with System Theme"}
-          >
-            <Laptop
-              size={14}
-              className={cn(
-                currentThemeMode === "system" ? "text-white" : "text-slate-500 dark:text-slate-400"
-              )}
-            />
-          </button>
-        </div>
-
-        {/* Nút ngôn ngữ (Language Switcher - Full Name) */}
-        <LanguageSwitcher
-          variant="default"
-          showLabel={true}
-          id="home-top-right-language-switcher"
-          className="[&>button]:!border-0 [&>button]:!bg-transparent [&>button]:!shadow-none [&>button]:px-3 [&>button]:py-2 [&>button]:rounded-xl hover:[&>button]:bg-[var(--glass-bg-hover)]"
-        />
-      </motion.div>
+      {/* Top Right Stacked Interactive Action Cluster (Ngôn ngữ xếp chồng Giao diện xếp chồng Hình nền) */}
+      <TopNavActionStack
+        currentThemeMode={currentThemeMode}
+        onToggleThemeMode={handleToggleThemeMode}
+        onNavigate={onNavigate}
+        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[60]"
+      />
 
       {/* Middle Right Arrow Button */}
       <AnimatePresence>
@@ -757,7 +615,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                   true,
                 )
               }
-              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-slate-900/40 text-white shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-none transition-all hover:scale-110 hover:bg-slate-900/60 active:scale-95"
+              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/60 dark:border-white/20 bg-white/20 dark:bg-slate-900/40 text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl transition-all hover:scale-110 hover:bg-white/30 dark:hover:bg-slate-900/60 active:scale-95"
               title={
                 videoState === "idle_1"
                   ? "Chuyển sang Màn hình 2"
@@ -801,7 +659,7 @@ export function Home({ uiStyle = "glass", onNavigate }: HomeProps) {
                   data-name="Nút hủy video đang phát (Cancel Intro Video Button)"
                   type="button"
                   onClick={handleCancelIntro}
-                  className="flex w-[281px] h-[51px] cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-indigo-400/80 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_0_25px_rgba(99,102,241,0.6)] backdrop-blur-none transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
+                  className="flex w-[281px] h-[51px] cursor-pointer items-center justify-between px-3.5 py-2 rounded-full border-2 border-white/60 dark:border-white/20 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 shadow-[0_4px_25px_rgba(99,102,241,0.5)] backdrop-blur-xl transition-all duration-300 hover:from-blue-500 hover:to-violet-500 text-xs font-black text-white sm:text-sm"
                   style={{ width: "281px", height: "51px" }}
                   title={language === "vi" ? "Dừng video giới thiệu" : "Stop Intro Video"}
                 >

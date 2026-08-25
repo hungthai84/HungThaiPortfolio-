@@ -339,6 +339,29 @@ export const pageSummariesData: Record<PageId, PageSummaryInfo> = {
       },
     ],
   },
+  tuvi: {
+    pageId: "tuvi",
+    titleVi: "Tổng Kết Tử Vi Bản Mệnh (Horoscope Summary)",
+    titleEn: "Horoscope & Five-Elements Destiny Summary",
+    bannerQuoteVi:
+      "“Tâm tĩnh như thủy, trí sáng như kim – 22 năm rèn giũa đạo tâm và mưu lược vận hành.”",
+    bannerQuoteEn:
+      "“Mind calm as water, intellect sharp as gold – 22 years of cultivating operational wisdom and ethical leadership.”",
+    qnaList: [
+      {
+        qVi: "Bản mệnh Giáp Tý 1984 mang ý nghĩa gì trong sự nghiệp quản trị?",
+        aVi: "Mệnh Hải Trung Kim tượng trưng cho nguồn nội lực thâm sâu, bền bỉ, tính cách điềm tĩnh và tư duy chiến lược dài hạn.",
+        qEn: "What does the 1984 Giáp Tý destiny signify in management?",
+        aEn: "Sea Metal (Hải Trung Kim) represents deep inner resilience, steady composure, and strategic long-term execution.",
+      },
+      {
+        qVi: "Triết lý ngũ hành được ứng dụng vào vận hành CX như thế nào?",
+        aVi: "Hài hòa giữa Kim (quy trình SLA), Thủy (luồng dữ liệu CRM/AI), Mộc (phát triển nhân tài), Hỏa (nhiệt huyết CX) và Thổ (hạ tầng vững chắc).",
+        qEn: "How is the five-elements philosophy applied to CX operations?",
+        aEn: "Harmonizes Metal (SLA processes), Water (CRM/AI data flow), Wood (talent coaching), Fire (CX passion), and Earth (infrastructure stability).",
+      },
+    ],
+  },
   websiteManagement: {
     pageId: "websiteManagement",
     titleVi: "Hệ Thống Quản Trị Website (Website System)",

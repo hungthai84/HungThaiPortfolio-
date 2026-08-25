@@ -190,7 +190,7 @@ function MilestoneCard({ item, isVi, isSelected, onSelect }: MilestoneCardProps)
         whileHover={{ y: -2 }}
         onClick={onSelect}
         className={cn(
-          "flex-1 rounded-[18px] border bg-white/35 dark:bg-slate-900/60 backdrop-blur-[10px] p-4 sm:p-4.5 shadow-[0_2px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_15px_rgba(0,0,0,0.35)] transition-all duration-300 border-white/40 dark:border-white/10 hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/40 mb-3",
+          "flex-1 rounded-2xl border !bg-transparent !border-none !shadow-none backdrop-blur-none p-4 sm:p-4.5 shadow-sm transition-all duration-300 !border-none hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/40 mb-3",
           isSelected && "border-indigo-400/80 dark:border-indigo-500 bg-indigo-50/30 dark:bg-indigo-950/40 ring-1 ring-indigo-400/50"
         )}
       >
